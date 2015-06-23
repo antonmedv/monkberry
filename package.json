@@ -1,0 +1,28 @@
+{
+  "name": "monkberry",
+  "version": "1.0.0",
+  "description": "DOM Template Engine",
+  "main": "lib/mockberry.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/monkberry/monkberry.git"
+  },
+  "keywords": [
+    "dom",
+    "template",
+    "view"
+  ],
+  "author": "Anton Medvedev <anton@elfet.ru>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/monkberry/monkberry/issues"
+  },
+  "homepage": "https://github.com/monkberry/monkberry#readme",
+  "dependencies": {
+    "asciitree": "^1.0.0",
+    "htmlparser2": "^3.8.3"
+  }
+}

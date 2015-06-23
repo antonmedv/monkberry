@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+var fs = require('fs');
+var path = require('path');
+var Monkberry = require('../lib/monkberry.js');
+
+var args = process.argv.slice(2);
+var filePath = args.pop();
+var name = path.parse(filePath).name;
+
+fs.readFile(filePath, {encoding: 'utf8'}, function (err, data) {
+  if (err) {
+    throw err;
+  }
+  Monkberry(name, data, {
+    normalizeWhitespace: true
+  }, function (code) {
+    console.log(code);
+  });
+});
