@@ -6,7 +6,7 @@
     this.wrappers = {};
   }
 
-  Monkberry.prototype.foreach = function (parent, node, children, template, data) {
+  Monkberry.prototype.foreach = function foreach(parent, node, children, template, data) {
     var i, j, len, childrenSize = Map.size(children);
 
     len = childrenSize - data.length;
@@ -40,7 +40,7 @@
     }
   };
 
-  Monkberry.prototype.render = function (name, values, no_cache) {
+  Monkberry.prototype.render = function render(name, values, no_cache) {
     no_cache = no_cache || false;
 
     if (this.templates[name]) {
@@ -55,9 +55,17 @@
         }
       }
 
-      view.appendTo = function (node) {
-        for (var i of view.nodes) {
-          node.appendChild(i);
+      view.appendTo = function (toNode) {
+        for (var node of view.nodes) {
+          if (node instanceof MonkberryNode) {
+            toNode.appendChild(node.placeholderNode);
+            node.appendTo(node.placeholderNode);
+          } else if (toNode instanceof MonkberryNode) {
+            toNode.appendChild(node);
+            toNode.appendTo(toNode.placeholderNode);
+          } else {
+            toNode.appendChild(node);
+          }
         }
       };
 
@@ -82,20 +90,20 @@
     }
   };
 
-  Monkberry.prototype.prerender = function (name, times) {
+  Monkberry.prototype.prerender = function prerender(name, times) {
     while (times--) {
       this.pool.push(name, this.render(name, undefined, true));
     }
   };
 
-  Monkberry.prototype.mount = function (templates) {
+  Monkberry.prototype.mount = function mount(templates) {
     var _this = this;
     Object.keys(templates).forEach(function (name) {
       _this.templates[name] = templates[name];
     });
   };
 
-  Monkberry.prototype.willWrap = function (name, wrap) {
+  Monkberry.prototype.willWrap = function willWrap(name, wrap) {
     this.wrappers[name] = wrap;
   };
 
@@ -103,14 +111,14 @@
     this.store = {};
   }
 
-  Pool.prototype.push = function (name, view) {
+  Pool.prototype.push = function push(name, view) {
     if (!this.store[name]) {
       this.store[name] = [];
     }
     this.store[name].push(view);
   };
 
-  Pool.prototype.pull = function (name) {
+  Pool.prototype.pull = function pull(name) {
     if (this.store[name]) {
       return this.store[name].pop();
     } else {
@@ -121,7 +129,7 @@
   function Map() {
   }
 
-  Map.max = function (map) {
+  Map.max = function max(map) {
     var max = 0;
     for (var i in map) if (map.hasOwnProperty(i)) {
       if (i > max) {
@@ -131,17 +139,17 @@
     return parseInt(max);
   };
 
-  Map.push = function (map, element) {
+  Map.push = function push(map, element) {
     var max = Map.max(map) + 1;
     map[max] = element;
     return max;
   };
 
-  Map.remove = function (map, i) {
+  Map.remove = function remove(map, i) {
     delete map[i];
   };
 
-  Map.size = function (map) {
+  Map.size = function size(map) {
     var size = 0;
     for (var i in map) if (map.hasOwnProperty(i)) {
       size++;
@@ -149,5 +157,34 @@
     return size;
   };
 
+  function MonkberryNode(comment) {
+    this.children = [];
+    this.placeholderNode = document.createComment(comment || 'node');
+  }
+
+  MonkberryNode.prototype.parentNode = {
+    removeChild: function (node) {
+      for (var i = 0, len = node.children.length; i < len; i++) {
+        if (node.children[i].parentNode) {
+          node.children[i].parentNode.removeChild(node.children[i]);
+          node.children.splice(i, 1);
+        }
+      }
+    }
+  };
+
+  MonkberryNode.prototype.appendChild = function appendChild(node) {
+    this.children.push(node);
+  };
+
+  MonkberryNode.prototype.appendTo = function appendTo(node) {
+    if (node.parentNode) {
+      for (var i of this.children) {
+        node.parentNode.insertBefore(i, node);
+      }
+    }
+  };
+
+  window.MonkberryNode = MonkberryNode;
   window.monkberry = new Monkberry();
 })(window);
