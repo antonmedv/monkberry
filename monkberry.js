@@ -167,7 +167,7 @@
     this.placeholderNode = document.createComment(comment || 'node');
   }
 
-  PseudoNode.prototype.remove = function () {
+  PseudoNode.prototype.remove = function remove() {
     for (var i = 0, len = this.children.length; i < len; i++) {
       if (this.children[i].parentNode) {
         this.children[i].parentNode.removeChild(this.children[i]);
@@ -176,7 +176,7 @@
     }
   };
 
-  PseudoNode.prototype.pushChild = function appendChild(node) {
+  PseudoNode.prototype.pushChild = function pushChild(node) {
     this.children.push(node);
   };
 
