@@ -56,13 +56,14 @@
       }
 
       view.appendTo = function (toNode) {
-        for (var node of view.nodes) {
-          if (node instanceof MonkberryNode) {
-            toNode.appendChild(node.placeholderNode);
-            node.appendTo(node.placeholderNode);
-          } else if (toNode instanceof MonkberryNode) {
-            toNode.appendChild(node);
-            toNode.appendTo(toNode.placeholderNode);
+        for (var i = 0, len = view.nodes.length; i < len; i++) {
+          var node = view.nodes[i];
+          if (node instanceof PseudoNode) {
+            node.appendTo(toNode);
+            node.insertBeforePlaceholder();
+          } else if (toNode instanceof PseudoNode) {
+            toNode.pushChild(node);
+            toNode.insertBeforePlaceholder();
           } else {
             toNode.appendChild(node);
           }
@@ -70,8 +71,12 @@
       };
 
       view.remove = function () {
-        for (var node of view.nodes) {
-          node.parentNode.removeChild(node);
+        for (var i = 0, len = view.nodes.length; i < len; i++) {
+          if (view.nodes[i] instanceof PseudoNode) {
+            view.nodes[i].remove();
+          } else {
+            view.nodes[i].parentNode.removeChild(view.nodes[i]);
+          }
         }
         self.pool.push(name, view);
       };
@@ -103,8 +108,8 @@
     });
   };
 
-  Monkberry.prototype.willWrap = function willWrap(name, wrap) {
-    this.wrappers[name] = wrap;
+  Monkberry.prototype.pnode = function pnode(comment) {
+    return new PseudoNode(comment);
   };
 
   function Pool() {
@@ -157,34 +162,35 @@
     return size;
   };
 
-  function MonkberryNode(comment) {
+  function PseudoNode(comment) {
     this.children = [];
     this.placeholderNode = document.createComment(comment || 'node');
   }
 
-  MonkberryNode.prototype.parentNode = {
-    removeChild: function (node) {
-      for (var i = 0, len = node.children.length; i < len; i++) {
-        if (node.children[i].parentNode) {
-          node.children[i].parentNode.removeChild(node.children[i]);
-          node.children.splice(i, 1);
-        }
+  PseudoNode.prototype.remove = function () {
+    for (var i = 0, len = this.children.length; i < len; i++) {
+      if (this.children[i].parentNode) {
+        this.children[i].parentNode.removeChild(this.children[i]);
+        this.children.splice(i, 1);
       }
     }
   };
 
-  MonkberryNode.prototype.appendChild = function appendChild(node) {
+  PseudoNode.prototype.pushChild = function appendChild(node) {
     this.children.push(node);
   };
 
-  MonkberryNode.prototype.appendTo = function appendTo(node) {
-    if (node.parentNode) {
-      for (var i of this.children) {
-        node.parentNode.insertBefore(i, node);
+  PseudoNode.prototype.appendTo = function appendTo(node) {
+    node.appendChild(this.placeholderNode);
+  };
+
+  PseudoNode.prototype.insertBeforePlaceholder = function insertBeforePlaceholder() {
+    if (this.placeholderNode.parentNode) {
+      for (var i = 0, len = this.children.length; i < len; i++) {
+        this.placeholderNode.parentNode.insertBefore(this.children[i], this.placeholderNode);
       }
     }
   };
 
-  window.MonkberryNode = MonkberryNode;
   window.monkberry = new Monkberry();
 })(window);
