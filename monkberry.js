@@ -6,8 +6,8 @@
     this.wrappers = {};
   }
 
-  Monkberry.prototype.foreach = function foreach(parent, node, children, template, data) {
-    var i, j, len, childrenSize = Map.size(children);
+  Monkberry.prototype.foreach = function (parent, node, children, template, data) {
+    var i, j, len, childrenSize = size(children);
 
     len = childrenSize - data.length;
     for (i in children) if (children.hasOwnProperty(i)) {
@@ -26,48 +26,47 @@
     for (j = childrenSize, len = data.length; j < len; j++) {
       var view = this.render(template, data[j]);
       view.parent = parent;
-
       view.appendTo(node);
-      i = Map.push(children, view);
+      i = push(children, view);
 
-      var removeNodes = view.remove;
-      view.remove = (function (i, view, removeNodes) {
+      var viewRemove = view.remove;
+      view.remove = (function (i, viewRemove) {
         return function () {
-          removeNodes();
-          Map.remove(children, i);
+          viewRemove();
+          remove(children, i);
         };
-      })(i, view, removeNodes);
+      })(i, viewRemove);
     }
   };
 
-  Monkberry.prototype.iftest = function iftest(parent, node, ref/*.child*/, template, data, test) {
-    if (ref.child) {
+  Monkberry.prototype.iftest = function (parent, node, child/*.ref*/, template, data, test) {
+    if (child.ref) {
       if (test) {
-        ref.child.update(data);
+        child.ref.update(data);
       }
       else {
-        ref.child.remove();
+        child.ref.remove();
       }
     } else if (test) {
       var view = this.render(template, data);
       view.parent = parent;
       view.appendTo(node);
 
-      var removeNodes = view.remove;
+      var viewRemove = view.remove;
       view.remove = function () {
-        removeNodes();
-        ref.child = null;
+        viewRemove();
+        child.ref = null;
       };
 
-      ref.child = view;
+      child.ref = view;
     }
   };
 
-  Monkberry.prototype.render = function render(name, values, no_cache) {
+  Monkberry.prototype.render = function (name, values, no_cache) {
     no_cache = no_cache || false;
 
     if (this.templates[name]) {
-      var view;
+      var view, self = this;
 
       if (no_cache) {
         view = this.templates[name]();
@@ -80,38 +79,37 @@
 
       view.appendTo = function (toNode) {
         for (var i = 0, len = view.nodes.length; i < len; i++) {
-          var node = view.nodes[i];
-          if (node instanceof PseudoNode) {
-            node.appendTo(toNode);
-          } else if (toNode instanceof PseudoNode) {
-            toNode.appendChild(node);
-
-            view.onRemove.push((function (node) {
-              return function () {
-                var pos = toNode.children.indexOf(node);
-                if (pos !== -1) {
-                  toNode.children.splice(pos, 1);
-                }
-              }
-            })(node));
-
+          if (toNode.nodeType == 8) {
+            if (toNode.parentNode) {
+              toNode.parentNode.insertBefore(view.nodes[i], toNode);
+            } else {
+              throw new Error("Can not insert child view into parent view.");
+            }
           } else {
-            toNode.appendChild(node);
+            toNode.appendChild(view.nodes[i]);
           }
         }
       };
 
-      view.onRemove = [];
+      view.root = function (toNode) {
+        if (view.nodes.length == 1) {
+          return view.nodes[0];
+        } else {
+          var fragment = document.createDocumentFragment();
+          for (var i = 0, len = view.nodes.length; i < len; i++) {
+            fragment.appendChild(view.nodes[i]);
+          }
+          return fragment;
+        }
+      };
 
       view.remove = function () {
-        for (var i = 0, len = view.nodes.length; i < len; i++) {
+        var i = view.nodes.length;
+        while (i--) {
+          console.log('Remove', view.nodes[i]);
           view.nodes[i].parentNode.removeChild(view.nodes[i]);
         }
-
-        var callback;
-        while (callback = view.onRemove.pop()) {
-          callback();
-        }
+        self.pool.push(name, view);
       };
 
       if (values !== undefined) {
@@ -130,35 +128,31 @@
     }
   };
 
-  Monkberry.prototype.prerender = function prerender(name, times) {
+  Monkberry.prototype.prerender = function (name, times) {
     while (times--) {
       this.pool.push(name, this.render(name, undefined, true));
     }
   };
 
-  Monkberry.prototype.mount = function mount(templates) {
+  Monkberry.prototype.mount = function (templates) {
     var _this = this;
     Object.keys(templates).forEach(function (name) {
       _this.templates[name] = templates[name];
     });
   };
 
-  Monkberry.prototype.pnode = function pnode(comment) {
-    return new PseudoNode(comment);
-  };
-
   function Pool() {
     this.store = {};
   }
 
-  Pool.prototype.push = function push(name, view) {
+  Pool.prototype.push = function (name, view) {
     if (!this.store[name]) {
       this.store[name] = [];
     }
     this.store[name].push(view);
   };
 
-  Pool.prototype.pull = function pull(name) {
+  Pool.prototype.pull = function (name) {
     if (this.store[name]) {
       return this.store[name].pop();
     } else {
@@ -166,93 +160,35 @@
     }
   };
 
-  function Map() {
-  }
+  // Helper functions
 
-  Map.max = function max(map) {
-    var max = 0;
+  function max(map) {
+    var maximum = 0;
     for (var i in map) if (map.hasOwnProperty(i)) {
-      if (i > max) {
-        max = i;
+      if (i > maximum) {
+        maximum = i;
       }
     }
-    return parseInt(max);
-  };
+    return parseInt(maximum);
+  }
 
-  Map.push = function push(map, element) {
-    var max = Map.max(map) + 1;
-    map[max] = element;
-    return max;
-  };
+  function push(map, element) {
+    var maximum = max(map) + 1;
+    map[maximum] = element;
+    return maximum;
+  }
 
-  Map.remove = function remove(map, i) {
+  function remove(map, i) {
     delete map[i];
-  };
+  }
 
-  Map.size = function size(map) {
+  function size(map) {
     var size = 0;
     for (var i in map) if (map.hasOwnProperty(i)) {
       size++;
     }
     return size;
-  };
-
-  function PseudoNode(comment) {
-    this.children = [];
-    this.placeholderNode = document.createComment(comment || 'node');
   }
-
-  PseudoNode.prototype.remove = function remove() {
-    for (var i = 0, len = this.children.length; i < len; i++) {
-      if (this.children[i].parentNode) {
-        this.children[i].parentNode.removeChild(this.children[i]);
-        this.children.splice(i, 1);
-      }
-    }
-  };
-
-  PseudoNode.prototype.appendChild = function appendChild(node) {
-    this.children.push(node);
-    if (this.placeholderNode.parentNode) {
-      this.placeholderNode.parentNode.insertBefore(node, this.placeholderNode);
-    }
-  };
-
-  PseudoNode.prototype.appendTo = function appendTo(node) {
-    node.appendChild(this.placeholderNode);
-
-    for (var i = 0, len = this.children.length; i < len; i++) {
-      this.placeholderNode.parentNode.insertBefore(this.children[i], this.placeholderNode);
-    }
-
-    // After appending pseudo node to real node, be able to delete itself.
-    var self = this;
-    this.parentNode = {
-      removeChild: function (node) {
-        if (node instanceof PseudoNode && node === self) {
-          var filteredChildren = [];
-
-          for (var i = 0, len = node.children.length; i < len; i++) {
-            self.placeholderNode.parentNode.removeChild(node.children[i]);
-            if (self.children.indexOf(node.children[i]) == -1) {
-              filteredChildren.push(node.children[i]);
-            }
-          }
-
-          self.children = filteredChildren;
-
-        } else {
-          throw new Error('You are trying to remove from pseudo node another node or another type.');
-        }
-      }
-    };
-  };
-
-  PseudoNode.prototype.setAttribute = function setAttribute(attr, value) {
-    for (var i = 0, len = this.children.length; i < len; i++) {
-      this.children[i].setAttribute(attr, value);
-    }
-  };
 
   window.monkberry = new Monkberry();
 })(window);
