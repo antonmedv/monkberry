@@ -40,11 +40,34 @@
     }
   };
 
+  Monkberry.prototype.iftest = function iftest(parent, node, ref/*.child*/, template, data, test) {
+    if (ref.child) {
+      if (test) {
+        ref.child.update(data);
+      }
+      else {
+        ref.child.remove();
+      }
+    } else if (test) {
+      var view = this.render(template, data);
+      view.parent = parent;
+      view.appendTo(node);
+
+      var removeNodes = view.remove;
+      view.remove = function () {
+        removeNodes();
+        ref.child = null;
+      };
+
+      ref.child = view;
+    }
+  };
+
   Monkberry.prototype.render = function render(name, values, no_cache) {
     no_cache = no_cache || false;
 
     if (this.templates[name]) {
-      var view, self = this;
+      var view;
 
       if (no_cache) {
         view = this.templates[name]();
@@ -60,33 +83,45 @@
           var node = view.nodes[i];
           if (node instanceof PseudoNode) {
             node.appendTo(toNode);
-            node.insertBeforePlaceholder();
           } else if (toNode instanceof PseudoNode) {
-            toNode.pushChild(node);
-            toNode.insertBeforePlaceholder();
+            toNode.appendChild(node);
+
+            view.onRemove.push((function (node) {
+              return function () {
+                var pos = toNode.children.indexOf(node);
+                if (pos !== -1) {
+                  toNode.children.splice(pos, 1);
+                }
+              }
+            })(node));
+
           } else {
             toNode.appendChild(node);
           }
         }
       };
 
+      view.onRemove = [];
+
       view.remove = function () {
         for (var i = 0, len = view.nodes.length; i < len; i++) {
-          if (view.nodes[i] instanceof PseudoNode) {
-            view.nodes[i].remove();
-          } else {
-            view.nodes[i].parentNode.removeChild(view.nodes[i]);
-          }
+          view.nodes[i].parentNode.removeChild(view.nodes[i]);
         }
-        self.pool.push(name, view);
+
+        var callback;
+        while (callback = view.onRemove.pop()) {
+          callback();
+        }
       };
 
       if (values !== undefined) {
         view.update(values);
       }
 
-      if (this.wrappers[name]) {
+      view.wrapped = view.wrapped || {};
+      if (this.wrappers[name] && !view.wrapped[name]) {
         view = this.wrappers[name](view);
+        view.wrapped[name] = true;
       }
 
       return view;
@@ -176,19 +211,46 @@
     }
   };
 
-  PseudoNode.prototype.pushChild = function pushChild(node) {
+  PseudoNode.prototype.appendChild = function appendChild(node) {
     this.children.push(node);
+    if (this.placeholderNode.parentNode) {
+      this.placeholderNode.parentNode.insertBefore(node, this.placeholderNode);
+    }
   };
 
   PseudoNode.prototype.appendTo = function appendTo(node) {
     node.appendChild(this.placeholderNode);
+
+    for (var i = 0, len = this.children.length; i < len; i++) {
+      this.placeholderNode.parentNode.insertBefore(this.children[i], this.placeholderNode);
+    }
+
+    // After appending pseudo node to real node, be able to delete itself.
+    var self = this;
+    this.parentNode = {
+      removeChild: function (node) {
+        if (node instanceof PseudoNode && node === self) {
+          var filteredChildren = [];
+
+          for (var i = 0, len = node.children.length; i < len; i++) {
+            self.placeholderNode.parentNode.removeChild(node.children[i]);
+            if (self.children.indexOf(node.children[i]) == -1) {
+              filteredChildren.push(node.children[i]);
+            }
+          }
+
+          self.children = filteredChildren;
+
+        } else {
+          throw new Error('You are trying to remove from pseudo node another node or another type.');
+        }
+      }
+    };
   };
 
-  PseudoNode.prototype.insertBeforePlaceholder = function insertBeforePlaceholder() {
-    if (this.placeholderNode.parentNode) {
-      for (var i = 0, len = this.children.length; i < len; i++) {
-        this.placeholderNode.parentNode.insertBefore(this.children[i], this.placeholderNode);
-      }
+  PseudoNode.prototype.setAttribute = function setAttribute(attr, value) {
+    for (var i = 0, len = this.children.length; i < len; i++) {
+      this.children[i].setAttribute(attr, value);
     }
   };
 
