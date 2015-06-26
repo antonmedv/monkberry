@@ -83,7 +83,8 @@
             if (toNode.parentNode) {
               toNode.parentNode.insertBefore(view.nodes[i], toNode);
             } else {
-              throw new Error("Can not insert child view into parent view.");
+              throw new Error("Can not insert child view into parent node." +
+              "Look like some custom tag(or if/for) be placed inside another.");
             }
           } else {
             toNode.appendChild(view.nodes[i]);
@@ -91,7 +92,7 @@
         }
       };
 
-      view.root = function (toNode) {
+      view.getDom = function (toNode) {
         if (view.nodes.length == 1) {
           return view.nodes[0];
         } else {
