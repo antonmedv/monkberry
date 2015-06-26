@@ -1,19 +1,38 @@
 #!/usr/bin/env node
 var fs = require('fs');
 var path = require('path');
+var program = require('commander');
 var Monkberry = require('../lib/index.js');
 
-var args = process.argv.slice(2);
-var filePath = args.pop();
-var name = path.parse(filePath).name;
+program
+  .usage('[options] <file ...>')
+  .option('-o, --output [file]', 'output file name, if not specified will write to stdout.')
+  .option('-w, --whitespace', 'keep whitespaces')
+  .parse(process.argv);
 
-fs.readFile(filePath, {encoding: 'utf8'}, function (err, data) {
-  if (err) {
-    throw err;
-  }
-  Monkberry(name, data, {
-    normalizeWhitespace: true
-  }, function (code) {
-    console.log(code);
+var compiler = null;
+
+program.args.forEach(function (file) {
+  var name = path.parse(file).name;
+  var text = fs.readFileSync(file, {encoding: 'utf8'});
+  Monkberry(name, text, {
+    normalizeWhitespace: program.whitespace ? false : true
+  }, function (forFile) {
+    if (compiler) {
+      compiler.subTemplates.push(forFile);
+    } else {
+      compiler = forFile;
+    }
   });
 });
+
+if (compiler) {
+  var code = compiler.compile();
+  if (program.output) {
+    fs.writeFileSync(program.output, code, {encoding: 'utf8'});
+  } else {
+    console.log(code);
+  }
+} else {
+  program.outputHelp();
+}
