@@ -1,4 +1,4 @@
-(function (window) {
+(function () {
   function Monkberry() {
     this.pool = new Pool();
     this.templates = {};
@@ -106,7 +106,6 @@
       view.remove = function () {
         var i = view.nodes.length;
         while (i--) {
-          console.log('Remove', view.nodes[i]);
           view.nodes[i].parentNode.removeChild(view.nodes[i]);
         }
         self.pool.push(name, view);
@@ -190,5 +189,9 @@
     return size;
   }
 
-  window.monkberry = new Monkberry();
-})(window);
+  if (typeof module !== "undefined") {
+    module.exports = new Monkberry();
+  } else {
+    window.monkberry = new Monkberry();
+  }
+})();

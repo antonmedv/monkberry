@@ -2,10 +2,12 @@
   "name": "monkberry",
   "version": "1.0.0",
   "description": "DOM Template Engine",
+  "bin": "./bin/monkberry",
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "browser": "./monkberry.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/monkberry/monkberry.git"
@@ -24,6 +26,7 @@
   "dependencies": {
     "asciitree": "^1.0.0",
     "commander": "^2.8.1",
-    "htmlparser2": "^3.8.3"
+    "htmlparser2": "^3.8.3",
+    "through": "^2.3.7"
   }
 }
