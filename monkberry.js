@@ -24,9 +24,11 @@
     }
 
     for (j = childrenSize, len = data.length; j < len; j++) {
-      var view = this.render(template, data[j]);
+      var view = this.render(template);
       view.parent = parent;
+      parent.children.push(view);
       view.appendTo(node);
+      view.update(data[j]);
       i = push(children, view);
 
       var viewRemove = view.remove;
@@ -48,17 +50,18 @@
         child.ref.remove();
       }
     } else if (test) {
-      var view = this.render(template, data);
+      var view = this.render(template);
       view.parent = parent;
+      parent.children.push(view);
       view.appendTo(node);
+      view.update(data);
+      child.ref = view;
 
       var viewRemove = view.remove;
       view.remove = function () {
         viewRemove();
         child.ref = null;
       };
-
-      child.ref = view;
     }
   };
 
@@ -77,6 +80,9 @@
         }
       }
 
+      view.parent = null;
+      view.children = [];
+
       view.appendTo = function (toNode) {
         for (var i = 0, len = view.nodes.length; i < len; i++) {
           if (toNode.nodeType == 8) {
@@ -84,7 +90,7 @@
               toNode.parentNode.insertBefore(view.nodes[i], toNode);
             } else {
               throw new Error("Can not insert child view into parent node." +
-              "Look like some custom tag(or if/for) be placed inside another.");
+              "You need append your view first and then update.");
             }
           } else {
             toNode.appendChild(view.nodes[i]);
@@ -105,9 +111,20 @@
       };
 
       view.remove = function () {
+        // Remove appended nodes
         var i = view.nodes.length;
         while (i--) {
           view.nodes[i].parentNode.removeChild(view.nodes[i]);
+        }
+        // Remove all children views
+        i = view.children.length;
+        while (i--) {
+          view.children[i].remove();
+        }
+        // Remove this view from parent views children.
+        if (view.parent) {
+          i = view.parent.children.indexOf(view);
+          view.parent.children.splice(i, 1);
         }
         self.pool.push(name, view);
       };
@@ -165,6 +182,7 @@
   function max(map) {
     var maximum = 0;
     for (var i in map) if (map.hasOwnProperty(i)) {
+      i = parseInt(i);
       if (i > maximum) {
         maximum = i;
       }
