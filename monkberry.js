@@ -6,7 +6,7 @@
     this.wrappers = {};
   }
 
-  Monkberry.prototype.foreach = function (parent, node, children, template, data) {
+  Monkberry.prototype.foreach = function (parent, node, children, template, data, options) {
     var i, j, len, childrenSize = size(children);
 
     len = childrenSize - data.length;
@@ -20,7 +20,8 @@
 
     j = 0;
     for (i in children) if (children.hasOwnProperty(i)) {
-      children[i].update(data[j++]);
+      children[i].update(forData(data[j], j, options));
+      j++;
     }
 
     for (j = childrenSize, len = data.length; j < len; j++) {
@@ -28,7 +29,7 @@
       view.parent = parent;
       parent.children.push(view);
       view.appendTo(node);
-      view.update(data[j]);
+      view.update(forData(data[j], j, options));
       i = push(children, view);
 
       var viewRemove = view.remove;
@@ -177,7 +178,7 @@
     }
   };
 
-  // Helper functions
+  // Helper functions for working with "map".
 
   function max(map) {
     var maximum = 0;
@@ -206,6 +207,23 @@
       size++;
     }
     return size;
+  }
+
+  // Helper function for working with foreach loops data.
+
+  function forData(data, i, options) {
+    if (options) {
+      var newData = {};
+      newData[options.valueName] = data;
+
+      if (options.keyName) {
+        newData[options.keyName] = i;
+      }
+
+      return newData;
+    } else {
+      return data;
+    }
   }
 
   if (typeof module !== "undefined") {
