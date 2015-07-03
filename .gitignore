@@ -5,3 +5,6 @@ pids
 
 # Dependency directory
 node_modules
+
+# Sub repositories
+benchmark
