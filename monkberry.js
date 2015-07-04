@@ -30,19 +30,19 @@
       parent.children.push(view);
       view.appendTo(node);
       view.update(forData(data[j], j, options));
-      i = push(children, view);
+      i = push(children, view); // TODO: Fix bottleneck
 
       var viewRemove = view.remove;
-      view.remove = (function (i, viewRemove) {
+      view.remove = (function (i, view, viewRemove) {
         return function () {
-          viewRemove();
+          viewRemove.call(view);
           remove(children, i);
         };
-      })(i, viewRemove);
+      })(i, view, viewRemove);
     }
   };
 
-  Monkberry.prototype.iftest = function (parent, node, child/*.ref*/, template, data, test) {
+  Monkberry.prototype.insert = function (parent, node, child/*.ref*/, template, data, test) {
     if (child.ref) {
       if (test) {
         child.ref.update(data);
@@ -60,7 +60,7 @@
 
       var viewRemove = view.remove;
       view.remove = function () {
-        viewRemove();
+        viewRemove.call(view);
         child.ref = null;
       };
     }
@@ -74,61 +74,16 @@
 
       if (no_cache) {
         view = this.templates[name]();
+        view.name = name;
+        view.pool = this.pool;
       } else {
         view = this.pool.pull(name);
         if (!view) {
           view = this.templates[name]();
+          view.name = name;
+          view.pool = this.pool;
         }
       }
-
-      view.parent = null;
-      view.children = [];
-
-      view.appendTo = function (toNode) {
-        for (var i = 0, len = view.nodes.length; i < len; i++) {
-          if (toNode.nodeType == 8) {
-            if (toNode.parentNode) {
-              toNode.parentNode.insertBefore(view.nodes[i], toNode);
-            } else {
-              throw new Error("Can not insert child view into parent node." +
-              "You need append your view first and then update.");
-            }
-          } else {
-            toNode.appendChild(view.nodes[i]);
-          }
-        }
-      };
-
-      view.getDom = function (toNode) {
-        if (view.nodes.length == 1) {
-          return view.nodes[0];
-        } else {
-          var fragment = document.createDocumentFragment();
-          for (var i = 0, len = view.nodes.length; i < len; i++) {
-            fragment.appendChild(view.nodes[i]);
-          }
-          return fragment;
-        }
-      };
-
-      view.remove = function () {
-        // Remove appended nodes
-        var i = view.nodes.length;
-        while (i--) {
-          view.nodes[i].parentNode.removeChild(view.nodes[i]);
-        }
-        // Remove all children views
-        i = view.children.length;
-        while (i--) {
-          view.children[i].remove();
-        }
-        // Remove this view from parent views children.
-        if (view.parent) {
-          i = view.parent.children.indexOf(view);
-          view.parent.children.splice(i, 1);
-        }
-        self.pool.push(name, view);
-      };
 
       if (values !== undefined) {
         view.update(values);
@@ -157,6 +112,63 @@
     Object.keys(templates).forEach(function (name) {
       _this.templates[name] = templates[name];
     });
+  };
+
+  Monkberry.prototype.view = function () {
+    return new View;
+  };
+
+  function View() {
+    this.name = '';
+    this.parent = null;
+    this.children = [];
+    this.nodes = [];
+  }
+
+  View.prototype.appendTo = function (toNode) {
+    for (var i = 0, len = this.nodes.length; i < len; i++) {
+      if (toNode.nodeType == 8) {
+        if (toNode.parentNode) {
+          toNode.parentNode.insertBefore(this.nodes[i], toNode);
+        } else {
+          throw new Error("Can not insert child view into parent node." +
+          "You need append your view first and then update.");
+        }
+      } else {
+        toNode.appendChild(this.nodes[i]);
+      }
+    }
+  };
+
+  View.prototype.dom = function (toNode) {
+    if (this.nodes.length == 1) {
+      return this.nodes[0];
+    } else {
+      var fragment = document.createDocumentFragment();
+      for (var i = 0, len = this.nodes.length; i < len; i++) {
+        fragment.appendChild(this.nodes[i]);
+      }
+      return fragment;
+    }
+  };
+
+  View.prototype.remove = function () {
+    // Remove appended nodes
+    var i = this.nodes.length;
+    while (i--) {
+      this.nodes[i].parentNode.removeChild(this.nodes[i]);
+    }
+    // Remove all children views
+    i = this.children.length;
+    while (i--) {
+      this.children[i].remove();
+    }
+    // Remove this view from parent views children.
+    if (this.parent) {
+      i = this.parent.children.indexOf(this);
+      this.parent.children.splice(i, 1);
+    }
+    this.pool.push(this.name, this);
   };
 
   function Pool() {
