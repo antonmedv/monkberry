@@ -7,20 +7,20 @@
   }
 
   Monkberry.prototype.foreach = function (parent, node, children, template, data, options) {
-    var i, j, len, childrenSize = size(children);
+    var i, j, len, childrenSize = children.length;
 
     len = childrenSize - data.length;
-    for (i in children) if (children.hasOwnProperty(i)) {
+    for (i in children.items) {
       if (len-- > 0) {
-        children[i].remove();
+        children.items[i].remove();
       } else {
         break;
       }
     }
 
     j = 0;
-    for (i in children) if (children.hasOwnProperty(i)) {
-      children[i].update(forData(data[j], j, options));
+    for (i in children.items) {
+      children.items[i].update(forData(data[j], j, options));
       j++;
     }
 
@@ -30,15 +30,12 @@
       parent.children.push(view);
       view.appendTo(node);
       view.update(forData(data[j], j, options));
-      i = push(children, view); // TODO: Fix bottleneck
-
-      var viewRemove = view.remove;
-      view.remove = (function (i, view, viewRemove) {
+      i = children.push(view);
+      view.onRemove = (function (i) {
         return function () {
-          viewRemove.call(view);
-          remove(children, i);
+          children.remove(i);
         };
-      })(i, view, viewRemove);
+      })(i);
     }
   };
 
@@ -57,10 +54,7 @@
       view.appendTo(node);
       view.update(data);
       child.ref = view;
-
-      var viewRemove = view.remove;
-      view.remove = function () {
-        viewRemove.call(view);
+      view.onRemove = function () {
         child.ref = null;
       };
     }
@@ -118,6 +112,10 @@
     return new View;
   };
 
+  Monkberry.prototype.map = function () {
+    return new Map;
+  };
+
   function View() {
     this.name = '';
     this.parent = null;
@@ -158,6 +156,10 @@
     while (i--) {
       this.nodes[i].parentNode.removeChild(this.nodes[i]);
     }
+    // Remove self from parent's children map
+    if (this.onRemove) {
+      this.onRemove();
+    }
     // Remove all children views
     i = this.children.length;
     while (i--) {
@@ -192,34 +194,25 @@
 
   // Helper functions for working with "map".
 
-  function max(map) {
-    var maximum = 0;
-    for (var i in map) if (map.hasOwnProperty(i)) {
-      i = parseInt(i);
-      if (i > maximum) {
-        maximum = i;
-      }
+  function Map() {
+    this.items = Object.create(null);
+    this.length = 0;
+    this.next = 0;
+  }
+
+  Map.prototype.push = function (element) {
+    this.items[this.next] = element;
+    this.length += 1;
+    this.next += 1;
+    return this.next - 1;
+  };
+
+  Map.prototype.remove = function (i) {
+    if (i in this.items) {
+      delete this.items[i];
+      this.length -= 1;
     }
-    return parseInt(maximum);
-  }
-
-  function push(map, element) {
-    var maximum = max(map) + 1;
-    map[maximum] = element;
-    return maximum;
-  }
-
-  function remove(map, i) {
-    delete map[i];
-  }
-
-  function size(map) {
-    var size = 0;
-    for (var i in map) if (map.hasOwnProperty(i)) {
-      size++;
-    }
-    return size;
-  }
+  };
 
   // Helper function for working with foreach loops data.
 
