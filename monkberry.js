@@ -1,4 +1,4 @@
-(function () {
+(function (document) {
   function Monkberry() {
     this.pool = new Pool();
     this.templates = {};
@@ -211,6 +211,9 @@
     if (i in this.items) {
       delete this.items[i];
       this.length -= 1;
+    } else {
+      // TODO: Remove this in future, after API stabilization.
+      throw new Error('You are trying to delete not existing element "' + i + '" form map.');
     }
   };
 
@@ -236,4 +239,4 @@
   } else {
     window.monkberry = new Monkberry();
   }
-})();
+})(window.document);
