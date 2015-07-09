@@ -6,21 +6,21 @@
     this.wrappers = {};
   }
 
-  Monkberry.prototype.foreach = function (parent, node, children, template, data, options) {
-    var i, j, len, childrenSize = children.length;
+  Monkberry.prototype.foreach = function (parent, node, map, template, data, options) {
+    var i, j, len, childrenSize = map.length;
 
     len = childrenSize - data.length;
-    for (i in children.items) {
+    for (i in map.items) {
       if (len-- > 0) {
-        children.items[i].remove();
+        map.items[i].remove();
       } else {
         break;
       }
     }
 
     j = 0;
-    for (i in children.items) {
-      children.items[i].update(forData(data[j], j, options));
+    for (i in map.items) {
+      map.items[i].update(forData(data[j], j, options));
       j++;
     }
 
@@ -43,10 +43,10 @@
       view.update(forData(data[j], j, options));
 
       // Remember to remove from children map on view remove
-      i = children.push(view);
+      i = map.push(view);
       view.onRemove = (function (i) {
         return function () {
-          children.remove(i);
+          map.remove(i);
         };
       })(i);
     }
@@ -161,7 +161,7 @@
         toNode.parentNode.insertBefore(this.nodes[i], toNode);
       } else {
         throw new Error("Can not insert child view into parent node." +
-        "You need append your view first and then update.");
+          "You need append your view first and then update.");
       }
     }
   };
