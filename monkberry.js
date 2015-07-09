@@ -25,11 +25,24 @@
     }
 
     for (j = childrenSize, len = data.length; j < len; j++) {
+      // Render new view
       var view = this.render(template);
+
+      // Set view hierarchy
       view.parent = parent;
       parent.children.push(view);
-      view.appendTo(node);
+
+      // Add nodes DOM
+      if (node.nodeType == 8) {
+        view.insertBefore(node);
+      } else {
+        view.appendTo(node);
+      }
+
+      // Set view data (note what it must be after adding nodes to DOM)
       view.update(forData(data[j], j, options));
+
+      // Remember to remove from children map on view remove
       i = children.push(view);
       view.onRemove = (function (i) {
         return function () {
@@ -48,11 +61,24 @@
         child.ref.remove();
       }
     } else if (test) {
+      // Render new view
       var view = this.render(template);
+
+      // Set view hierarchy
       view.parent = parent;
       parent.children.push(view);
-      view.appendTo(node);
+
+      // Add nodes DOM
+      if (node.nodeType == 8) {
+        view.insertBefore(node);
+      } else {
+        view.appendTo(node);
+      }
+
+      // Set view data (note what it must be after adding nodes to DOM)
       view.update(data);
+
+      // Remember to remove from children map on view remove
       child.ref = view;
       view.onRemove = function () {
         child.ref = null;
@@ -64,7 +90,7 @@
     no_cache = no_cache || false;
 
     if (this.templates[name]) {
-      var view, self = this;
+      var view;
 
       if (no_cache) {
         view = this.templates[name]();
@@ -125,15 +151,17 @@
 
   View.prototype.appendTo = function (toNode) {
     for (var i = 0, len = this.nodes.length; i < len; i++) {
-      if (toNode.nodeType == 8) {
-        if (toNode.parentNode) {
-          toNode.parentNode.insertBefore(this.nodes[i], toNode);
-        } else {
-          throw new Error("Can not insert child view into parent node." +
-          "You need append your view first and then update.");
-        }
+      toNode.appendChild(this.nodes[i]);
+    }
+  };
+
+  View.prototype.insertBefore = function (toNode) {
+    for (var i = 0, len = this.nodes.length; i < len; i++) {
+      if (toNode.parentNode) {
+        toNode.parentNode.insertBefore(this.nodes[i], toNode);
       } else {
-        toNode.appendChild(this.nodes[i]);
+        throw new Error("Can not insert child view into parent node." +
+        "You need append your view first and then update.");
       }
     }
   };
