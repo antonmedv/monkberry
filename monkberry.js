@@ -143,10 +143,10 @@
   };
 
   function View() {
-    this.name = '';
-    this.parent = null;
-    this.nested = [];
-    this.nodes = [];
+    this.name = ''; // Name of template
+    this.parent = null; // Parent view
+    this.nested = []; // Nested views
+    this.nodes = []; // Root DOM nodes
   }
 
   View.prototype.appendTo = function (toNode) {
@@ -198,6 +198,7 @@
       i = this.parent.nested.indexOf(this);
       this.parent.nested.splice(i, 1);
     }
+    // Store view in pool for reuse
     this.pool.push(this.name, this);
   };
 
@@ -245,8 +246,9 @@
     }
   };
 
-  // Helper function for working with foreach loops data.
-
+  /**
+   *  Helper function for working with foreach loops data.
+   */
   function forData(data, i, options) {
     if (options) {
       var newData = {};
