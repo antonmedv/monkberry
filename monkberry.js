@@ -30,7 +30,7 @@
 
       // Set view hierarchy
       view.parent = parent;
-      parent.children.push(view);
+      parent.nested.push(view);
 
       // Add nodes DOM
       if (node.nodeType == 8) {
@@ -66,7 +66,7 @@
 
       // Set view hierarchy
       view.parent = parent;
-      parent.children.push(view);
+      parent.nested.push(view);
 
       // Add nodes DOM
       if (node.nodeType == 8) {
@@ -145,7 +145,7 @@
   function View() {
     this.name = '';
     this.parent = null;
-    this.children = [];
+    this.nested = [];
     this.nodes = [];
   }
 
@@ -188,15 +188,15 @@
     if (this.onRemove) {
       this.onRemove();
     }
-    // Remove all children views
-    i = this.children.length;
+    // Remove all nested views
+    i = this.nested.length;
     while (i--) {
-      this.children[i].remove();
+      this.nested[i].remove();
     }
-    // Remove this view from parent views children.
+    // Remove this view from parent's nested views.
     if (this.parent) {
-      i = this.parent.children.indexOf(this);
-      this.parent.children.splice(i, 1);
+      i = this.parent.nested.indexOf(this);
+      this.parent.nested.splice(i, 1);
     }
     this.pool.push(this.name, this);
   };
