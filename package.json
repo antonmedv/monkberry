@@ -5,7 +5,7 @@
   "bin": "./bin/monkberry",
   "main": "lib/index.js",
   "scripts": {
-    "test": "node_modules/.bin/testem ci"
+    "test": "node_modules/.bin/testem ci -l phantomjs"
   },
   "browser": "./monkberry.js",
   "repository": {
