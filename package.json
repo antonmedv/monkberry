@@ -5,7 +5,7 @@
   "bin": "./bin/monkberry",
   "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node_modules/.bin/testem ci"
   },
   "browser": "./monkberry.js",
   "repository": {
@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "asciitree": "^1.0.0",
-    "jasmine": "^2.3.2"
+    "jasmine": "^2.3.2",
+    "testem": "^0.9.4"
   }
 }
