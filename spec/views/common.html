@@ -1,0 +1,27 @@
+<monkberry>
+    <div>
+        Monkberry Moon Delight
+    </div>
+</monkberry>
+<test1>
+    <p>{{ text }}</p>
+</test1>
+<test2>
+    <input type="text" value="{{ value }}">
+</test2>
+<test3>
+    <p>foo {{ bar }} baz</p>
+</test3>
+<test4>
+    <div class="foo {{ bar }} baz"/>
+</test4>
+<test5>
+    <div class="{{ foo }} {{ bar }}"/>
+</test5>
+<test6>
+    <ul>
+        <for each="key, value in list">
+            <li>{{ key }}:{{ value }}</li>
+        </for>
+    </ul>
+</test6>

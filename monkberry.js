@@ -129,6 +129,11 @@
 
   Monkberry.prototype.mount = function (templates) {
     var _this = this;
+
+    if (typeof templates === 'function') {
+      templates = templates(this, document);
+    }
+
     Object.keys(templates).forEach(function (name) {
       _this.templates[name] = templates[name];
     });
