@@ -1,10 +1,6 @@
-# Runtime data
-pids
-*.pid
-*.seed
-
 # Dependency directory
-node_modules
+node_modules/
 
 # Sub repositories
-benchmark
+benchmark/
+monkberrify/
