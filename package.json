@@ -1,7 +1,7 @@
 {
   "name": "monkberry",
   "version": "1.0.1",
-  "description": "DOM Template Engine",
+  "description": "JavaScript DOM Template Engine",
   "bin": "./bin/monkberry",
   "main": "lib/index.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "template",
     "view"
   ],
-  "author": "Anton Medvedev <anton@elfet.ru>",
+  "author": "Anton Medvedev <anton@medv.io>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/monkberry/monkberry/issues"
