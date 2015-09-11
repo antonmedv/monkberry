@@ -25,24 +25,24 @@
     }
 
     for (j = childrenSize, len = data.length; j < len; j++) {
-      // Render new view
+      // Render new view.
       var view = this.render(template);
 
-      // Set view hierarchy
+      // Set view hierarchy.
       view.parent = parent;
       parent.nested.push(view);
 
-      // Add nodes DOM
+      // Add nodes DOM.
       if (node.nodeType == 8) {
         view.insertBefore(node);
       } else {
         view.appendTo(node);
       }
 
-      // Set view data (note what it must be after adding nodes to DOM)
+      // Set view data (note what it must be after adding nodes to DOM).
       view.update(forData(data[j], j, options));
 
-      // Remember to remove from children map on view remove
+      // Remember to remove from children map on view remove.
       i = map.push(view);
       view.onRemove = (function (i) {
         return function () {
@@ -61,24 +61,24 @@
         child.ref.remove();
       }
     } else if (test) {
-      // Render new view
+      // Render new view.
       var view = this.render(template);
 
-      // Set view hierarchy
+      // Set view hierarchy.
       view.parent = parent;
       parent.nested.push(view);
 
-      // Add nodes DOM
+      // Add nodes DOM.
       if (node.nodeType == 8) {
         view.insertBefore(node);
       } else {
         view.appendTo(node);
       }
 
-      // Set view data (note what it must be after adding nodes to DOM)
+      // Set view data (note what it must be after adding nodes to DOM).
       view.update(data);
 
-      // Remember to remove from children map on view remove
+      // Remember to remove child ref on remove of view.
       child.ref = view;
       view.onRemove = function () {
         child.ref = null;
@@ -130,6 +130,7 @@
   Monkberry.prototype.mount = function (templates) {
     var _this = this;
 
+    // Some of templates mounts as factory which returns list of templates.
     if (typeof templates === 'function') {
       templates = templates(this, document);
     }
@@ -147,11 +148,14 @@
     return new Map;
   };
 
+  /**
+   * Main class for view.
+   */
   function View() {
-    this.name = ''; // Name of template
-    this.parent = null; // Parent view
-    this.nested = []; // Nested views
-    this.nodes = []; // Root DOM nodes
+    this.name = ''; // Name of template.
+    this.parent = null; // Parent view.
+    this.nested = []; // Nested views.
+    this.nodes = []; // Root DOM nodes.
   }
 
   View.prototype.appendTo = function (toNode) {
@@ -184,16 +188,16 @@
   };
 
   View.prototype.remove = function () {
-    // Remove appended nodes
+    // Remove appended nodes.
     var i = this.nodes.length;
     while (i--) {
       this.nodes[i].parentNode.removeChild(this.nodes[i]);
     }
-    // Remove self from parent's children map
+    // Remove self from parent's children map or child ref.
     if (this.onRemove) {
       this.onRemove();
     }
-    // Remove all nested views
+    // Remove all nested views.
     i = this.nested.length;
     while (i--) {
       this.nested[i].remove();
@@ -203,10 +207,14 @@
       i = this.parent.nested.indexOf(this);
       this.parent.nested.splice(i, 1);
     }
-    // Store view in pool for reuse
+    // Store view in pool for reuse in future.
     this.pool.push(this.name, this);
   };
 
+  /**
+   * Pool stores pre rendered views for faster template
+   * rendering and removed views for reuseing DOM nodes.
+   */
   function Pool() {
     this.store = {};
   }
@@ -226,8 +234,9 @@
     }
   };
 
-  // Helper functions for working with "map".
-
+  /**
+   * Simple Map implementation with length property.
+   */
   function Map() {
     this.items = Object.create(null);
     this.length = 0;
@@ -246,13 +255,13 @@
       delete this.items[i];
       this.length -= 1;
     } else {
-      // TODO: Remove this in future, after API stabilization.
       throw new Error('You are trying to delete not existing element "' + i + '" form map.');
     }
   };
 
   /**
    *  Helper function for working with foreach loops data.
+   *  Will transform data for "key, value of array" constructions.
    */
   function forData(data, i, options) {
     if (options) {
