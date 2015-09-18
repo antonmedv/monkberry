@@ -1,5 +1,5 @@
 # Monkberry
-[![Build Status](http://img.shields.io/travis/monkberry/monkberry.svg)](https://travis-ci.org/monkberry/monkberry)
+[![Build Status](https://travis-ci.org/monkberry/monkberry.svg?branch=master)](https://travis-ci.org/monkberry/monkberry)
 
 JavaScript DOM template engine.
 
