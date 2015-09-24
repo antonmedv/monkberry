@@ -1,0 +1,67 @@
+<!library>
+<monkberry>
+    <div>
+        Monkberry Moon Delight
+    </div>
+</monkberry>
+<test1>
+    <p>{{ text }}</p>
+</test1>
+<test2>
+    <input type="text" value="{{ value }}">
+</test2>
+<test3>
+    <p>foo {{ bar }} baz</p>
+</test3>
+<test4>
+    <div class="foo {{ bar }} baz"></div>
+</test4>
+<test5>
+    <div class="{{ foo }} {{ bar }}"></div>
+</test5>
+<test6>
+    <ul>
+        <for each="key, value in list">
+            <li>{{ key }}:{{ value }}</li>
+        </for>
+    </ul>
+</test6>
+<test7>
+    <p>first</p>
+    <p>second</p>
+</test7>
+<test8>
+    <div>
+        <test1/>
+    </div>
+</test8>
+<test9>
+    <div>
+        <custom-inline>
+            <p>inline</p>
+        </custom-inline>
+        <custom-inline/>
+    </div>
+</test9>
+<test10>
+    <div>
+        <p>
+            <if test="a">a</if>
+        </p>
+        <p>
+            <for each="b">b</for>
+        </p>
+    </div>
+</test10>
+<test11>
+    <div>
+        <if test="a">a</if>
+        <if test="b">b</if>
+    </div>
+</test11>
+<test12>
+    <div>
+        <if test="a">a</if>
+        <for each="b">i</for>
+    </div>
+</test12>
