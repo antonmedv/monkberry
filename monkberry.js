@@ -164,6 +164,20 @@
     }
   };
 
+  View.prototype.update = function (data) {
+    var _this = this;
+    if (_this.set) {
+      Object.keys(data).forEach(function (key) {
+        if (_this.set.hasOwnProperty(key)) {
+          _this.set[key](data);
+        }
+      });
+    }
+    if (_this._update) {
+      _this._update(data);
+    }
+  };
+
   View.prototype.insertBefore = function (toNode) {
     for (var i = 0, len = this.nodes.length; i < len; i++) {
       if (toNode.parentNode) {

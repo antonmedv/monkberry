@@ -65,3 +65,13 @@
         <for each="b">i</for>
     </div>
 </test12>
+<test-if>
+    <div>
+        <if test="test">
+            true: {{ context }}
+        </if>
+    </div>
+</test-if>
+<test-filters>
+    <p>{{ text | append('case') | upperCase }}</p>
+</test-filters>

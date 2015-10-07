@@ -104,19 +104,42 @@ describe('Monkberry', function () {
     expect(view).toBe('<div><p>inline</p><!--custom-inline--><p>inline</p><!--custom-inline--></div>');
   });
 
-  it('should optimize "if"/"for" tag, if it only child', function () {
+  it('should optimize <if>/<for> tag, if it is only child', function () {
     var view = monkberry.render('test10', {a: true, b: [1]});
     expect(view).toBe('<div><p>a</p><p>b</p></div>');
   });
 
-  it('should place placeholders for multiply "if" tags', function () {
+  it('should place placeholders for multiply <if> tags', function () {
     var view = monkberry.render('test11');
     expect(view).toBe('<div><!--if--><!--if--></div>');
   });
 
-  it('should place placeholders for multiply "if" and "for" tags', function () {
+  it('should place placeholders for multiply <if> and <for> tags', function () {
     var view = monkberry.render('test12');
     expect(view).toBe('<div><!--if--><!--for--></div>');
+  });
+
+  it('should properly for with <if> tags', function () {
+    var view = monkberry.render('test-if', {test: true, context: 'parent data'});
+    expect(view).toBe('<div> true: parent data </div>');
+
+    view.update({test: false});
+    expect(view).toBe('<div></div>');
+
+    view.update({test: true});
+    expect(view).toBe('<div> true: parent data </div>');
+  });
+
+  it('should properly for with filters', function () {
+    monkberry.filters.append = function (value, text) {
+      return value + text;
+    };
+    monkberry.filters.upperCase = function (value) {
+      return value.toUpperCase();
+    };
+
+    var view = monkberry.render('test-filters', {text: 'upper_'});
+    expect(view).toBe('<p>UPPER_CASE</p>');
   });
 
 });
