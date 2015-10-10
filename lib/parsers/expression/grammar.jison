@@ -363,7 +363,7 @@ MemberExpression
         {
             $$ = new MemberExpressionNode($1, $3, true, createSourceLocation(null, @1, @4));
         }
-    | MemberExpression "." IdentifierName
+    | MemberExpression "." AccessorName
         {
             $$ = new MemberExpressionNode($1, $3, false, createSourceLocation(null, @1, @3));
         }
@@ -394,26 +394,26 @@ CallExpression
         {
             $$ = new MemberExpressionNode($1, $3, true, createSourceLocation(null, @1, @4));
         }
-    | CallExpression "." IdentifierName
+    | CallExpression "." AccessorName
         {
             $$ = new MemberExpressionNode($1, $3, false, createSourceLocation(null, @1, @3));
         }
     ;
 
 FilterExpression
-    : Expression "|" MemberExpression
+    : Expression "|" AccessorName
         {
             $$ = new FilterExpressionNode($3, [$1], createSourceLocation(null, @1, @2));
         }
-    | Expression "|" MemberExpression Arguments
+    | Expression "|" AccessorName Arguments
         {
             $$ = new FilterExpressionNode($3, [$1].concat($4), createSourceLocation(null, @1, @2));
         }
-    | FilterExpression "|" MemberExpression
+    | FilterExpression "|" AccessorName
         {
             $$ = new FilterExpressionNode($3, [$1], createSourceLocation(null, @1, @2));
         }
-    | FilterExpression "|" MemberExpression Arguments
+    | FilterExpression "|" AccessorName Arguments
         {
             $$ = new FilterExpressionNode($3, [$1].concat($4), createSourceLocation(null, @1, @2));
         }
@@ -427,6 +427,17 @@ IdentifierName
     | ReservedWord
         {
             $$ = new IdentifierNode($1, createSourceLocation(null, @1, @1));
+        }
+    ;
+
+AccessorName
+    : "IDENTIFIER"
+        {
+            $$ = new AccessorNode($1, createSourceLocation(null, @1, @1));
+        }
+    | ReservedWord
+        {
+            $$ = new AccessorNode($1, createSourceLocation(null, @1, @1));
         }
     ;
 
@@ -1030,6 +1041,12 @@ function IdentifierNode(name, loc) {
 	this.loc = loc;
 }
 
+function AccessorNode(name, loc) {
+	this.type = "Accessor";
+	this.name = name;
+	this.loc = loc;
+}
+
 function LiteralNode(value, loc) {
 	this.type = "Literal";
 	this.value = value;
@@ -1079,4 +1096,5 @@ parser.ast.NewExpressionNode = NewExpressionNode;
 parser.ast.CallExpressionNode = CallExpressionNode;
 parser.ast.MemberExpressionNode = MemberExpressionNode;
 parser.ast.IdentifierNode = IdentifierNode;
+parser.ast.AccessorNode = AccessorNode;
 parser.ast.LiteralNode = LiteralNode;
