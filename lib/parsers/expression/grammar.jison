@@ -160,8 +160,7 @@ lexer.lex = function() {
 %% /* Define Grammar Productions */
 
 Statement
-    : EmptyStatement
-    | ExpressionStatement
+    : ExpressionStatement
     ;
 
 StatementList
@@ -189,19 +188,12 @@ InitialiserNoIn
         }
     ;
 
-EmptyStatement
-    : ";"
-        {
-            $$ = new EmptyStatementNode(createSourceLocation(null, @1, @1));
-        }
-    ;
-
 ExpressionStatement
-    : ExpressionNoBF ";"
+    : Expression ";"
         {
             $$ = new ExpressionStatementNode($1, createSourceLocation(null, @1, @2));
         }
-    | ExpressionNoBF error
+    | Expression error
         {
             $$ = new ExpressionStatementNode($1, createSourceLocation(null, @1, @1));
         }
@@ -231,11 +223,6 @@ SourceElement
     ;
 
 PrimaryExpression
-    : PrimaryExpressionNoBrace
-    | ObjectLiteral
-    ;
-
-PrimaryExpressionNoBrace
     : "THIS"
         {
             $$ = new ThisExpressionNode(createSourceLocation(null, @1, @1));
@@ -250,7 +237,9 @@ PrimaryExpressionNoBrace
         {
             $$ = $2;
         }
+    | ObjectLiteral
     ;
+
 
 ArrayLiteral
     : "[" "]"
@@ -384,32 +373,8 @@ MemberExpression
         }
     ;
 
-MemberExpressionNoBF
-    : PrimaryExpressionNoBrace
-    | MemberExpressionNoBF "[" Expression "]"
-        {
-            $$ = new MemberExpressionNode($1, $3, true, createSourceLocation(null, @1, @4));
-        }
-    | MemberExpressionNoBF "." IdentifierName
-        {
-            $$ = new MemberExpressionNode($1, $3, false, createSourceLocation(null, @1, @3));
-        }
-    | "NEW" MemberExpression Arguments
-        {
-            $$ = new NewExpressionNode($2, $3, createSourceLocation(null, @1, @3));
-        }
-    ;
-
 NewExpression
     : MemberExpression
-    | "NEW" NewExpression
-        {
-            $$ = new NewExpressionNode($2, null, createSourceLocation(null, @1, @2));
-        }
-    ;
-
-NewExpressionNoBF
-    : MemberExpressionNoBF
     | "NEW" NewExpression
         {
             $$ = new NewExpressionNode($2, null, createSourceLocation(null, @1, @2));
@@ -430,25 +395,6 @@ CallExpression
             $$ = new MemberExpressionNode($1, $3, true, createSourceLocation(null, @1, @4));
         }
     | CallExpression "." IdentifierName
-        {
-            $$ = new MemberExpressionNode($1, $3, false, createSourceLocation(null, @1, @3));
-        }
-    ;
-
-CallExpressionNoBF
-    : MemberExpressionNoBF Arguments
-        {
-            $$ = new CallExpressionNode($1, $2, createSourceLocation(null, @1, @2));
-        }
-    | CallExpressionNoBF Arguments
-        {
-            $$ = new CallExpressionNode($1, $2, createSourceLocation(null, @1, @2));
-        }
-    | CallExpressionNoBF "[" Expression "]"
-        {
-            $$ = new MemberExpressionNode($1, $3, true, createSourceLocation(null, @1, @4));
-        }
-    | CallExpressionNoBF "." IdentifierName
         {
             $$ = new MemberExpressionNode($1, $3, false, createSourceLocation(null, @1, @3));
         }
@@ -511,11 +457,6 @@ LeftHandSideExpression
     | CallExpression
     ;
 
-LeftHandSideExpressionNoBF
-    : NewExpressionNoBF
-    | CallExpressionNoBF
-    ;
-
 PostfixExpression
     : LeftHandSideExpression
     | LeftHandSideExpression "++"
@@ -528,25 +469,8 @@ PostfixExpression
         }
     ;
 
-PostfixExpressionNoBF
-    : LeftHandSideExpressionNoBF
-    | LeftHandSideExpressionNoBF "++"
-        {
-            $$ = new UpdateExpressionNode("++", $1, false, createSourceLocation(null, @1, @2));
-        }
-    | LeftHandSideExpressionNoBF "--"
-        {
-            $$ = new UpdateExpressionNode("--", $1, false, createSourceLocation(null, @1, @2));
-        }
-    ;
-
 UnaryExpression
     : PostfixExpression
-    | UnaryExpr
-    ;
-
-UnaryExpressionNoBF
-    : PostfixExpressionNoBF
     | UnaryExpr
     ;
 
@@ -609,22 +533,6 @@ MultiplicativeExpression
         }
     ;
 
-MultiplicativeExpressionNoBF
-    : UnaryExpressionNoBF
-    | MultiplicativeExpressionNoBF "*" UnaryExpression
-        {
-            $$ = new BinaryExpressionNode("*", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | MultiplicativeExpressionNoBF "/" UnaryExpression
-        {
-            $$ = new BinaryExpressionNode("/", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | MultiplicativeExpressionNoBF "%" UnaryExpression
-        {
-            $$ = new BinaryExpressionNode("%", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    ;
-
 AdditiveExpression
     : MultiplicativeExpression
     | AdditiveExpression "+" MultiplicativeExpression
@@ -632,18 +540,6 @@ AdditiveExpression
             $$ = new BinaryExpressionNode("+", $1, $3, createSourceLocation(null, @1, @3));
         }
     | AdditiveExpression "-" MultiplicativeExpression
-        {
-            $$ = new BinaryExpressionNode("-", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    ;
-
-AdditiveExpressionNoBF
-    : MultiplicativeExpressionNoBF
-    | AdditiveExpressionNoBF "+" MultiplicativeExpression
-        {
-            $$ = new BinaryExpressionNode("+", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | AdditiveExpressionNoBF "-" MultiplicativeExpression
         {
             $$ = new BinaryExpressionNode("-", $1, $3, createSourceLocation(null, @1, @3));
         }
@@ -660,22 +556,6 @@ ShiftExpression
             $$ = new BinaryExpressionNode(">>", $1, $3, createSourceLocation(null, @1, @3));
         }
     | ShiftExpression ">>>" AdditiveExpression
-        {
-            $$ = new BinaryExpressionNode(">>>", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    ;
-
-ShiftExpressionNoBF
-    : AdditiveExpressionNoBF
-    | ShiftExpressionNoBF "<<" AdditiveExpression
-        {
-            $$ = new BinaryExpressionNode("<<", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | ShiftExpressionNoBF ">>" AdditiveExpression
-        {
-            $$ = new BinaryExpressionNode(">>", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | ShiftExpressionNoBF ">>>" AdditiveExpression
         {
             $$ = new BinaryExpressionNode(">>>", $1, $3, createSourceLocation(null, @1, @3));
         }
@@ -733,34 +613,6 @@ RelationalExpressionNoIn
         }
     ;
 
-RelationalExpressionNoBF
-    : ShiftExpressionNoBF
-    | RelationalExpressionNoBF "<" ShiftExpression
-        {
-            $$ = new BinaryExpressionNode("<", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | RelationalExpressionNoBF ">" ShiftExpression
-        {
-            $$ = new BinaryExpressionNode(">", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | RelationalExpressionNoBF "<=" ShiftExpression
-        {
-            $$ = new BinaryExpressionNode("<=", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | RelationalExpressionNoBF ">=" ShiftExpression
-        {
-            $$ = new BinaryExpressionNode(">=", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | RelationalExpressionNoBF "INSTANCEOF" ShiftExpression
-        {
-            $$ = new BinaryExpressionNode("instanceof", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | RelationalExpressionNoBF "IN" ShiftExpression
-        {
-            $$ = new BinaryExpressionNode("in", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    ;
-
 EqualityExpression
     : RelationalExpression
     | EqualityExpression "==" RelationalExpression
@@ -801,29 +653,9 @@ EqualityExpressionNoIn
         }
     ;
 
-EqualityExpressionNoBF
-    : RelationalExpressionNoBF
-    | EqualityExpressionNoBF "==" RelationalExpression
-        {
-            $$ = new BinaryExpressionNode("==", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | EqualityExpressionNoBF "!=" RelationalExpression
-        {
-            $$ = new BinaryExpressionNode("!=", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | EqualityExpressionNoBF "===" RelationalExpression
-        {
-            $$ = new BinaryExpressionNode("===", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | EqualityExpressionNoBF "!==" RelationalExpression
-        {
-            $$ = new BinaryExpressionNode("!==", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    ;
-
 LogicalANDExpression
     : EqualityExpression
-    | LogicalANDExpression "&&" BitwiseORExpression
+    | LogicalANDExpression "&&" EqualityExpression
         {
             $$ = new LogicalExpressionNode("&&", $1, $3, createSourceLocation(null, @1, @3));
         }
@@ -831,15 +663,7 @@ LogicalANDExpression
 
 LogicalANDExpressionNoIn
     : EqualityExpressionNoIn
-    | LogicalANDExpressionNoIn "&&" BitwiseORExpressionNoIn
-        {
-            $$ = new LogicalExpressionNode("&&", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    ;
-
-LogicalANDExpressionNoBF
-    : EqualityExpressionNoBF
-    | LogicalANDExpressionNoBF "&&" BitwiseORExpression
+    | LogicalANDExpressionNoIn "&&" EqualityExpressionNoIn
         {
             $$ = new LogicalExpressionNode("&&", $1, $3, createSourceLocation(null, @1, @3));
         }
@@ -861,14 +685,6 @@ LogicalORExpressionNoIn
         }
     ;
 
-LogicalORExpressionNoBF
-    : LogicalANDExpressionNoBF
-    | LogicalORExpressionNoBF "||" LogicalANDExpression
-        {
-            $$ = new LogicalExpressionNode("||", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    ;
-
 ConditionalExpression
     : LogicalORExpression
     | LogicalORExpression "?" AssignmentExpression ":" AssignmentExpression
@@ -885,16 +701,9 @@ ConditionalExpressionNoIn
         }
     ;
 
-ConditionalExpressionNoBF
-    : LogicalORExpressionNoBF
-    | LogicalORExpressionNoBF "?" AssignmentExpression ":" AssignmentExpression
-        {
-            $$ = new ConditionalExpressionNode($1, $3, $5, createSourceLocation(null, @1, @5));
-        }
-    ;
-
 AssignmentExpression
     : ConditionalExpression
+    | FilterExpression
     | LeftHandSideExpression "=" AssignmentExpression
         {
             $$ = new AssignmentExpressionNode("=", $1, $3, createSourceLocation(null, @1, @3));
@@ -907,23 +716,12 @@ AssignmentExpression
 
 AssignmentExpressionNoIn
     : ConditionalExpressionNoIn
+    | FilterExpression
     | LeftHandSideExpression "=" AssignmentExpressionNoIn
         {
             $$ = new AssignmentExpressionNode("=", $1, $3, createSourceLocation(null, @1, @3));
         }
     | LeftHandSideExpression AssignmentOperator AssignmentExpressionNoIn
-        {
-            $$ = new AssignmentExpressionNode($2, $1, $3, createSourceLocation(null, @1, @3));
-        }
-    ;
-
-AssignmentExpressionNoBF
-    : ConditionalExpressionNoBF
-    | LeftHandSideExpressionNoBF "=" AssignmentExpression
-        {
-            $$ = new AssignmentExpressionNode("=", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | LeftHandSideExpressionNoBF AssignmentOperator AssignmentExpression
         {
             $$ = new AssignmentExpressionNode($2, $1, $3, createSourceLocation(null, @1, @3));
         }
@@ -960,20 +758,6 @@ Expression
 ExpressionNoIn
     : AssignmentExpressionNoIn
     | ExpressionNoIn "," AssignmentExpressionNoIn
-        {
-            if ($1.type === "SequenceExpression") {
-                $1.expressions.concat($3);
-                $1.loc = createSourceLocation(null, @1, @3);
-                $$ = $1;
-            } else {
-                $$ = new SequenceExpressionNode([$1, $3], createSourceLocation(null, @1, @3));
-            }
-        }
-    ;
-
-ExpressionNoBF
-    : AssignmentExpressionNoBF
-    | ExpressionNoBF "," AssignmentExpression
         {
             if ($1.type === "SequenceExpression") {
                 $1.expressions.concat($3);
@@ -1134,11 +918,6 @@ function ProgramNode(body, loc) {
 	this.loc = loc;
 }
 
-function EmptyStatementNode(loc) {
-	this.type = "EmptyStatement";
-	this.loc = loc;
-}
-
 function ExpressionStatementNode(expression, loc) {
 	this.type = "ExpressionStatement";
 	this.expression = expression;
@@ -1149,30 +928,6 @@ function FilterExpressionNode(callee, args, loc) {
 	this.type = "FilterExpression";
 	this.callee = callee;
 	this.arguments = args;
-	this.loc = loc;
-}
-
-function FunctionDeclarationNode(id, params, body, generator, expression, loc) {
-	this.type = "FunctionDeclaration";
-	this.id = id;
-	this.params = params;
-	this.body = body;
-	this.generator = generator;
-	this.expression = expression;
-	this.loc = loc;
-}
-
-function VariableDeclarationNode(declarations, kind, loc) {
-	this.type = "VariableDeclaration";
-	this.declarations = declarations;
-	this.kind = kind;
-	this.loc = loc;
-}
-
-function VariableDeclaratorNode(id, init, loc) {
-	this.type = "VariableDeclarator";
-	this.id = id;
-	this.init = init;
 	this.loc = loc;
 }
 
@@ -1190,16 +945,6 @@ function ArrayExpressionNode(elements, loc) {
 function ObjectExpressionNode(properties, loc) {
 	this.type = "ObjectExpression";
 	this.properties = properties;
-	this.loc = loc;
-}
-
-function FunctionExpressionNode(id, params, body, generator, expression, loc) {
-	this.type = "FunctionExpression";
-	this.id = id;
-	this.params = params;
-	this.body = body;
-	this.generator = generator;
-	this.expression = expression;
 	this.loc = loc;
 }
 
@@ -1279,21 +1024,6 @@ function MemberExpressionNode(object, property, computed, loc) {
 	this.loc = loc;
 }
 
-function SwitchCaseNode(test, consequent, loc) {
-	this.type = "SwitchCase";
-	this.test = test;
-	this.consequent = consequent;
-	this.loc = loc;
-}
-
-function CatchClauseNode(param, body, loc) {
-	this.type = "CatchClause";
-	this.param = param;
-	this.guard = null; /* Firefox specific */
-	this.body = body;
-	this.loc = loc;
-}
-
 function IdentifierNode(name, loc) {
 	this.type = "Identifier";
 	this.name = name;
@@ -1333,16 +1063,11 @@ function ArrayPatternNode() {
 /* Expose the AST Node Constructors */
 parser.ast = {};
 parser.ast.ProgramNode = ProgramNode;
-parser.ast.EmptyStatementNode = EmptyStatementNode;
 parser.ast.ExpressionStatementNode = ExpressionStatementNode;
 parser.ast.FilterExpressionNode = FilterExpressionNode;
-parser.ast.FunctionDeclarationNode = FunctionDeclarationNode;
-parser.ast.VariableDeclarationNode = VariableDeclarationNode;
-parser.ast.VariableDeclaratorNode = VariableDeclaratorNode;
 parser.ast.ThisExpressionNode = ThisExpressionNode;
 parser.ast.ArrayExpressionNode = ArrayExpressionNode;
 parser.ast.ObjectExpressionNode = ObjectExpressionNode;
-parser.ast.FunctionExpressionNode = FunctionExpressionNode;
 parser.ast.SequenceExpressionNode = SequenceExpressionNode;
 parser.ast.UnaryExpressionNode = UnaryExpressionNode;
 parser.ast.BinaryExpressionNode = BinaryExpressionNode;
@@ -1353,7 +1078,5 @@ parser.ast.ConditionalExpressionNode = ConditionalExpressionNode;
 parser.ast.NewExpressionNode = NewExpressionNode;
 parser.ast.CallExpressionNode = CallExpressionNode;
 parser.ast.MemberExpressionNode = MemberExpressionNode;
-parser.ast.SwitchCaseNode = SwitchCaseNode;
-parser.ast.CatchClauseNode = CatchClauseNode;
 parser.ast.IdentifierNode = IdentifierNode;
 parser.ast.LiteralNode = LiteralNode;
