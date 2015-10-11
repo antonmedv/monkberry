@@ -71,6 +71,13 @@ describe('Monkberry', function () {
     expect(view).toBe('<ul><li>0:a</li><li>1:b</li><li>2:c</li><li>3:d</li></ul>');
   });
 
+  it('should render arrays with externals', function () {
+    var view = monkberry.render('test6.1');
+
+    view.update({list: [1, 2, 3], ext: '.js'});
+    expect(view).toBe('<div><p>1.js</p><p>2.js</p><p>3.js</p></div>');
+  });
+
   it('should correctly work with wrappers', function () {
     var items = [];
     monkberry.wrappers['test6.for0'] = function (view) {

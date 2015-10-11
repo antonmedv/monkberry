@@ -21,11 +21,18 @@
 </test5>
 <test6>
     <ul>
-        <for each="key, value in list">
+        <for each="key, value of list">
             <li>{{ key }}:{{ value }}</li>
         </for>
     </ul>
 </test6>
+<test6.1>
+    <div>
+        <for each="value of list">
+            <p>{{ value }}{{ ext }}</p>
+        </for>
+    </div>
+</test6.1>
 <test7>
     <p>first</p>
     <p>second</p>
