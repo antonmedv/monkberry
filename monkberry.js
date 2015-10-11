@@ -140,6 +140,15 @@
     });
   };
 
+  Monkberry.prototype.extend = function (obj, from) {
+    for (var key in from) {
+      if (from.hasOwnProperty(key)) {
+        obj[key] = from[key];
+      }
+    }
+    return obj;
+  };
+
   Monkberry.prototype.view = function () {
     return new View;
   };
@@ -166,7 +175,7 @@
 
   View.prototype.update = function (data) {
     var _this = this, keys = typeof data === 'object' ? Object.keys(data) : [];
-    if (this.__cache__) {
+    if (_this.__cache__) {
       // Clear cache to prevent double updating.
       keys.forEach(function (key) {
         if (key in _this.__cache__) {
