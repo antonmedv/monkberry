@@ -142,4 +142,40 @@ describe('Monkberry', function () {
     expect(view).toBe('<p>UPPER_CASE</p>');
   });
 
+  it('should work with expressions', function () {
+    var view = monkberry.render('test-expressions', {
+      a: 1,
+      b: 2,
+      c: 100,
+      d: 2,
+      more: {
+        amazing: 'a'
+      },
+      features: ['b', 'c']
+    });
+    expect(view).toBe('<a title="150">abc</a>');
+
+    view.update({more: {amazing: 'Amazing!'}});
+
+    expect(view).toBe('<a title="150">Amazing!bc</a>');
+  });
+
+  it('should work with expression in <if> tag', function () {
+    var view = monkberry.render('test-expression-if', {
+      array: [1, 2, 3, 4, 5],
+      look: 3,
+      indep: 'independent'
+    });
+    expect(view).toBe('<div>(one)<!--if-->3<p>independent</p><!--if--></div>');
+
+    view.update({look: 2});
+    expect(view).toBe('<div>(one)<!--if-->2<p>independent</p><!--if--></div>');
+
+    view.update({look: -1});
+    expect(view).toBe('<div>(one)<!--if--><!--if--></div>');
+
+    view.update({array: [-1]});
+    expect(view).toBe('<div><!--if-->-1<p>independent</p><!--if--></div>');
+  });
+
 });

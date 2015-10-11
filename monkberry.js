@@ -165,9 +165,17 @@
   };
 
   View.prototype.update = function (data) {
-    var _this = this;
+    var _this = this, keys = typeof data === 'object' ? Object.keys(data) : [];
+    if (this.__cache__) {
+      // Clear cache to prevent double updating.
+      keys.forEach(function (key) {
+        if (key in _this.__cache__) {
+          delete _this.__cache__[key];
+        }
+      });
+    }
     if (_this.set) {
-      Object.keys(data).forEach(function (key) {
+      keys.forEach(function (key) {
         if (_this.set.hasOwnProperty(key)) {
           _this.set[key](data, data[key]);
         }
