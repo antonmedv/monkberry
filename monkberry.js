@@ -169,7 +169,7 @@
     if (_this.set) {
       Object.keys(data).forEach(function (key) {
         if (_this.set.hasOwnProperty(key)) {
-          _this.set[key](data);
+          _this.set[key](data, data[key]);
         }
       });
     }
