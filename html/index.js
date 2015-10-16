@@ -22,7 +22,7 @@ console.log(asciitree(
           case 'Element':
             return '<' + node.name + '>';
           case 'Text':
-            return '"' + node.text.replace(/\n/g, '\\n') + '"';
+            return '"' + node.text.replace(/[\s]+/g, ' ') + '"';
           default:
             return node.type;
         }

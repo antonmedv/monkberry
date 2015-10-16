@@ -53,11 +53,26 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
                                         return ">";
                                    %}
 <html>{Identifier}                 parser.restricted = false; return "IDENTIFIER";
+<html>\s+                          %{
+                                        if (yytext.match(/\r|\n/)) {
+                                            parser.newLine = true;
+                                        }
+
+                                        if (parser.restricted && parser.newLine) {
+                                            this.unput(yytext);
+                                            parser.restricted = false;
+                                            return ";";
+                                        }
+                                   %}
+<html>"="                          return "=";
+<html>{StringLiteral}              parser.restricted = false; return "STRING_LITERAL";
 <html>"/"                          return "/";
+
 <regexp>{RegularExpressionLiteral} %{
                                         this.begin("expr");
                                         return "REGEXP_LITERAL";
                                    %}
+
 <expr>(\r\n|\r|\n)+\s*"++"         return "BR++"; /* Handle restricted postfix production */
 <expr>(\r\n|\r|\n)+\s*"--"         return "BR--"; /* Handle restricted postfix production */
 <expr>\s+                          %{
@@ -151,6 +166,7 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 <expr>"^="                         return "^=";
 <expr>"^"                          return "^";
 <expr>"~"                          parser.restricted = false; return "~";
+
 <<EOF>>                            return "EOF";
 
 %%
