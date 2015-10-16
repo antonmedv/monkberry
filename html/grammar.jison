@@ -52,7 +52,11 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
                                         this.begin("expr");
                                         return "{{";
                                    %}
-([^(<|"{{")]+)                           return "TEXT";
+"{%"                               %{
+                                        this.begin("expr");
+                                        return "{%";
+                                   %}
+([^(<|"{{")]+)                     return "TEXT";
 
 <html>">"                          %{
                                         this.popState();
@@ -82,6 +86,10 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 <expr>"}}"                         %{
                                         this.popState();
                                         return "}}";
+                                   %}
+<expr>"%}"                         %{
+                                        this.popState();
+                                        return "%" + "}";
                                    %}
 <expr>(\r\n|\r|\n)+\s*"++"         return "BR++"; /* Handle restricted postfix production */
 <expr>(\r\n|\r|\n)+\s*"--"         return "BR--"; /* Handle restricted postfix production */
@@ -119,6 +127,8 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
                                         }
                                    %}
 <expr>{StringLiteral}              parser.restricted = false; return "STRING_LITERAL";
+<expr>"if"                         return "IF";
+<expr>"endif"                      return "ENDIF";
 <expr>"in"                         return "IN";
 <expr>"instanceof"                 return "INSTANCEOF";
 <expr>"true"                       parser.restricted = false; return "TRUE";
@@ -227,9 +237,9 @@ Element
         {
           $$ = new TextNode($1, createSourceLocation(null, @1, @1));
         }
-    | "{{" ExpressionStatement "}}"
+    | Statement
         {
-            $$ = $2;
+            $$ = $1;
         }
     | "<" IDENTIFIER AttributeList "/" ">"
         {
@@ -256,6 +266,23 @@ Element
                     "Tag identifiers should be same (<" + $2 + "> != </" + $7 + ">)"
                 );
             }
+        }
+    ;
+
+
+Statement
+    : "{{" ExpressionStatement "}}"
+        {
+            $$ = $2;
+        }
+    | IfStatement
+    ;
+
+
+IfStatement
+    :  "{%" IF ExpressionStatement "%}" ElementList "{%" ENDIF "%}"
+        {
+          $$ = new IfStatementNode($3, $5, null, createSourceLocation(null, @1, @8));
         }
     ;
 
@@ -939,6 +966,14 @@ function ExpressionStatementNode(expression, loc) {
     this.loc = loc;
 }
 
+function IfStatementNode(test, consequent, alternate, loc) {
+	this.type = "IfStatement";
+	this.test = test;
+	this.consequent = consequent;
+	this.alternate = alternate;
+	this.loc = loc;
+}
+
 function FilterExpressionNode(callee, args, loc) {
 	this.type = "FilterExpression";
 	this.callee = callee;
@@ -1088,6 +1123,7 @@ parser.ast.TextNode = TextNode;
 parser.ast.ElementNode = ElementNode;
 parser.ast.AttributeNode = AttributeNode;
 parser.ast.ExpressionStatementNode = ExpressionStatementNode;
+parser.ast.IfStatementNode = IfStatementNode;
 parser.ast.FilterExpressionNode = FilterExpressionNode;
 parser.ast.ThisExpressionNode = ThisExpressionNode;
 parser.ast.ArrayExpressionNode = ArrayExpressionNode;
