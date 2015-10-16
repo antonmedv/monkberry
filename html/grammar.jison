@@ -662,29 +662,6 @@ RelationalExpression
         }
     ;
 
-RelationalExpressionNoIn
-    : ShiftExpression
-    | RelationalExpressionNoIn "<" ShiftExpression
-        {
-            $$ = new BinaryExpressionNode("<", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | RelationalExpressionNoIn ">" ShiftExpression
-        {
-            $$ = new BinaryExpressionNode(">", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | RelationalExpressionNoIn "<=" ShiftExpression
-        {
-            $$ = new BinaryExpressionNode("<=", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | RelationalExpressionNoIn ">=" ShiftExpression
-        {
-            $$ = new BinaryExpressionNode(">=", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | RelationalExpressionNoIn "INSTANCEOF" ShiftExpression
-        {
-            $$ = new BinaryExpressionNode("instanceof", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    ;
 
 EqualityExpression
     : RelationalExpression
@@ -706,25 +683,6 @@ EqualityExpression
         }
     ;
 
-EqualityExpressionNoIn
-    : RelationalExpressionNoIn
-    | EqualityExpressionNoIn "==" RelationalExpressionNoIn
-        {
-            $$ = new BinaryExpressionNode("==", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | EqualityExpressionNoIn "!=" RelationalExpressionNoIn
-        {
-            $$ = new BinaryExpressionNode("!=", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | EqualityExpressionNoIn "===" RelationalExpressionNoIn
-        {
-            $$ = new BinaryExpressionNode("===", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | EqualityExpressionNoIn "!==" RelationalExpressionNoIn
-        {
-            $$ = new BinaryExpressionNode("!==", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    ;
 
 LogicalANDExpression
     : EqualityExpression
@@ -734,13 +692,6 @@ LogicalANDExpression
         }
     ;
 
-LogicalANDExpressionNoIn
-    : EqualityExpressionNoIn
-    | LogicalANDExpressionNoIn "&&" EqualityExpressionNoIn
-        {
-            $$ = new LogicalExpressionNode("&&", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    ;
 
 LogicalORExpression
     : LogicalANDExpression
@@ -750,13 +701,6 @@ LogicalORExpression
         }
     ;
 
-LogicalORExpressionNoIn
-    : LogicalANDExpressionNoIn
-    | LogicalORExpressionNoIn "||" LogicalANDExpressionNoIn
-        {
-            $$ = new LogicalExpressionNode("||", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    ;
 
 ConditionalExpression
     : LogicalORExpression
@@ -766,13 +710,6 @@ ConditionalExpression
         }
     ;
 
-ConditionalExpressionNoIn
-    : LogicalORExpressionNoIn
-    | LogicalORExpressionNoIn "?" AssignmentExpression ":" AssignmentExpressionNoIn
-        {
-            $$ = new ConditionalExpressionNode($1, $3, $5, createSourceLocation(null, @1, @5));
-        }
-    ;
 
 AssignmentExpression
     : ConditionalExpression
@@ -787,18 +724,6 @@ AssignmentExpression
         }
     ;
 
-AssignmentExpressionNoIn
-    : ConditionalExpressionNoIn
-    | FilterExpression
-    | LeftHandSideExpression "=" AssignmentExpressionNoIn
-        {
-            $$ = new AssignmentExpressionNode("=", $1, $3, createSourceLocation(null, @1, @3));
-        }
-    | LeftHandSideExpression AssignmentOperator AssignmentExpressionNoIn
-        {
-            $$ = new AssignmentExpressionNode($2, $1, $3, createSourceLocation(null, @1, @3));
-        }
-    ;
 
 AssignmentOperator
     : "*="
@@ -828,19 +753,6 @@ Expression
         }
     ;
 
-ExpressionNoIn
-    : AssignmentExpressionNoIn
-    | ExpressionNoIn "," AssignmentExpressionNoIn
-        {
-            if ($1.type === "SequenceExpression") {
-                $1.expressions.concat($3);
-                $1.loc = createSourceLocation(null, @1, @3);
-                $$ = $1;
-            } else {
-                $$ = new SequenceExpressionNode([$1, $3], createSourceLocation(null, @1, @3));
-            }
-        }
-    ;
 
 Literal
     : NullLiteral
