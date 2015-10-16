@@ -38,16 +38,28 @@ RegularExpressionChar ([^\n\r\\\/\[])|{RegularExpressionBackslashSequence}|{Regu
 RegularExpressionBody {RegularExpressionFirstChar}{RegularExpressionChar}*
 RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 
-%x REGEXP
+%x html
+%x tag
+%x regexp
+%x expr
 %options flex
 %%
-<REGEXP>{RegularExpressionLiteral} %{
-                                        this.begin("INITIAL");
+<html>"<"                          %{
+                                        this.begin("tag");
+                                        return "<";
+                                   %}
+<html>">"                          %{
+                                        this.popState();
+                                        return ">";
+                                   %}
+<tag>{Identifier}                  parser.restricted = false; return "IDENTIFIER";
+<regexp>{RegularExpressionLiteral} %{
+                                        this.begin("expr");
                                         return "REGEXP_LITERAL";
                                    %}
-(\r\n|\r|\n)+\s*"++"               return "BR++"; /* Handle restricted postfix production */
-(\r\n|\r|\n)+\s*"--"               return "BR--"; /* Handle restricted postfix production */
-\s+                                %{
+<expr>(\r\n|\r|\n)+\s*"++"         return "BR++"; /* Handle restricted postfix production */
+<expr>(\r\n|\r|\n)+\s*"--"         return "BR--"; /* Handle restricted postfix production */
+<expr>\s+                          %{
                                         if (yytext.match(/\r|\n/)) {
                                             parser.newLine = true;
                                         }
@@ -58,7 +70,7 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
                                             return ";";
                                         }
                                    %}
-"/*"(.|\r|\n)*?"*/"                %{
+<expr>"/*"(.|\r|\n)*?"*/"          %{
                                         if (yytext.match(/\r|\n/)) {
                                             parser.newLine = true;
                                         }
@@ -69,7 +81,7 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
                                             return ";";
                                         }
                                    %}
-"//".*($|\r\n|\r|\n)               %{
+<expr>"//".*($|\r\n|\r|\n)         %{
                                         if (yytext.match(/\r|\n/)) {
                                             parser.newLine = true;
                                         }
@@ -80,66 +92,66 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
                                             return ";";
                                         }
                                    %}
-{StringLiteral}                    parser.restricted = false; return "STRING_LITERAL";
-"in"                               return "IN";
-"instanceof"                       return "INSTANCEOF";
-"true"                             parser.restricted = false; return "TRUE";
-"false"                            parser.restricted = false; return "FALSE";
-"null"                             parser.restricted = false; return "NULL";
-{Identifier}                       parser.restricted = false; return "IDENTIFIER";
-{DecimalLiteral}                   parser.restricted = false; return "NUMERIC_LITERAL";
-{HexIntegerLiteral}                parser.restricted = false; return "NUMERIC_LITERAL";
-{OctalIntegerLiteral}              parser.restricted = false; return "NUMERIC_LITERAL";
-"{"                                parser.restricted = false; return "{";
-"}"                                return "}";
-"("                                parser.restricted = false; return "(";
-")"                                return ")";
-"["                                parser.restricted = false; return "[";
-"]"                                return "]";
-"."                                return ".";
-";"                                parser.restricted = false; return ";";
-","                                return ",";
-"?"                                return "?";
-":"                                return ":";
-"==="                              return "===";
-"=="                               return "==";
-"="                                return "=";
-"!=="                              return "!==";
-"!="                               return "!=";
-"!"                                parser.restricted = false; return "!";
-"<<="                              return "<<=";
-"<<"                               return "<<";
-"<="                               return "<=";
-"<"                                return "<";
-">>>="                             return ">>>=";
-">>>"                              return ">>>";
-">>="                              return ">>=";
-">>"                               return ">>";
-">="                               return ">=";
-">"                                return ">";
-"+="                               return "+=";
-"++"                               parser.restricted = false; return "++";
-"+"                                return "+";
-"-="                               return "-=";
-"--"                               parser.restricted = false; return "--";
-"-"                                return "-";
-"*="                               return "*=";
-"*"                                return "*";
-"/="                               return "/=";
-"/"                                return "/";
-"%="                               return "%=";
-"%"                                return "%";
-"&&"                               return "&&";
-"&="                               return "&=";
-"&"                                return "&";
-"||"                               return "||";
-"|="                               return "|=";
-"|"                                return "|";
-"^="                               return "^=";
-"^"                                return "^";
-"~"                                parser.restricted = false; return "~";
-<<EOF>>                            return "EOF";
-.                                  return "ERROR";
+<expr>{StringLiteral}              parser.restricted = false; return "STRING_LITERAL";
+<expr>"in"                         return "IN";
+<expr>"instanceof"                 return "INSTANCEOF";
+<expr>"true"                       parser.restricted = false; return "TRUE";
+<expr>"false"                      parser.restricted = false; return "FALSE";
+<expr>"null"                       parser.restricted = false; return "NULL";
+<expr>{Identifier}                 parser.restricted = false; return "IDENTIFIER";
+<expr>{DecimalLiteral}             parser.restricted = false; return "NUMERIC_LITERAL";
+<expr>{HexIntegerLiteral}          parser.restricted = false; return "NUMERIC_LITERAL";
+<expr>{OctalIntegerLiteral}        parser.restricted = false; return "NUMERIC_LITERAL";
+<expr>"{"                          parser.restricted = false; return "{";
+<expr>"}"                          return "}";
+<expr>"("                          parser.restricted = false; return "(";
+<expr>")"                          return ")";
+<expr>"["                          parser.restricted = false; return "[";
+<expr>"]"                          return "]";
+<expr>"."                          return ".";
+<expr>";"                          parser.restricted = false; return ";";
+<expr>","                          return ",";
+<expr>"?"                          return "?";
+<expr>":"                          return ":";
+<expr>"==="                        return "===";
+<expr>"=="                         return "==";
+<expr>"="                          return "=";
+<expr>"!=="                        return "!==";
+<expr>"!="                         return "!=";
+<expr>"!"                          parser.restricted = false; return "!";
+<expr>"<<="                        return "<<=";
+<expr>"<<"                         return "<<";
+<expr>"<="                         return "<=";
+<expr>"<"                          return "<";
+<expr>">>>="                       return ">>>=";
+<expr>">>>"                        return ">>>";
+<expr>">>="                        return ">>=";
+<expr>">>"                         return ">>";
+<expr>">="                         return ">=";
+<expr>">"                          return ">";
+<expr>"+="                         return "+=";
+<expr>"++"                         parser.restricted = false; return "++";
+<expr>"+"                          return "+";
+<expr>"-="                         return "-=";
+<expr>"--"                         parser.restricted = false; return "--";
+<expr>"-"                          return "-";
+<expr>"*="                         return "*=";
+<expr>"*"                          return "*";
+<expr>"/="                         return "/=";
+<expr>"/"                          return "/";
+<expr>"%="                         return "%=";
+<expr>"%"                          return "%";
+<expr>"&&"                         return "&&";
+<expr>"&="                         return "&=";
+<expr>"&"                          return "&";
+<expr>"||"                         return "||";
+<expr>"|="                         return "|=";
+<expr>"|"                          return "|";
+<expr>"^="                         return "^=";
+<expr>"^"                          return "^";
+<expr>"~"                          parser.restricted = false; return "~";
+<<EOF>>                      return "EOF";
+.                            return "ERROR";
 
 %%
 
@@ -156,8 +168,76 @@ lexer.lex = function() {
 
 /lex
 
-%start Program /* Define Start Production */
+%start Document /* Define Start Production */
 %% /* Define Grammar Productions */
+
+Document
+    : ElementList EOF
+        {
+            $$ = new ProgramNode($1, createSourceLocation(null, @1, @2));
+            return $$;
+        }
+    ;
+
+ElementList
+    : Element
+        {
+            $$ = [$1];
+        }
+    | ElementList Element
+        {
+            $$ = $1.concat($2);
+        }
+    |
+        {
+            $$ = [];
+        }
+    ;
+
+Element
+    : TEXT
+        {
+            $$ = new TextNode($1, createSourceLocation(null, @1, @2));
+        }
+    | "<" IDENTIFIER AttributeList "/" ">"
+        {
+            $$ = new ElementNode($2, $3, [], createSourceLocation(null, @1, @2));
+        }
+    | "<" IDENTIFIER AttributeList ">" "<" "/" IDENTIFIER ">"
+        {
+           $$ = new ElementNode($2, $3, [], createSourceLocation(null, @1, @2));
+        }
+    | "<" IDENTIFIER AttributeList ">" ElementList  "<" "/" IDENTIFIER ">"
+        {
+            if ($2 == $8) {
+                $$ = new ElementNode($2, $3, $5, createSourceLocation(null, @1, @2));
+            } else {
+                throw new SyntaxError('Not equals!');
+            }
+        }
+    ;
+
+AttributeList
+    : Attribute
+        {
+            $$ = [$1]
+        }
+    | AttributeList Attribute
+        {
+            $$ = $1.concat($2);
+        }
+    |
+        {
+            $$ = [];
+        }
+    ;
+
+Attribute
+    : IDENTIFIER "=" STRING_LITERAL
+        {
+            $$ = new AttributeNode($1, $3, createSourceLocation(null, @1, @2));
+        }
+    ;
 
 Statement
     : ExpressionStatement
@@ -830,11 +910,11 @@ RegularExpressionLiteral
 RegularExpressionLiteralBegin
     : "/"
         {
-            yy.lexer.begin("REGEXP");
+            yy.lexer.begin("regexp");
         }
     | "/="
         {
-            yy.lexer.begin("REGEXP");
+            yy.lexer.begin("regexp");
         }
     ;
 
@@ -923,6 +1003,33 @@ parser.parseError = function(str, hash) {
 /* End Parser Customization Methods */
 
 /* Begin AST Node Constructors */
+function DocumentNode(body, loc) {
+    this.type = "Document";
+    this.body = body;
+    this.loc = loc;
+}
+
+function TextNode(text, loc) {
+    this.type = "Text";
+    this.text = text;
+    this.loc = loc;
+}
+
+function ElementNode(name, attributes, body, loc) {
+    this.type = "Element";
+    this.name = name;
+    this.attributes = attributes;
+    this.body = body;
+    this.loc = loc;
+}
+
+function AttributeNode(name, value, loc) {
+    this.type = "Attribute";
+    this.name = name;
+    this.value = value;
+    this.loc = loc;
+}
+
 function ProgramNode(body, loc) {
 	this.type = "Program";
 	this.body = body;
@@ -1079,6 +1186,10 @@ function ArrayPatternNode() {
 
 /* Expose the AST Node Constructors */
 parser.ast = {};
+parser.ast.DocumentNode = DocumentNode;
+parser.ast.TextNode = TextNode;
+parser.ast.ElementNode = ElementNode;
+parser.ast.AttributeNode = AttributeNode;
 parser.ast.ProgramNode = ProgramNode;
 parser.ast.ExpressionStatementNode = ExpressionStatementNode;
 parser.ast.FilterExpressionNode = FilterExpressionNode;

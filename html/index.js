@@ -1,7 +1,8 @@
+var fs = require('fs');
 var asciitree = require('asciitree');
 var parser = require('./grammar').parser;
 
-var code = '2/42/4*543-54/87+44*5/6*7/3-4*5-2+345';
+var code = fs.readFileSync('template.twig', {encoding: 'utf8'});
 
 var ast = parser.parse(code);
 
@@ -18,6 +19,8 @@ console.log(asciitree(
             return node.value.toString();
           case 'Accessor':
             return '.' + node.name;
+          case 'Element':
+            return '<' + node.name + '>';
           default:
             return node.type;
         }
@@ -36,6 +39,8 @@ console.log(asciitree(
             return [];
           case  'Accessor':
             return [];
+          case 'Element':
+            return node.body.concat(node.attributes);
           default:
             return Object.keys(node)
               .filter(function (key) {
