@@ -21,6 +21,8 @@ console.log(asciitree(
             return '.' + node.name;
           case 'Element':
             return '<' + node.name + '>';
+          case 'Text':
+            return '"' + node.text.replace(/\n/g, '\\n') + '"';
           default:
             return node.type;
         }
@@ -41,6 +43,8 @@ console.log(asciitree(
             return [];
           case 'Element':
             return node.body.concat(node.attributes);
+          case 'Text':
+            return [];
           default:
             return Object.keys(node)
               .filter(function (key) {

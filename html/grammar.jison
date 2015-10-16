@@ -39,20 +39,21 @@ RegularExpressionBody {RegularExpressionFirstChar}{RegularExpressionChar}*
 RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 
 %x html
-%x tag
 %x regexp
 %x expr
 %options flex
 %%
-<html>"<"                          %{
-                                        this.begin("tag");
+"<"                                %{
+                                        this.begin("html");
                                         return "<";
                                    %}
+([^<]+)                           return "TEXT";
 <html>">"                          %{
                                         this.popState();
                                         return ">";
                                    %}
-<tag>{Identifier}                  parser.restricted = false; return "IDENTIFIER";
+<html>{Identifier}                 parser.restricted = false; return "IDENTIFIER";
+<html>"/"                          return "/";
 <regexp>{RegularExpressionLiteral} %{
                                         this.begin("expr");
                                         return "REGEXP_LITERAL";
@@ -150,8 +151,7 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 <expr>"^="                         return "^=";
 <expr>"^"                          return "^";
 <expr>"~"                          parser.restricted = false; return "~";
-<<EOF>>                      return "EOF";
-.                            return "ERROR";
+<<EOF>>                            return "EOF";
 
 %%
 
@@ -197,7 +197,7 @@ ElementList
 Element
     : TEXT
         {
-            $$ = new TextNode($1, createSourceLocation(null, @1, @2));
+          $$ = new TextNode($1, createSourceLocation(null, @1, @1));
         }
     | "<" IDENTIFIER AttributeList "/" ">"
         {
