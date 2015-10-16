@@ -43,11 +43,17 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 %x expr
 %options flex
 %%
+
 "<"                                %{
                                         this.begin("html");
                                         return "<";
                                    %}
-([^<]+)                           return "TEXT";
+"{{"                               %{
+                                        this.begin("expr");
+                                        return "{{";
+                                   %}
+([^(<|"{{")]+)                           return "TEXT";
+
 <html>">"                          %{
                                         this.popState();
                                         return ">";
@@ -69,10 +75,14 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 <html>"/"                          return "/";
 
 <regexp>{RegularExpressionLiteral} %{
-                                        this.begin("expr");
+                                        this.popState();
                                         return "REGEXP_LITERAL";
                                    %}
 
+<expr>"}}"                         %{
+                                        this.popState();
+                                        return "}}";
+                                   %}
 <expr>(\r\n|\r|\n)+\s*"++"         return "BR++"; /* Handle restricted postfix production */
 <expr>(\r\n|\r|\n)+\s*"--"         return "BR--"; /* Handle restricted postfix production */
 <expr>\s+                          %{
@@ -190,10 +200,11 @@ lexer.lex = function() {
 Document
     : ElementList EOF
         {
-            $$ = new ProgramNode($1, createSourceLocation(null, @1, @2));
+            $$ = new DocumentNode($1, createSourceLocation(null, @1, @2));
             return $$;
         }
     ;
+
 
 ElementList
     : Element
@@ -210,28 +221,44 @@ ElementList
         }
     ;
 
+
 Element
     : TEXT
         {
           $$ = new TextNode($1, createSourceLocation(null, @1, @1));
         }
+    | "{{" Expression "}}"
+        {
+            $$ = $2;
+        }
     | "<" IDENTIFIER AttributeList "/" ">"
         {
-            $$ = new ElementNode($2, $3, [], createSourceLocation(null, @1, @2));
+            $$ = new ElementNode($2, $3, [], createSourceLocation(null, @1, @5));
         }
     | "<" IDENTIFIER AttributeList ">" "<" "/" IDENTIFIER ">"
         {
-           $$ = new ElementNode($2, $3, [], createSourceLocation(null, @1, @2));
+            if ($2 == $7) {
+                $$ = new ElementNode($2, $3, [], createSourceLocation(null, @1, @8));
+            } else {
+                throw new SyntaxError(
+                    "Syntax error on line " + (yylineno + 1) + ":\n" +
+                    "Tag identifiers should be same (<" + $2 + "> != </" + $7 + ">)"
+                );
+            }
         }
     | "<" IDENTIFIER AttributeList ">" ElementList  "<" "/" IDENTIFIER ">"
         {
             if ($2 == $8) {
-                $$ = new ElementNode($2, $3, $5, createSourceLocation(null, @1, @2));
+                $$ = new ElementNode($2, $3, $5, createSourceLocation(null, @1, @9));
             } else {
-                throw new SyntaxError('Not equals!');
+                throw new SyntaxError(
+                    "Syntax error on line " + (yylineno + 1) + ":\n" +
+                    "Tag identifiers should be same (<" + $2 + "> != </" + $7 + ">)"
+                );
             }
         }
     ;
+
 
 AttributeList
     : Attribute
@@ -248,6 +275,7 @@ AttributeList
         }
     ;
 
+
 Attribute
     : IDENTIFIER "=" STRING_LITERAL
         {
@@ -255,68 +283,6 @@ Attribute
         }
     ;
 
-Statement
-    : ExpressionStatement
-    ;
-
-StatementList
-    : StatementList Statement
-        {
-            $$ = $1.concat($2);
-        }
-    |
-        {
-            $$ = [];
-        }
-    ;
-
-Initialiser
-    : "=" AssignmentExpression
-        {
-            $$ = $2;
-        }
-    ;
-
-InitialiserNoIn
-    : "=" AssignmentExpressionNoIn
-        {
-            $$ = $2;
-        }
-    ;
-
-ExpressionStatement
-    : Expression ";"
-        {
-            $$ = new ExpressionStatementNode($1, createSourceLocation(null, @1, @2));
-        }
-    | Expression error
-        {
-            $$ = new ExpressionStatementNode($1, createSourceLocation(null, @1, @1));
-        }
-    ;
-
-Program
-    : SourceElements EOF
-        {
-            $$ = new ProgramNode($1, createSourceLocation(null, @1, @2));
-            return $$;
-        }
-    ;
-
-SourceElements
-    : SourceElements SourceElement
-        {
-            $$ = $1.concat($2);
-        }
-    |
-        {
-            $$ = [];
-        }
-    ;
-
-SourceElement
-    : Statement
-    ;
 
 PrimaryExpression
     : "THIS"
@@ -1011,7 +977,7 @@ parser.parse = function(source, args) {
 };
 
 parser.parseError = function(str, hash) {
-//		alert(JSON.stringify(hash) + "\n\n\n" + parser.newLine + "\n" + parser.wasNewLine + "\n\n" + hash.expected.indexOf("';'"));
+    //console.log(JSON.stringify(hash) + "\n\n\n" + parser.newLine + "\n" + parser.wasNewLine + "\n\n" + hash.expected.indexOf("';'"));
 	if (!((hash.expected && hash.expected.indexOf("';'") >= 0) && (hash.token === "}" || hash.token === "EOF" || hash.token === "BR++" || hash.token === "BR--" || parser.newLine || parser.wasNewLine))) {
 		throw new SyntaxError(str);
 	}
@@ -1044,18 +1010,6 @@ function AttributeNode(name, value, loc) {
     this.name = name;
     this.value = value;
     this.loc = loc;
-}
-
-function ProgramNode(body, loc) {
-	this.type = "Program";
-	this.body = body;
-	this.loc = loc;
-}
-
-function ExpressionStatementNode(expression, loc) {
-	this.type = "ExpressionStatement";
-	this.expression = expression;
-	this.loc = loc;
 }
 
 function FilterExpressionNode(callee, args, loc) {
@@ -1206,8 +1160,6 @@ parser.ast.DocumentNode = DocumentNode;
 parser.ast.TextNode = TextNode;
 parser.ast.ElementNode = ElementNode;
 parser.ast.AttributeNode = AttributeNode;
-parser.ast.ProgramNode = ProgramNode;
-parser.ast.ExpressionStatementNode = ExpressionStatementNode;
 parser.ast.FilterExpressionNode = FilterExpressionNode;
 parser.ast.ThisExpressionNode = ThisExpressionNode;
 parser.ast.ArrayExpressionNode = ArrayExpressionNode;
