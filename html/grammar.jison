@@ -128,6 +128,7 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
                                    %}
 <expr>{StringLiteral}              parser.restricted = false; return "STRING_LITERAL";
 <expr>"if"                         return "IF";
+<expr>"else"                       return "ELSE";
 <expr>"endif"                      return "ENDIF";
 <expr>"in"                         return "IN";
 <expr>"instanceof"                 return "INSTANCEOF";
@@ -282,7 +283,11 @@ Statement
 IfStatement
     :  "{%" IF ExpressionStatement "%}" ElementList "{%" ENDIF "%}"
         {
-          $$ = new IfStatementNode($3, $5, null, createSourceLocation(null, @1, @8));
+            $$ = new IfStatementNode($3, $5, null, createSourceLocation(null, @1, @8));
+        }
+    |  "{%" IF ExpressionStatement "%}" ElementList "{%" ELSE "%}" ElementList "{%" ENDIF "%}"
+        {
+            $$ = new IfStatementNode($3, $5, $9, createSourceLocation(null, @1, @12));
         }
     ;
 
