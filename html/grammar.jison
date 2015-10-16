@@ -227,7 +227,7 @@ Element
         {
           $$ = new TextNode($1, createSourceLocation(null, @1, @1));
         }
-    | "{{" Expression "}}"
+    | "{{" ExpressionStatement "}}"
         {
             $$ = $2;
         }
@@ -279,7 +279,15 @@ AttributeList
 Attribute
     : IDENTIFIER "=" STRING_LITERAL
         {
-            $$ = new AttributeNode($1, $3, createSourceLocation(null, @1, @2));
+            $$ = new AttributeNode($1, $3, createSourceLocation(null, @1, @3));
+        }
+    ;
+
+
+ExpressionStatement
+    : Expression
+        {
+            $$ = new ExpressionStatementNode($1, createSourceLocation(null, @1, @1));
         }
     ;
 
@@ -634,6 +642,7 @@ ShiftExpression
         }
     ;
 
+
 RelationalExpression
     : ShiftExpression
     | RelationalExpression "<" ShiftExpression
@@ -924,6 +933,12 @@ function AttributeNode(name, value, loc) {
     this.loc = loc;
 }
 
+function ExpressionStatementNode(expression, loc) {
+    this.type = 'ExpressionStatement';
+    this.expression = expression;
+    this.loc = loc;
+}
+
 function FilterExpressionNode(callee, args, loc) {
 	this.type = "FilterExpression";
 	this.callee = callee;
@@ -1072,6 +1087,7 @@ parser.ast.DocumentNode = DocumentNode;
 parser.ast.TextNode = TextNode;
 parser.ast.ElementNode = ElementNode;
 parser.ast.AttributeNode = AttributeNode;
+parser.ast.ExpressionStatementNode = ExpressionStatementNode;
 parser.ast.FilterExpressionNode = FilterExpressionNode;
 parser.ast.ThisExpressionNode = ThisExpressionNode;
 parser.ast.ArrayExpressionNode = ArrayExpressionNode;
