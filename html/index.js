@@ -4,6 +4,8 @@ var parser = require('./grammar').parser;
 
 var code = fs.readFileSync('template.twig', {encoding: 'utf8'});
 
+code = code.replace(/(}}|%}|>)\s+(<|{%|{{)/g, '$1$2');
+
 var ast = parser.parse(code);
 
 console.log(asciitree(
@@ -27,7 +29,7 @@ console.log(asciitree(
             return node.type;
         }
       } else {
-        return node;
+        return JSON.stringify(node);
       }
     },
     function (node) {
@@ -44,6 +46,8 @@ console.log(asciitree(
           case 'Element':
             return node.body.concat(node.attributes);
           case 'Text':
+            return [];
+          case undefined:
             return [];
           default:
             return Object.keys(node)

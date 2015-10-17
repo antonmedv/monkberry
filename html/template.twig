@@ -1,12 +1,9 @@
 <div>
-    Hello world!
-    {{ value }}
-    <div class="wow">
-        Internal
-    </div>
-    {% if cond == true %}
-        <div>True</div>
-    {% else %}
-        {{ beta ? 1 : 0 }}
+    {% if test == "more" %}
+        val
     {% endif %}
+
+    {% for key, item of list %}
+        {{ item }}
+    {% endfor %}
 </div>

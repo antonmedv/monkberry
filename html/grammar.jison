@@ -130,6 +130,9 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 <expr>"if"                         return "IF";
 <expr>"else"                       return "ELSE";
 <expr>"endif"                      return "ENDIF";
+<expr>"for"                        return "FOR";
+<expr>"endfor"                     return "ENDFOR";
+<expr>"of"                         return "OF";
 <expr>"in"                         return "IN";
 <expr>"instanceof"                 return "INSTANCEOF";
 <expr>"true"                       parser.restricted = false; return "TRUE";
@@ -272,22 +275,39 @@ Element
 
 
 Statement
-    : "{{" ExpressionStatement "}}"
+    : "{{" Expression "}}"
         {
-            $$ = $2;
+            $$ = new ExpressionStatementNode($2, createSourceLocation(null, @1, @3));
         }
     | IfStatement
+    | ForStatement
     ;
 
 
 IfStatement
-    :  "{%" IF ExpressionStatement "%}" ElementList "{%" ENDIF "%}"
+    :  "{%" IF Expression "%}" ElementList "{%" ENDIF "%}"
         {
             $$ = new IfStatementNode($3, $5, null, createSourceLocation(null, @1, @8));
         }
-    |  "{%" IF ExpressionStatement "%}" ElementList "{%" ELSE "%}" ElementList "{%" ENDIF "%}"
+    |  "{%" IF Expression "%}" ElementList "{%" ELSE "%}" ElementList "{%" ENDIF "%}"
         {
             $$ = new IfStatementNode($3, $5, $9, createSourceLocation(null, @1, @12));
+        }
+    ;
+
+
+ForStatement
+    :  "{%" FOR Expression "%}" ElementList "{%" ENDFOR "%}"
+        {
+            $$ = new ForStatementNode($3, $5, null, createSourceLocation(null, @1, @8));
+        }
+    |  "{%" FOR IDENTIFIER "OF" Expression "%}" ElementList "{%" ENDFOR "%}"
+        {
+            $$ = new ForStatementNode($5, $7, {value: $3}, createSourceLocation(null, @1, @10));
+        }
+    |  "{%" FOR IDENTIFIER "," IDENTIFIER "OF" Expression "%}" ElementList "{%" ENDFOR "%}"
+        {
+            $$ = new ForStatementNode($7, $9, {key: $3, value: $5}, createSourceLocation(null, @1, @11));
         }
     ;
 
@@ -312,14 +332,6 @@ Attribute
     : IDENTIFIER "=" STRING_LITERAL
         {
             $$ = new AttributeNode($1, $3, createSourceLocation(null, @1, @3));
-        }
-    ;
-
-
-ExpressionStatement
-    : Expression
-        {
-            $$ = new ExpressionStatementNode($1, createSourceLocation(null, @1, @1));
         }
     ;
 
@@ -565,10 +577,12 @@ ArgumentList
         }
     ;
 
+
 LeftHandSideExpression
     : NewExpression
     | CallExpression
     ;
+
 
 PostfixExpression
     : LeftHandSideExpression
@@ -582,10 +596,12 @@ PostfixExpression
         }
     ;
 
+
 UnaryExpression
     : PostfixExpression
     | UnaryExpr
     ;
+
 
 UnaryExpr
     : "TYPEOF" UnaryExpression
@@ -630,6 +646,7 @@ UnaryExpr
         }
     ;
 
+
 MultiplicativeExpression
     : UnaryExpression
     | MultiplicativeExpression "*" UnaryExpression
@@ -646,6 +663,7 @@ MultiplicativeExpression
         }
     ;
 
+
 AdditiveExpression
     : MultiplicativeExpression
     | AdditiveExpression "+" MultiplicativeExpression
@@ -657,6 +675,7 @@ AdditiveExpression
             $$ = new BinaryExpressionNode("-", $1, $3, createSourceLocation(null, @1, @3));
         }
     ;
+
 
 ShiftExpression
     : AdditiveExpression
@@ -971,11 +990,19 @@ function ExpressionStatementNode(expression, loc) {
     this.loc = loc;
 }
 
-function IfStatementNode(test, consequent, alternate, loc) {
+function IfStatementNode(test, then, _else, loc) {
 	this.type = "IfStatement";
 	this.test = test;
-	this.consequent = consequent;
-	this.alternate = alternate;
+	this.then = then;
+	this._else = _else;
+	this.loc = loc;
+}
+
+function ForStatementNode(expr, body, options, loc) {
+	this.type = "ForStatement";
+	this.expr = expr;
+	this.body = body;
+	this.options = options;
 	this.loc = loc;
 }
 
