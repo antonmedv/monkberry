@@ -8,7 +8,7 @@ export default function (ast) {
       sourceNode(this.loc, [this.nodeName, " = document.createElement('", this.name, "')"])
     );
 
-    var children = this.body.map((node) => node.compile());
+    var children = this.body.map((node) => node.compile(figure));
     for (var child of children) {
       figure.construct.push(
         sourceNode(this.loc, [this.nodeName, ".appendChild(", child, ");"])

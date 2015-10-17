@@ -3,10 +3,12 @@ import { Figure } from './figure';
 import document from './compiler/document';
 import element from './compiler/element';
 import expression from './compiler/expression';
+import text from './compiler/text';
 
 document(parser.ast);
 element(parser.ast);
 expression(parser.ast);
+text(parser.ast);
 
 
 var fs = require('fs');
@@ -21,5 +23,8 @@ var output  = ast.compile(figure).toStringWithSourceMap({
 });
 
 console.log(output.code);
-console.log(output.map.toString());
+
+fs.writeFileSync('dist.js', output.code, {encoding: 'utf8'});
+fs.writeFileSync('dist.js.map', output.map, {encoding: 'utf8'});
+
 

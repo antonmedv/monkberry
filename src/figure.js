@@ -1,3 +1,5 @@
+import { sourceNode } from './compiler/sourceNode';
+
 export class Figure {
   constructor(name) {
     this.name = name;
@@ -17,5 +19,9 @@ export class Figure {
       this.uniqCounters[name] = 0
     }
     return this.uniqCounters[name]++;
+  }
+
+  compileDeclarations() {
+    return sourceNode(null, this.declarations).join(',\n    ');
   }
 }
