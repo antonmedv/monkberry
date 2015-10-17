@@ -39,52 +39,37 @@ RegularExpressionBody {RegularExpressionFirstChar}{RegularExpressionChar}*
 RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 
 %x html
+%x attr
 %x regexp
 %x expr
 %options flex
 %%
 
-"<"                                %{
-                                        this.begin("html");
-                                        return "<";
-                                   %}
-"{{"                               %{
-                                        this.begin("expr");
-                                        return "{{";
-                                   %}
-"{%"                               %{
-                                        this.begin("expr");
-                                        return "{%";
-                                   %}
-([^(<|"{{"|"{%")]+)                     return "TEXT";
+"<"                                this.begin("html"); return "<";
+"{{"                               this.begin("expr"); return "{{";
+"{%"                               this.begin("expr"); return "{%";
+([^(<|"{{"|"{%")]+)                return "TEXT";
 
-<html>">"                          %{
-                                        this.popState();
-                                        return ">";
-                                   %}
+<html>">"                          this.popState(); return ">";
 <html>"input"                      return "INPUT";
 <html>"br"                         return "BR";
 <html>"link"                       return "LINK";
 <html>"meta"                       return "META";
-<html>{Identifier}                 return "IDENTIFIER";
+<html>([\w-]+)                     return "IDENTIFIER";
 <html>\s+                          /* skip whitespaces */
 <html>"="                          return "=";
-<html>{StringLiteral}              return "STRING_LITERAL";
+<html>(\")                         this.begin("attr"); return "QUOTE";
 <html>"/"                          return "/";
 
-<regexp>{RegularExpressionLiteral} %{
-                                        this.popState();
-                                        return "REGEXP_LITERAL";
-                                   %}
+<attr>"{{"                         this.begin("expr"); return "{{";
+<attr>"{%"                         this.begin("expr"); return "{%";
+<attr>([^(\"|"{{"|"{%")]+)         return "TEXT";
+<attr>(\")                         this.popState(); return "QUOTE";
 
-<expr>"}}"                         %{
-                                        this.popState();
-                                        return "}}";
-                                   %}
-<expr>"%}"                         %{
-                                        this.popState();
-                                        return "%" + "}";
-                                   %}
+<regexp>{RegularExpressionLiteral} this.popState(); return "REGEXP_LITERAL";
+
+<expr>"}}"                         this.popState(); return "}}";
+<expr>"%}"                         this.popState(); return "%" + "}";
 <expr>\s+                          /* skip whitespaces */
 <expr>"/*"(.|\r|\n)*?"*/"          /* skip comments */
 <expr>"//".*($|\r\n|\r|\n)         /* skip comments */
@@ -240,12 +225,17 @@ EmptyTag
     ;
 
 Statement
+    : ExpressionStatement
+    | IfStatement
+    | ForStatement
+    ;
+
+
+ExpressionStatement
     : "{{" Expression "}}"
         {
             $$ = new ExpressionStatementNode($2, createSourceLocation(null, @1, @3));
         }
-    | IfStatement
-    | ForStatement
     ;
 
 
@@ -294,11 +284,32 @@ AttributeList
 
 
 Attribute
-    : IDENTIFIER "=" STRING_LITERAL
+    : IDENTIFIER "=" QUOTE AttributeValue QUOTE
         {
-            $$ = new AttributeNode($1, $3, createSourceLocation(null, @1, @3));
+            $$ = new AttributeNode($1, $4, createSourceLocation(null, @1, @5));
         }
     ;
+
+
+AttributeValue
+    : TEXT
+        {
+            $$ = [$1];
+        }
+    | ExpressionStatement
+        {
+            $$ = [$1];
+        }
+    | AttributeValue TEXT
+        {
+            $$ = $1.concat($2);
+        }
+    | AttributeValue ExpressionStatement
+        {
+            $$ = $1.concat($2);
+        }
+    ;
+
 
 
 PrimaryExpression
@@ -911,10 +922,10 @@ function ElementNode(name, attributes, body, loc) {
     this.loc = loc;
 }
 
-function AttributeNode(name, value, loc) {
+function AttributeNode(name, body, loc) {
     this.type = "Attribute";
     this.name = name;
-    this.value = value;
+    this.body = body;
     this.loc = loc;
 }
 
