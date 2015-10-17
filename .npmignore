@@ -1,0 +1,6 @@
+/src/
+/spec/
+.gitignore
+.travis.yml
+README.md
+testem.json
