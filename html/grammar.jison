@@ -62,6 +62,10 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
                                         this.popState();
                                         return ">";
                                    %}
+<html>"input"                      return "INPUT";
+<html>"br"                         return "BR";
+<html>"link"                       return "LINK";
+<html>"meta"                       return "META";
 <html>{Identifier}                 return "IDENTIFIER";
 <html>\s+                          /* skip whitespaces */
 <html>"="                          return "=";
@@ -191,6 +195,14 @@ Element
         {
             $$ = $1;
         }
+    | "<" EmptyTag AttributeList ">"
+        {
+            $$ = new ElementNode($2, $3, [], createSourceLocation(null, @1, @4));
+        }
+    | "<" EmptyTag AttributeList "/" ">"
+            {
+                $$ = new ElementNode($2, $3, [], createSourceLocation(null, @1, @5));
+            }
     | "<" IDENTIFIER AttributeList "/" ">"
         {
             $$ = new ElementNode($2, $3, [], createSourceLocation(null, @1, @5));
@@ -219,6 +231,13 @@ Element
         }
     ;
 
+
+EmptyTag
+    : INPUT
+    | BR
+    | LINK
+    | META
+    ;
 
 Statement
     : "{{" Expression "}}"
