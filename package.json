@@ -5,7 +5,11 @@
   "bin": "./bin/monkberry",
   "main": "lib/index.js",
   "scripts": {
-    "test": "node_modules/.bin/testem ci -l phantomjs"
+    "test": "node_modules/.bin/testem ci -l phantomjs",
+    "compile:jison": "node_modules/.bin/jison parser/grammar.jison -o parser/index.js",
+    "compile": "node_modules/.bin/babel -d lib/ src/",
+    "build": "node_modules/.bin/babel -w -d lib/ src/",
+    "prepublish": "npm run compile && npm run compile:jison"
   },
   "browser": "./monkberry.js",
   "repository": {
@@ -26,11 +30,14 @@
   "dependencies": {
     "commander": "^2.8.1",
     "htmlparser2": "^3.8.3",
+    "source-map": "^0.5.1",
     "through": "^2.3.7"
   },
   "devDependencies": {
     "asciitree": "^1.0.0",
+    "babel": "^5.8.23",
     "jasmine": "^2.3.2",
+    "jison": "^0.4.15",
     "testem": "^0.9.4"
   }
 }
