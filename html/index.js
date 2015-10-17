@@ -47,6 +47,8 @@ console.log(asciitree(
             return node.body.concat(node.attributes);
           case 'Text':
             return [];
+          case 'ObjectExpression':
+            return [];
           case undefined:
             return [];
           default:

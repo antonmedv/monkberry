@@ -38,6 +38,9 @@ RegularExpressionChar ([^\n\r\\\/\[])|{RegularExpressionBackslashSequence}|{Regu
 RegularExpressionBody {RegularExpressionFirstChar}{RegularExpressionChar}*
 RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 
+Text [^(<|{{|{%)]+
+AttributeText [^\"{{{%]+
+
 %x html
 %x attr
 %x regexp
@@ -48,7 +51,7 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 "<"                                this.begin("html"); return "<";
 "{{"                               this.begin("expr"); return "{{";
 "{%"                               this.begin("expr"); return "{%";
-([^(<|"{{"|"{%")]+)                return "TEXT";
+{Text}                             return "TEXT";
 
 <html>">"                          this.popState(); return ">";
 <html>"input"                      return "INPUT";
@@ -63,7 +66,7 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 
 <attr>"{{"                         this.begin("expr"); return "{{";
 <attr>"{%"                         this.begin("expr"); return "{%";
-<attr>([^(\"|"{{"|"{%")]+)         return "TEXT";
+<attr>{AttributeText}              return "TEXT";
 <attr>(\")                         this.popState(); return "QUOTE";
 
 <regexp>{RegularExpressionLiteral} this.popState(); return "REGEXP_LITERAL";
@@ -284,7 +287,11 @@ AttributeList
 
 
 Attribute
-    : IDENTIFIER "=" QUOTE AttributeValue QUOTE
+    : IDENTIFIER
+        {
+            $$ = new AttributeNode($1, null, createSourceLocation(null, @1, @1));
+        }
+    | IDENTIFIER "=" QUOTE AttributeValue QUOTE
         {
             $$ = new AttributeNode($1, $4, createSourceLocation(null, @1, @5));
         }
@@ -292,7 +299,8 @@ Attribute
 
 
 AttributeValue
-    : TEXT
+    :
+    | TEXT
         {
             $$ = [$1];
         }
