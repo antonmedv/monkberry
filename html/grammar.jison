@@ -56,26 +56,16 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
                                         this.begin("expr");
                                         return "{%";
                                    %}
-([^(<|"{{")]+)                     return "TEXT";
+([^(<|"{{"|"{%")]+)                     return "TEXT";
 
 <html>">"                          %{
                                         this.popState();
                                         return ">";
                                    %}
-<html>{Identifier}                 parser.restricted = false; return "IDENTIFIER";
-<html>\s+                          %{
-                                        if (yytext.match(/\r|\n/)) {
-                                            parser.newLine = true;
-                                        }
-
-                                        if (parser.restricted && parser.newLine) {
-                                            this.unput(yytext);
-                                            parser.restricted = false;
-                                            return ";";
-                                        }
-                                   %}
+<html>{Identifier}                 return "IDENTIFIER";
+<html>\s+                          /* skip whitespaces */
 <html>"="                          return "=";
-<html>{StringLiteral}              parser.restricted = false; return "STRING_LITERAL";
+<html>{StringLiteral}              return "STRING_LITERAL";
 <html>"/"                          return "/";
 
 <regexp>{RegularExpressionLiteral} %{
@@ -91,42 +81,10 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
                                         this.popState();
                                         return "%" + "}";
                                    %}
-<expr>(\r\n|\r|\n)+\s*"++"         return "BR++"; /* Handle restricted postfix production */
-<expr>(\r\n|\r|\n)+\s*"--"         return "BR--"; /* Handle restricted postfix production */
-<expr>\s+                          %{
-                                        if (yytext.match(/\r|\n/)) {
-                                            parser.newLine = true;
-                                        }
-
-                                        if (parser.restricted && parser.newLine) {
-                                            this.unput(yytext);
-                                            parser.restricted = false;
-                                            return ";";
-                                        }
-                                   %}
-<expr>"/*"(.|\r|\n)*?"*/"          %{
-                                        if (yytext.match(/\r|\n/)) {
-                                            parser.newLine = true;
-                                        }
-
-                                        if (parser.restricted && parser.newLine) {
-                                            this.unput(yytext);
-                                            parser.restricted = false;
-                                            return ";";
-                                        }
-                                   %}
-<expr>"//".*($|\r\n|\r|\n)         %{
-                                        if (yytext.match(/\r|\n/)) {
-                                            parser.newLine = true;
-                                        }
-
-                                        if (parser.restricted && parser.newLine) {
-                                            this.unput(yytext);
-                                            parser.restricted = false;
-                                            return ";";
-                                        }
-                                   %}
-<expr>{StringLiteral}              parser.restricted = false; return "STRING_LITERAL";
+<expr>\s+                          /* skip whitespaces */
+<expr>"/*"(.|\r|\n)*?"*/"          /* skip comments */
+<expr>"//".*($|\r\n|\r|\n)         /* skip comments */
+<expr>{StringLiteral}              return "STRING_LITERAL";
 <expr>"if"                         return "IF";
 <expr>"else"                       return "ELSE";
 <expr>"endif"                      return "ENDIF";
@@ -135,21 +93,21 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 <expr>"of"                         return "OF";
 <expr>"in"                         return "IN";
 <expr>"instanceof"                 return "INSTANCEOF";
-<expr>"true"                       parser.restricted = false; return "TRUE";
-<expr>"false"                      parser.restricted = false; return "FALSE";
-<expr>"null"                       parser.restricted = false; return "NULL";
-<expr>{Identifier}                 parser.restricted = false; return "IDENTIFIER";
-<expr>{DecimalLiteral}             parser.restricted = false; return "NUMERIC_LITERAL";
-<expr>{HexIntegerLiteral}          parser.restricted = false; return "NUMERIC_LITERAL";
-<expr>{OctalIntegerLiteral}        parser.restricted = false; return "NUMERIC_LITERAL";
-<expr>"{"                          parser.restricted = false; return "{";
+<expr>"true"                       return "TRUE";
+<expr>"false"                      return "FALSE";
+<expr>"null"                       return "NULL";
+<expr>{Identifier}                 return "IDENTIFIER";
+<expr>{DecimalLiteral}             return "NUMERIC_LITERAL";
+<expr>{HexIntegerLiteral}          return "NUMERIC_LITERAL";
+<expr>{OctalIntegerLiteral}        return "NUMERIC_LITERAL";
+<expr>"{"                          return "{";
 <expr>"}"                          return "}";
-<expr>"("                          parser.restricted = false; return "(";
+<expr>"("                          return "(";
 <expr>")"                          return ")";
-<expr>"["                          parser.restricted = false; return "[";
+<expr>"["                          return "[";
 <expr>"]"                          return "]";
 <expr>"."                          return ".";
-<expr>";"                          parser.restricted = false; return ";";
+<expr>";"                          return ";";
 <expr>","                          return ",";
 <expr>"?"                          return "?";
 <expr>":"                          return ":";
@@ -158,7 +116,7 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 <expr>"="                          return "=";
 <expr>"!=="                        return "!==";
 <expr>"!="                         return "!=";
-<expr>"!"                          parser.restricted = false; return "!";
+<expr>"!"                          return "!";
 <expr>"<<="                        return "<<=";
 <expr>"<<"                         return "<<";
 <expr>"<="                         return "<=";
@@ -170,10 +128,10 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 <expr>">="                         return ">=";
 <expr>">"                          return ">";
 <expr>"+="                         return "+=";
-<expr>"++"                         parser.restricted = false; return "++";
+<expr>"++"                         return "++";
 <expr>"+"                          return "+";
 <expr>"-="                         return "-=";
-<expr>"--"                         parser.restricted = false; return "--";
+<expr>"--"                         return "--";
 <expr>"-"                          return "-";
 <expr>"*="                         return "*=";
 <expr>"*"                          return "*";
@@ -189,23 +147,11 @@ RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 <expr>"|"                          return "|";
 <expr>"^="                         return "^=";
 <expr>"^"                          return "^";
-<expr>"~"                          parser.restricted = false; return "~";
+<expr>"~"                          return "~";
 
 <<EOF>>                            return "EOF";
 
 %%
-
-/* Begin Lexer Customization Methods */
-var _originalLexMethod = lexer.lex;
-
-lexer.lex = function() {
-	parser.wasNewLine = parser.newLine;
-	parser.newLine = false;
-
-	return _originalLexMethod.call(this);
-};
-/* End Lexer Customization Methods */
-
 /lex
 
 %start Document /* Define Start Production */
@@ -608,18 +554,6 @@ UnaryExpr
         {
             $$ = new UnaryExpressionNode("typeof", true, $2, createSourceLocation(null, @1, @2));
         }
-    | "BR++" UnaryExpression
-        {
-            @1.first_line = @1.last_line;
-            @1.first_column = @1.last_column - 2;
-            $$ = new UpdateExpressionNode("++", $2, true, createSourceLocation(null, @1, @2));
-        }
-    | "BR--" UnaryExpression
-        {
-            @1.first_line = @1.last_line;
-            @1.first_column = @1.last_column - 2;
-            $$ = new UpdateExpressionNode("--", $2, true, createSourceLocation(null, @1, @2));
-        }
     | "++" UnaryExpression
         {
             $$ = new UpdateExpressionNode("++", $2, true, createSourceLocation(null, @1, @2));
@@ -936,25 +870,6 @@ function parseNumericLiteral(literal) {
 		return Number(literal);
 	}
 }
-
-/* Begin Parser Customization Methods */
-var _originalParseMethod = parser.parse;
-
-parser.parse = function(source, args) {
-	parser.wasNewLine = false;
-	parser.newLine = false;
-	parser.restricted = false;
-
-	return _originalParseMethod.call(this, source);
-};
-
-parser.parseError = function(str, hash) {
-    //console.log(JSON.stringify(hash) + "\n\n\n" + parser.newLine + "\n" + parser.wasNewLine + "\n\n" + hash.expected.indexOf("';'"));
-	if (!((hash.expected && hash.expected.indexOf("';'") >= 0) && (hash.token === "}" || hash.token === "EOF" || hash.token === "BR++" || hash.token === "BR--" || parser.newLine || parser.wasNewLine))) {
-		throw new SyntaxError(str);
-	}
-};
-/* End Parser Customization Methods */
 
 /* Begin AST Node Constructors */
 function DocumentNode(body, loc) {
