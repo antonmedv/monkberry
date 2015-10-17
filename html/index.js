@@ -1,16 +1,21 @@
 var fs = require('fs');
 var asciitree = require('asciitree');
-var parser = require('./grammar').parser;
+var parser = require('../parser').parser;
 var expr = require('../lib/compiler/expression');
 
-var code = fs.readFileSync(__dirname + '/template.twig', {encoding: 'utf8'});
+var file = 'template.twig';
+var code = fs.readFileSync(__dirname + '/' + file, {encoding: 'utf8'});
 
 //code = code.replace(/(}}|%}|>)\s+(<|{%|{{)/g, '$1$2');
 
 expr(parser.ast);
-var ast = parser.parse(code);
+var ast = parser.parse(code, file);
 
-console.log(ast.body[0].compile());
+var output = ast.body[0].compile().toStringWithSourceMap({
+  file: 'dist.js'
+});
+console.log(output.code);
+console.log(output.map.toString());
 
 console.log(asciitree(
     ast.body[0],

@@ -85,7 +85,7 @@ var $0 = $$.length - 1;
 switch (yystate) {
 case 1:
 
-            this.$ = new DocumentNode($$[$0-1], createSourceLocation(null, _$[$0-1], _$[$0]));
+            this.$ = new DocumentNode($$[$0-1], createSourceLocation(_$[$0-1], _$[$0]));
             return this.$;
         
 break;
@@ -116,7 +116,7 @@ case 8:
 break;
 case 9:
 
-          this.$ = new TextNode($$[$0], createSourceLocation(null, _$[$0], _$[$0]));
+          this.$ = new TextNode($$[$0], createSourceLocation(_$[$0], _$[$0]));
         
 break;
 case 10:
@@ -126,23 +126,23 @@ case 10:
 break;
 case 11:
 
-            this.$ = new ElementNode($$[$0-2], $$[$0-1], [], createSourceLocation(null, _$[$0-3], _$[$0]));
+            this.$ = new ElementNode($$[$0-2], $$[$0-1], [], createSourceLocation(_$[$0-3], _$[$0]));
         
 break;
 case 12:
 
-                this.$ = new ElementNode($$[$0-3], $$[$0-2], [], createSourceLocation(null, _$[$0-4], _$[$0]));
+                this.$ = new ElementNode($$[$0-3], $$[$0-2], [], createSourceLocation(_$[$0-4], _$[$0]));
             
 break;
 case 13:
 
-            this.$ = new ElementNode($$[$0-3], $$[$0-2], [], createSourceLocation(null, _$[$0-4], _$[$0]));
+            this.$ = new ElementNode($$[$0-3], $$[$0-2], [], createSourceLocation(_$[$0-4], _$[$0]));
         
 break;
 case 14:
 
             if ($$[$0-6] == $$[$0-1]) {
-                this.$ = new ElementNode($$[$0-6], $$[$0-5], [], createSourceLocation(null, _$[$0-7], _$[$0]));
+                this.$ = new ElementNode($$[$0-6], $$[$0-5], [], createSourceLocation(_$[$0-7], _$[$0]));
             } else {
                 throw new SyntaxError(
                     "Syntax error on line " + (yylineno + 1) + ":\n" +
@@ -154,7 +154,7 @@ break;
 case 15:
 
             if ($$[$0-7] == $$[$0-1]) {
-                this.$ = new ElementNode($$[$0-7], $$[$0-6], $$[$0-4], createSourceLocation(null, _$[$0-8], _$[$0]));
+                this.$ = new ElementNode($$[$0-7], $$[$0-6], $$[$0-4], createSourceLocation(_$[$0-8], _$[$0]));
             } else {
                 throw new SyntaxError(
                     "Syntax error on line " + (yylineno + 1) + ":\n" +
@@ -165,32 +165,32 @@ case 15:
 break;
 case 24:
 
-            this.$ = new ExpressionStatementNode($$[$0-1], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new ExpressionStatementNode($$[$0-1], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 25:
 
-            this.$ = new IfStatementNode($$[$0-5], $$[$0-3], null, createSourceLocation(null, _$[$0-7], _$[$0]));
+            this.$ = new IfStatementNode($$[$0-5], $$[$0-3], null, createSourceLocation(_$[$0-7], _$[$0]));
         
 break;
 case 26:
 
-            this.$ = new IfStatementNode($$[$0-9], $$[$0-7], $$[$0-3], createSourceLocation(null, _$[$0-11], _$[$0]));
+            this.$ = new IfStatementNode($$[$0-9], $$[$0-7], $$[$0-3], createSourceLocation(_$[$0-11], _$[$0]));
         
 break;
 case 27:
 
-            this.$ = new ForStatementNode($$[$0-5], $$[$0-3], null, createSourceLocation(null, _$[$0-7], _$[$0]));
+            this.$ = new ForStatementNode($$[$0-5], $$[$0-3], null, createSourceLocation(_$[$0-7], _$[$0]));
         
 break;
 case 28:
 
-            this.$ = new ForStatementNode($$[$0-5], $$[$0-3], {value: $$[$0-7]}, createSourceLocation(null, _$[$0-9], _$[$0]));
+            this.$ = new ForStatementNode($$[$0-5], $$[$0-3], {value: $$[$0-7]}, createSourceLocation(_$[$0-9], _$[$0]));
         
 break;
 case 29:
 
-            this.$ = new ForStatementNode($$[$0-5], $$[$0-3], {key: $$[$0-9], value: $$[$0-7]}, createSourceLocation(null, _$[$0-11], _$[$0-1]));
+            this.$ = new ForStatementNode($$[$0-5], $$[$0-3], {key: $$[$0-9], value: $$[$0-7]}, createSourceLocation(_$[$0-11], _$[$0-1]));
         
 break;
 case 30:
@@ -200,22 +200,22 @@ case 30:
 break;
 case 33:
 
-            this.$ = new AttributeNode($$[$0], null, createSourceLocation(null, _$[$0], _$[$0]));
+            this.$ = new AttributeNode($$[$0], null, createSourceLocation(_$[$0], _$[$0]));
         
 break;
 case 34:
 
-            this.$ = new AttributeNode($$[$0-4], $$[$0-1], createSourceLocation(null, _$[$0-4], _$[$0]));
+            this.$ = new AttributeNode($$[$0-4], $$[$0-1], createSourceLocation(_$[$0-4], _$[$0]));
         
 break;
 case 40:
 
-            this.$ = new ThisExpressionNode(createSourceLocation(null, _$[$0], _$[$0]));
+            this.$ = new ThisExpressionNode(createSourceLocation(_$[$0], _$[$0]));
         
 break;
 case 41: case 80: case 81:
 
-            this.$ = new IdentifierNode($$[$0], createSourceLocation(null, _$[$0], _$[$0]));
+            this.$ = new IdentifierNode($$[$0], createSourceLocation(_$[$0], _$[$0]));
         
 break;
 case 44: case 85:
@@ -225,22 +225,22 @@ case 44: case 85:
 break;
 case 46:
 
-            this.$ = new ArrayExpressionNode([], createSourceLocation(null, _$[$0-1], _$[$0]));
+            this.$ = new ArrayExpressionNode([], createSourceLocation(_$[$0-1], _$[$0]));
         
 break;
 case 47: case 48:
 
-            this.$ = new ArrayExpressionNode($$[$0-1], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new ArrayExpressionNode($$[$0-1], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 49:
 
-            this.$ = new ArrayExpressionNode($$[$0-2].concat(null), createSourceLocation(null, _$[$0-3], _$[$0]));
+            this.$ = new ArrayExpressionNode($$[$0-2].concat(null), createSourceLocation(_$[$0-3], _$[$0]));
         
 break;
 case 50:
 
-            this.$ = new ArrayExpressionNode($$[$0-3].concat($$[$0-1]), createSourceLocation(null, _$[$0-4], _$[$0]));
+            this.$ = new ArrayExpressionNode($$[$0-3].concat($$[$0-1]), createSourceLocation(_$[$0-4], _$[$0]));
         
 break;
 case 51:
@@ -255,17 +255,17 @@ case 52:
 break;
 case 53:
 
-            this.$ = new ObjectExpressionNode([], createSourceLocation(null, _$[$0-1], _$[$0]));
+            this.$ = new ObjectExpressionNode([], createSourceLocation(_$[$0-1], _$[$0]));
         
 break;
 case 54:
 
-            this.$ = new ObjectExpressionNode($$[$0-1], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new ObjectExpressionNode($$[$0-1], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 55:
 
-            this.$ = new ObjectExpressionNode($$[$0-2], createSourceLocation(null, _$[$0-3], _$[$0]));
+            this.$ = new ObjectExpressionNode($$[$0-2], createSourceLocation(_$[$0-3], _$[$0]));
         
 break;
 case 58:
@@ -276,7 +276,7 @@ break;
 case 59:
 
             if ($$[$0-6] === "get") {
-                this.$ = {key: $$[$0-5], value: (new FunctionExpressionNode(null, [], $$[$0-1], false, false, createSourceLocation(null, _$[$0-5], _$[$0]))), kind: "get"};
+                this.$ = {key: $$[$0-5], value: (new FunctionExpressionNode(null, [], $$[$0-1], false, false, createSourceLocation(_$[$0-5], _$[$0]))), kind: "get"};
             } else {
                 this.parseError("Invalid getter", {});
             }
@@ -285,7 +285,7 @@ break;
 case 60:
 
             if ($$[$0-7] === "set") {
-                this.$ = {key: $$[$0-6], value: (new FunctionExpressionNode(null, $$[$0-4], $$[$0-1], false, false, createSourceLocation(null, _$[$0-6], _$[$0]))), kind: "set"};
+                this.$ = {key: $$[$0-6], value: (new FunctionExpressionNode(null, $$[$0-4], $$[$0-1], false, false, createSourceLocation(_$[$0-6], _$[$0]))), kind: "set"};
             } else {
                 this.parseError("Invalid setter", {});
             }
@@ -293,248 +293,248 @@ case 60:
 break;
 case 64:
 
-            this.$ = [new IdentifierNode($$[$0], createSourceLocation(null, _$[$0], _$[$0]))];
+            this.$ = [new IdentifierNode($$[$0], createSourceLocation(_$[$0], _$[$0]))];
         
 break;
 case 67: case 74:
 
-            this.$ = new MemberExpressionNode($$[$0-3], $$[$0-1], true, createSourceLocation(null, _$[$0-3], _$[$0]));
+            this.$ = new MemberExpressionNode($$[$0-3], $$[$0-1], true, createSourceLocation(_$[$0-3], _$[$0]));
         
 break;
 case 68: case 75:
 
-            this.$ = new MemberExpressionNode($$[$0-2], $$[$0], false, createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new MemberExpressionNode($$[$0-2], $$[$0], false, createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 69:
 
-            this.$ = new NewExpressionNode($$[$0-1], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new NewExpressionNode($$[$0-1], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 71:
 
-            this.$ = new NewExpressionNode($$[$0], null, createSourceLocation(null, _$[$0-1], _$[$0]));
+            this.$ = new NewExpressionNode($$[$0], null, createSourceLocation(_$[$0-1], _$[$0]));
         
 break;
 case 72: case 73:
 
-            this.$ = new CallExpressionNode($$[$0-1], $$[$0], createSourceLocation(null, _$[$0-1], _$[$0]));
+            this.$ = new CallExpressionNode($$[$0-1], $$[$0], createSourceLocation(_$[$0-1], _$[$0]));
         
 break;
 case 76: case 78:
 
-            this.$ = new FilterExpressionNode($$[$0], [$$[$0-2]], createSourceLocation(null, _$[$0-2], _$[$0-1]));
+            this.$ = new FilterExpressionNode($$[$0], [$$[$0-2]], createSourceLocation(_$[$0-2], _$[$0-1]));
         
 break;
 case 77: case 79:
 
-            this.$ = new FilterExpressionNode($$[$0-1], [$$[$0-3]].concat($$[$0]), createSourceLocation(null, _$[$0-3], _$[$0-2]));
+            this.$ = new FilterExpressionNode($$[$0-1], [$$[$0-3]].concat($$[$0]), createSourceLocation(_$[$0-3], _$[$0-2]));
         
 break;
 case 82: case 83:
 
-            this.$ = new AccessorNode($$[$0], createSourceLocation(null, _$[$0], _$[$0]));
+            this.$ = new AccessorNode($$[$0], createSourceLocation(_$[$0], _$[$0]));
         
 break;
 case 91:
 
-            this.$ = new UpdateExpressionNode("++", $$[$0-1], false, createSourceLocation(null, _$[$0-1], _$[$0]));
+            this.$ = new UpdateExpressionNode("++", $$[$0-1], false, createSourceLocation(_$[$0-1], _$[$0]));
         
 break;
 case 92:
 
-            this.$ = new UpdateExpressionNode("--", $$[$0-1], false, createSourceLocation(null, _$[$0-1], _$[$0]));
+            this.$ = new UpdateExpressionNode("--", $$[$0-1], false, createSourceLocation(_$[$0-1], _$[$0]));
         
 break;
 case 95:
 
-            this.$ = new UnaryExpressionNode("typeof", true, $$[$0], createSourceLocation(null, _$[$0-1], _$[$0]));
+            this.$ = new UnaryExpressionNode("typeof", true, $$[$0], createSourceLocation(_$[$0-1], _$[$0]));
         
 break;
 case 96:
 
-            this.$ = new UpdateExpressionNode("++", $$[$0], true, createSourceLocation(null, _$[$0-1], _$[$0]));
+            this.$ = new UpdateExpressionNode("++", $$[$0], true, createSourceLocation(_$[$0-1], _$[$0]));
         
 break;
 case 97:
 
-            this.$ = new UpdateExpressionNode("--", $$[$0], true, createSourceLocation(null, _$[$0-1], _$[$0]));
+            this.$ = new UpdateExpressionNode("--", $$[$0], true, createSourceLocation(_$[$0-1], _$[$0]));
         
 break;
 case 98:
 
-            this.$ = new UnaryExpressionNode("+", true, $$[$0], createSourceLocation(null, _$[$0-1], _$[$0]));
+            this.$ = new UnaryExpressionNode("+", true, $$[$0], createSourceLocation(_$[$0-1], _$[$0]));
         
 break;
 case 99:
 
-            this.$ = new UnaryExpressionNode("-", true, $$[$0], createSourceLocation(null, _$[$0-1], _$[$0]));
+            this.$ = new UnaryExpressionNode("-", true, $$[$0], createSourceLocation(_$[$0-1], _$[$0]));
         
 break;
 case 100:
 
-            this.$ = new UnaryExpressionNode("~", true, $$[$0], createSourceLocation(null, _$[$0-1], _$[$0]));
+            this.$ = new UnaryExpressionNode("~", true, $$[$0], createSourceLocation(_$[$0-1], _$[$0]));
         
 break;
 case 101:
 
-            this.$ = new UnaryExpressionNode("!", true, $$[$0], createSourceLocation(null, _$[$0-1], _$[$0]));
+            this.$ = new UnaryExpressionNode("!", true, $$[$0], createSourceLocation(_$[$0-1], _$[$0]));
         
 break;
 case 103:
 
-            this.$ = new BinaryExpressionNode("*", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode("*", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 104:
 
-            this.$ = new BinaryExpressionNode("/", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode("/", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 105:
 
-            this.$ = new BinaryExpressionNode("%", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode("%", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 107:
 
-            this.$ = new BinaryExpressionNode("+", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode("+", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 108:
 
-            this.$ = new BinaryExpressionNode("-", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode("-", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 110:
 
-            this.$ = new BinaryExpressionNode("<<", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode("<<", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 111:
 
-            this.$ = new BinaryExpressionNode(">>", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode(">>", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 112:
 
-            this.$ = new BinaryExpressionNode(">>>", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode(">>>", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 114:
 
-            this.$ = new BinaryExpressionNode("<", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode("<", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 115:
 
-            this.$ = new BinaryExpressionNode(">", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode(">", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 116:
 
-            this.$ = new BinaryExpressionNode("<=", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode("<=", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 117:
 
-            this.$ = new BinaryExpressionNode(">=", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode(">=", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 118:
 
-            this.$ = new BinaryExpressionNode("instanceof", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode("instanceof", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 119:
 
-            this.$ = new BinaryExpressionNode("in", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode("in", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 121:
 
-            this.$ = new BinaryExpressionNode("==", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode("==", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 122:
 
-            this.$ = new BinaryExpressionNode("!=", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode("!=", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 123:
 
-            this.$ = new BinaryExpressionNode("===", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode("===", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 124:
 
-            this.$ = new BinaryExpressionNode("!==", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new BinaryExpressionNode("!==", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 126:
 
-            this.$ = new LogicalExpressionNode("&&", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new LogicalExpressionNode("&&", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 128:
 
-            this.$ = new LogicalExpressionNode("||", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new LogicalExpressionNode("||", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 130:
 
-            this.$ = new ConditionalExpressionNode($$[$0-4], $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-4], _$[$0]));
+            this.$ = new ConditionalExpressionNode($$[$0-4], $$[$0-2], $$[$0], createSourceLocation(_$[$0-4], _$[$0]));
         
 break;
 case 133:
 
-            this.$ = new AssignmentExpressionNode("=", $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new AssignmentExpressionNode("=", $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 134:
 
-            this.$ = new AssignmentExpressionNode($$[$0-1], $$[$0-2], $$[$0], createSourceLocation(null, _$[$0-2], _$[$0]));
+            this.$ = new AssignmentExpressionNode($$[$0-1], $$[$0-2], $$[$0], createSourceLocation(_$[$0-2], _$[$0]));
         
 break;
 case 147:
 
             if ($$[$0-2].type === "SequenceExpression") {
                 $$[$0-2].expressions.concat($$[$0]);
-                $$[$0-2].loc = createSourceLocation(null, _$[$0-2], _$[$0]);
+                $$[$0-2].loc = createSourceLocation(_$[$0-2], _$[$0]);
                 this.$ = $$[$0-2];
             } else {
-                this.$ = new SequenceExpressionNode([$$[$0-2], $$[$0]], createSourceLocation(null, _$[$0-2], _$[$0]));
+                this.$ = new SequenceExpressionNode([$$[$0-2], $$[$0]], createSourceLocation(_$[$0-2], _$[$0]));
             }
         
 break;
 case 153:
 
-            this.$ = new LiteralNode(null, createSourceLocation(null, _$[$0], _$[$0]));
+            this.$ = new LiteralNode(null, createSourceLocation(_$[$0], _$[$0]));
         
 break;
 case 154:
 
-            this.$ = new LiteralNode(true, createSourceLocation(null, _$[$0], _$[$0]));
+            this.$ = new LiteralNode(true, createSourceLocation(_$[$0], _$[$0]));
         
 break;
 case 155:
 
-            this.$ = new LiteralNode(false, createSourceLocation(null, _$[$0], _$[$0]));
+            this.$ = new LiteralNode(false, createSourceLocation(_$[$0], _$[$0]));
         
 break;
 case 156:
 
-            this.$ = new LiteralNode(parseNumericLiteral($$[$0]), createSourceLocation(null, _$[$0], _$[$0]));
+            this.$ = new LiteralNode(parseNumericLiteral($$[$0]), createSourceLocation(_$[$0], _$[$0]));
         
 break;
 case 157:
 
-            this.$ = new LiteralNode($$[$0], createSourceLocation(null, _$[$0], _$[$0]));
+            this.$ = new LiteralNode($$[$0], createSourceLocation(_$[$0], _$[$0]));
         
 break;
 case 158:
 
-            this.$ = new LiteralNode(parseRegularExpressionLiteral($$[$0-1] + $$[$0]), createSourceLocation(null, _$[$0-1], _$[$0]));
+            this.$ = new LiteralNode(parseRegularExpressionLiteral($$[$0-1] + $$[$0]), createSourceLocation(_$[$0-1], _$[$0]));
         
 break;
 case 159: case 160:
@@ -692,8 +692,12 @@ parse: function parse(input) {
 }};
 
 
-function createSourceLocation(source, firstToken, lastToken) {
-	return new SourceLocation(source, new Position(firstToken.first_line, firstToken.first_column), new Position(lastToken.last_line, lastToken.last_column));
+function createSourceLocation(firstToken, lastToken, source) {
+	return new SourceLocation(
+	    source || parser.source,
+	    new Position(firstToken.first_line, firstToken.first_column),
+	    new Position(lastToken.last_line, lastToken.last_column)
+    );
 }
 
 function parseRegularExpressionLiteral(literal) {
@@ -715,6 +719,15 @@ function parseNumericLiteral(literal) {
 		return Number(literal);
 	}
 }
+
+/* Begin Parser Customization Methods */
+var originalParseMethod = parser.parse;
+
+parser.parse = function (code, source) {
+	parser.source = source;
+	return originalParseMethod.call(this, code);
+};
+/* End Parser Customization Methods */
 
 /* Begin AST Node Constructors */
 function DocumentNode(body, loc) {

@@ -13,168 +13,166 @@ export default function (ast) {
         sn.add(", ");
       }
 
-      sn.add(args[i].compile());
+      sn.add(this.arguments[i].compile());
     }
 
-    sn.add(")");
-
-    return sn;
+    return sn.add(")");
   };
 
-  ast.ArrayExpressionNode.prototype.print = function () {
-    var str = "[";
+  ast.ArrayExpressionNode.prototype.compile = function () {
+    var sn = sourceNode(this.loc, "[");
     var elements = this.elements;
 
-    for (var i = 0, len = elements.length; i < len; i++) {
-      if (i !== 0)
-        str += ", ";
+    for (var i = 0; i < this.elements.length; i++) {
+      if (i !== 0) {
+        sn.add(", ");
+      }
 
-      str += elements[i].print("", "");
+      sn.add(elements[i].compile());
     }
 
-    return str + "]";
+    return sn.add("]");
   };
 
-  ast.ObjectExpressionNode.prototype.print = function () {
-    var str = "({";
-    var properties = this.properties;
+  ast.ObjectExpressionNode.prototype.compile = function () {
+    var sn = sourceNode(this.loc, "({");
 
-    for (var i = 0, len = properties.length; i < len; i++) {
-      var prop = properties[i];
+    for (let i = 0; i < this.properties.length; i++) {
+      var prop = this.properties[i];
       var kind = prop.kind;
       var key = prop.key;
       var value = prop.value;
 
-      if (i !== 0)
-        str += ", ";
+      if (i !== 0) {
+        sn.add(", ");
+      }
 
       if (kind === "init") {
-        str += key.print("", "") + ": " + value.print("", "");
+        sn.add([key.compile(), ": ", value.compile()]);
       } else {
         var params = value.params;
         var body = value.body;
 
-        str += kind + " " + key.print("", "") + "(";
+        sn.add([kind, " ", key.compile(), "("]);
 
-        for (var j = 0, plen = params.length; j < plen; j++) {
-          if (j !== 0)
-            str += ", ";
+        for (let j = 0; j < params.length; j++) {
+          if (j !== 0) {
+            sn.add(", ");
+          }
 
-          str += params[j].print("", "");
+          sn.add(params[j].compile());
         }
 
-        str += ") { ";
+        sn.add(") { ");
 
-        for (var j = 0, blen = body.length; j < blen; j++) {
-          str += body[j].print("", "") + " ";
+        for (let j = 0; j < body.length; j++) {
+          sn.add([body[j].compile(), " "]);
         }
 
-        str += "}";
+        sn.add("}");
       }
     }
 
-    return str + "})";
+    return sn.add("})");
   };
 
-  ast.SequenceExpressionNode.prototype.print = function () {
-    var str = "";
-    var expressions = this.expressions;
+  ast.SequenceExpressionNode.prototype.compile = function () {
+    var sn = sourceNode(this.loc, "");
 
-    for (var i = 0, len = expressions.length; i < len; i++) {
-      if (i !== 0)
-        str += ", ";
+    for (var i = 0; i < this.expressions.length; i++) {
+      if (i !== 0) {
+        sn.add(", ");
+      }
 
-      str += expressions[i].print("", "");
+      sn.add(this.expressions[i].compile());
     }
 
-    return str;
+    return sn;
   };
 
-  ast.UnaryExpressionNode.prototype.print = function () {
-    var operator = this.operator;
-
-    if (operator === "delete" || operator === "void" || operator === "typeof") {
-      return operator + " (" + this.argument.print("", "") + ")";
+  ast.UnaryExpressionNode.prototype.compile = function () {
+    if (this.operator == "delete" || this.operator == "void" || this.operator == "typeof") {
+      return sourceNode(this.loc, [this.operator, " (", this.argument.compile(), ")"]);
     } else {
-      return operator + "(" + this.argument.print("", "") + ")";
+      return sourceNode(this.loc, [this.operator, "(", this.argument.compile(), ")"]);
     }
   };
 
-  ast.BinaryExpressionNode.prototype.print = function () {
-    return "(" + this.left.print("", "") + ") " + this.operator + " (" + this.right.print("", "") + ")";
+  ast.BinaryExpressionNode.prototype.compile = function () {
+    return sourceNode(this.loc, ["(", this.left.compile(), ") ", this.operator, " (", this.right.compile(), ")"]);
   };
 
-  ast.AssignmentExpressionNode.prototype.print = function () {
-    return "(" + this.left.print("", "") + ") " + this.operator + " (" + this.right.print("", "") + ")";
+  ast.AssignmentExpressionNode.prototype.compile = function () {
+    return sourceNode(this.loc, ["(", this.left.compile(), ") ", this.operator, " (", this.right.compile(), ")"]);
   };
 
-  ast.UpdateExpressionNode.prototype.print = function () {
+  ast.UpdateExpressionNode.prototype.compile = function () {
     if (this.prefix) {
-      return "(" + this.operator + this.argument.print("", "") + ")";
+      return sourceNode(this.loc, ["(", this.operator, this.argument.compile(), ")"]);
     } else {
-      return "(" + this.argument.print("", "") + this.operator + ")";
+      return sourceNode(this.loc, ["(", this.argument.compile(), this.operator, ")"]);
     }
   };
 
-  ast.LogicalExpressionNode.prototype.print = function () {
-    return "(" + this.left.print("", "") + ") " + this.operator + " (" + this.right.print("", "") + ")";
+  ast.LogicalExpressionNode.prototype.compile = function () {
+    return sourceNode(this.loc, ["(", this.left.compile(), ") ", this.operator, " (" + this.right.compile(), ")"]);
   };
 
-  ast.ConditionalExpressionNode.prototype.print = function () {
-    return "(" + this.test.print("", "") + ") ? " + this.consequent.print("", "") + " : " + this.alternate.print("", "");
+  ast.ConditionalExpressionNode.prototype.compile = function () {
+    return sourceNode(this.loc, ["(", this.test.compile(), ") ? ", this.consequent.compile(), " : ", this.alternate.compile()]);
   };
 
-  ast.NewExpressionNode.prototype.print = function () {
-    var str = "new " + this.callee.print("", "");
-    var args = this.arguments;
+  ast.NewExpressionNode.prototype.compile = function () {
+    var sn = sourceNode(this.loc, ["new ", this.callee.compile()]);
 
-    if (args !== null) {
-      str += "(";
+    if (this.arguments !== null) {
+      sn.add("(");
 
-      for (var i = 0, len = args.length; i < len; i++) {
-        if (i !== 0)
-          str += ", ";
+      for (var i = 0; i < this.arguments.length; i++) {
+        if (i !== 0) {
+          sn.add(", ");
+        }
 
-        str += args[i].print("", "");
+        sn.add(this.arguments[i].compile());
       }
 
-      str += ")";
+      sn.add(")");
     }
 
-    return str;
+    return sn;
   };
 
-  ast.CallExpressionNode.prototype.print = function () {
-    var str = this.callee.print("", "") + "(";
-    var args = this.arguments;
+  ast.CallExpressionNode.prototype.compile = function () {
+    var sn = sourceNode(this.loc, [this.callee.compile(), "("]);
 
-    for (var i = 0, len = args.length; i < len; i++) {
-      if (i !== 0)
-        str += ", ";
+    for (let i = 0; i < this.arguments.length; i++) {
+      if (i !== 0) {
+        sn.add(", ");
+      }
 
-      str += args[i].print("", "");
+      sn.add(this.arguments[i].compile());
     }
 
-    return str + ")";
+    return sn.add(")");
   };
 
-  ast.MemberExpressionNode.prototype.print = function () {
+  ast.MemberExpressionNode.prototype.compile = function () {
     if (this.computed) {
-      return this.object.print("", "") + "[" + this.property.print("", "") + "]";
+      return sourceNode(this.loc, [this.object.compile(), "[", this.property.compile(), "]"]);
     } else {
-      return this.object.print("", "") + "." + this.property.print("", "");
+      return sourceNode(this.loc, [this.object.compile(), ".", this.property.compile()]);
     }
   };
 
-  ast.IdentifierNode.prototype.print = function () {
-    return sourceNode(this.name);
+  ast.IdentifierNode.prototype.compile = function () {
+    return sourceNode(this.loc, this.name);
   };
 
-  ast.AccessorNode.prototype.print = function () {
-    return this.name;
+  ast.AccessorNode.prototype.compile = function () {
+    return sourceNode(this.loc, this.name);
   };
 
-  ast.LiteralNode.prototype.print = function () {
-    return this.value;
+  ast.LiteralNode.prototype.compile = function () {
+    return sourceNode(this.loc, this.value.toString());
   };
 };
