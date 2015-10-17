@@ -1,6 +1,6 @@
 {
   "name": "monkberry",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "JavaScript DOM Template Engine",
   "bin": "./bin/monkberry",
   "main": "lib/index.js",
@@ -29,7 +29,6 @@
   "homepage": "https://github.com/monkberry/monkberry#readme",
   "dependencies": {
     "commander": "^2.8.1",
-    "htmlparser2": "^3.8.3",
     "source-map": "^0.5.1",
     "through": "^2.3.7"
   },
