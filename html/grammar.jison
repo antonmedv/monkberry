@@ -38,8 +38,8 @@ RegularExpressionChar ([^\n\r\\\/\[])|{RegularExpressionBackslashSequence}|{Regu
 RegularExpressionBody {RegularExpressionFirstChar}{RegularExpressionChar}*
 RegularExpressionLiteral {RegularExpressionBody}\/{RegularExpressionFlags}
 
-Text [^(<|{{|{%)]+
-AttributeText [^\"{{{%]+
+Text [^<{]+
+AttributeText [^\"{]+
 
 %x html
 %x attr
@@ -49,6 +49,7 @@ AttributeText [^\"{{{%]+
 %%
 
 "<"                                this.begin("html"); return "<";
+"{"                                return "TEXT";
 "{{"                               this.begin("expr"); return "{{";
 "{%"                               this.begin("expr"); return "{%";
 {Text}                             return "TEXT";
@@ -56,6 +57,7 @@ AttributeText [^\"{{{%]+
 <html>">"                          this.popState(); return ">";
 <html>"input"                      return "INPUT";
 <html>"br"                         return "BR";
+<html>"hr"                         return "HR";
 <html>"link"                       return "LINK";
 <html>"meta"                       return "META";
 <html>([\w-]+)                     return "IDENTIFIER";
@@ -64,6 +66,7 @@ AttributeText [^\"{{{%]+
 <html>(\")                         this.begin("attr"); return "QUOTE";
 <html>"/"                          return "/";
 
+<attr>"{"                          return "TEXT";
 <attr>"{{"                         this.begin("expr"); return "{{";
 <attr>"{%"                         this.begin("expr"); return "{%";
 <attr>{AttributeText}              return "TEXT";
@@ -223,6 +226,7 @@ Element
 EmptyTag
     : INPUT
     | BR
+    | HR
     | LINK
     | META
     ;
