@@ -38,7 +38,7 @@ export class Figure {
 
     if (size(this.complexUpdaters) > 0) {
       sn.add('  // Complex update functions\n')
-        .add('  var __cache__ = view.cache = {};\n')
+        .add('  var __cache__ = view.__cache__ = {};\n')
         .add('  var λ = {\n')
         .add([this.compileComplexUpdaters(), '\n'])
         .add('  };\n')
@@ -47,22 +47,22 @@ export class Figure {
 
     if (size(this.updaters) > 0) {
       sn.add('  // Update functions\n')
-        .add('  view.set = {\n')
+        .add('  view.__update__ = {\n')
         .add([this.compileUpdaters(), '\n'])
         .add('  };\n')
         .add('\n');
     }
 
-    //if (figure.updateActions.length > 0) {
-    //  sn.add('  // Extra update function\n');
-    //  sn.add('  view._update = function (__data__) {\n');
-    //  sn.add([indent(figure.compileUpdateActions(), 4), '\n']);
-    //  sn.add('  };\n');
-    //  sn.add('\n');
-    //}
+    if (this.updateActions.length > 0) {
+      sn.add('  // Extra update function\n')
+      .add('  view.onUpdate = function (__data__) {\n')
+      .add([this.compileUpdateActions(), '\n'])
+      .add('  };\n')
+      .add('\n');
+    }
 
     sn.add('  // Set root nodes\n');
-    sn.add(['  view.nodes = [', this.children.join(', '), '];\n']);
+    sn.add(['  view.nodes = [', join(this.children, ', '), '];\n']);
     sn.add('  return view;\n');
 
     sn.add('}');
@@ -98,7 +98,15 @@ export class Figure {
     return sourceNode(null, parts).join(',\n');
   }
 
-  addUpdater(variables, callback, dataDependent = false) {
+  compileUpdateActions() {
+    var parts = [];
+    for (var control of this.updateActions) {
+      parts.push(control);
+    }
+    return join(parts, ';\n').add(parts.length ? ';' : '');
+  }
+
+  addUpdater(loc, variables, callback, dataDependent = false) {
     if (variables.length == 1) {
 
       this.onUpdater(variables[0]).add(callback());
@@ -114,7 +122,7 @@ export class Figure {
 
       for (let variable of variables) {
         this.onUpdater(variable).cache();
-        this.onUpdater(variable).addComplex(variables, complexUpdater.name);
+        this.onUpdater(variable).addComplex(loc, variables, complexUpdater.name);
       }
     }
   }

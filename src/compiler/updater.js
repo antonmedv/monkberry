@@ -58,7 +58,7 @@ export class Updater {
     this.operators.push(code);
   }
 
-  addComplex(params, functionName) {
+  addComplex(loc, params, functionName) {
     params = params.sort();
     var complexName = uniqueName(params);
 
@@ -66,7 +66,7 @@ export class Updater {
       this.complex[complexName] = new Complex(params);
     }
 
-    this.complex[complexName].add(functionName, params);
+    this.complex[complexName].add(functionName, [loc, params]);
   }
 
   cache() {
@@ -96,8 +96,8 @@ class Complex {
     var parts = [];
 
     Object.keys(this.calls).forEach((functionName) => {
-      var params = this.calls[functionName];
-      parts.push(sourceNode(null, [
+      var [loc, params] = this.calls[functionName];
+      parts.push(sourceNode(loc, [
         '        λ.', functionName, '(__data__, ', params.map((param) => '__cache__.' + param).join(', '), ');'
       ]));
     });

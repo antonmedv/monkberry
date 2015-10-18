@@ -3,14 +3,14 @@ import { collectVariables } from './expression/variable';
 
 export default function (ast) {
   ast.ExpressionStatementNode.prototype.compile = function (figure) {
-    this.nodeName = 'expr' + figure.uniqid();
+    this.nodeName = 'text' + figure.uniqid();
 
     figure.declarations.push(
       sourceNode(this.loc, [this.nodeName, " = document.createTextNode('')"])
     );
 
     var variables = collectVariables(this.expression);
-    figure.addUpdater(variables, () => {
+    figure.addUpdater(this.loc, variables, () => {
       return sourceNode(this.loc, ['      ', this.nodeName, '.textContent = ', this.expression.compile()]);
     });
 

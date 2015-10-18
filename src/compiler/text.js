@@ -7,13 +7,7 @@ export default function (ast) {
       return null;
     }
 
-    this.nodeName = 'text' + figure.uniqid();
-
-    figure.declarations.push(
-      // Trim new lines and white spaces to a single whitespace.
-      sourceNode(this.loc, [this.nodeName, " = document.createTextNode('", this.text.replace(/^\s+|\s+$/g, ' '), "')"])
-    );
-
-    return this.nodeName;
+    // Trim new lines and white spaces to a single whitespace.
+    return sourceNode(this.loc, ["document.createTextNode('", this.text.replace(/^\s+|\s+$/g, ' '), "')"]);
   };
 }

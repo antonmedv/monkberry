@@ -183,15 +183,15 @@
         }
       });
     }
-    if (_this.set) {
+    if (_this.__update__) {
       keys.forEach(function (key) {
-        if (_this.set.hasOwnProperty(key)) {
-          _this.set[key](data, data[key]);
+        if (_this.__update__.hasOwnProperty(key)) {
+          _this.__update__[key](data, data[key]);
         }
       });
     }
-    if (_this._update) {
-      _this._update(data);
+    if (_this.onUpdate) {
+      _this.onUpdate(data);
     }
   };
 
