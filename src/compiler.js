@@ -6,7 +6,14 @@ import visitor from './compiler/expression/visitor';
 import document from './compiler/document';
 import element from './compiler/element';
 import text from './compiler/text';
+import if_ from './compiler/if';
+
+
+
 import { drawGraph } from './graph';
+
+
+
 
 export default class Compiler {
   constructor() {
@@ -18,6 +25,7 @@ export default class Compiler {
     expression(parser.ast);
     visitor(parser.ast);
     text(parser.ast);
+    if_(parser.ast);
   }
 
   addSource(name, code) {

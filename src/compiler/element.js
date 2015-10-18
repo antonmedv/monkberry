@@ -9,7 +9,11 @@ export default function (ast) {
       sourceNode(this.loc, [this.nodeName, " = document.createElement('", this.name, "')"])
     );
 
-    var children = map(this.body, (node) => node.compile(figure));
+    var children = map(this.body, (node) => {
+      node.parent = this; // This is needed for backward lookup then optimizing "if" and "for".
+      return node.compile(figure);
+    });
+
     for (var child of children) {
       figure.construct.push(
         sourceNode(this.loc, [this.nodeName, ".appendChild(", child, ");"])

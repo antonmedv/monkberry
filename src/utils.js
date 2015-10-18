@@ -24,3 +24,15 @@ export function unique(a) {
 export function uniqueName(params) {
   return unique(params).sort().join('_');
 }
+
+export function lookUpOnlyOneChild(node) {
+  var parent = node.parent;
+  if (parent) {
+    if (parent.type == 'Element') {
+      if (parent.body.length == 1 && parent.body[0] == node) {
+        return parent;
+      }
+    }
+  }
+  return null;
+}

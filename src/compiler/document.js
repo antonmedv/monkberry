@@ -10,7 +10,7 @@ export default function (ast) {
     var fns = [];
     for (let [name, fn] of figures) {
       fns.push(
-        sourceNode(this.loc, '  "' + name + '": ')
+        sourceNode(null, '"' + name + '": ')
           .add(fn)
       );
     }
@@ -26,7 +26,7 @@ function compileWalk(figure) {
   figures.push([figure.name, fn]);
 
   for (let subFigure of figure.subFigures) {
-    figures.concat(compileWalk(subFigure));
+    figures = figures.concat(compileWalk(subFigure));
   }
 
   return figures;
