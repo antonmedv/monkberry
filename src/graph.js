@@ -1,23 +1,7 @@
-var fs = require('fs');
-var asciitree = require('asciitree');
-var parser = require('../parser').parser;
-var expr = require('../lib/compiler/expression');
+import asciitree from 'asciitree';
 
-var file = 'template.twig';
-var code = fs.readFileSync(__dirname + '/' + file, {encoding: 'utf8'});
-
-//code = code.replace(/(}}|%}|>)\s+(<|{%|{{)/g, '$1$2');
-
-expr(parser.ast);
-var ast = parser.parse(code, file);
-
-var output = ast.body[0].compile().toStringWithSourceMap({
-  file: 'dist.js'
-});
-console.log(output.code);
-console.log(output.map.toString());
-
-console.log(asciitree(
+export function drawGraph(ast) {
+  return asciitree(
     ast.body[0],
     function (node) {
       if (node.type) {
@@ -79,5 +63,6 @@ console.log(asciitree(
       } else {
         return [];
       }
-    })
-);
+    }
+  );
+}

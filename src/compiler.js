@@ -5,6 +5,7 @@ import expression from './compiler/expression';
 import document from './compiler/document';
 import element from './compiler/element';
 import text from './compiler/text';
+import { drawGraph } from './graph';
 
 export default class Compiler {
   constructor() {
@@ -29,6 +30,8 @@ export default class Compiler {
       var figure = new Figure(name.replace(/\.\w+$/, ''));
 
       figures.add(ast.compile(figure));
+
+      console.log(drawGraph(ast));
     }
 
     var output = sourceNode(null, '');

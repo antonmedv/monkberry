@@ -1,8 +1,26 @@
 import { sourceNode } from './sourceNode';
 
 export default function (ast) {
-  ast.ExpressionStatementNode.prototype.compile = function () {
-    return sourceNode(this.loc, this.expression.compile());
+  ast.ExpressionStatementNode.prototype.compile = function (figure) {
+    this.nodeName = 'expr' + figure.uniqid();
+
+    figure.declarations.push(
+      sourceNode(this.loc, [this.nodeName, " = document.createTextNode('')"])
+    );
+
+    var variables = [];
+
+    this.ast.visit(function (node) {
+      if (node.type == 'Identifier') {
+        if (variables.indexOf(node.name) == -1) {
+          variables.push(node.name);
+        }
+      }
+    });
+
+    sourceNode(this.loc, this.expression.compile());
+
+    return this.nodeName;
   };
 
   ast.FilterExpressionNode.prototype.compile = function () {

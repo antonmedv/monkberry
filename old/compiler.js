@@ -18,8 +18,8 @@ function Compiler(name, dom) {
   this.uniqCounters = {};
   this.declarations = [];
   this.construct = [];
-  this.complexSetters = {};
-  this.setters = {};
+  this.complexUpdaters = {};
+  this.updaters = {};
   this.variables = {};
   this.updateActions = [];
   this.subTemplates = [];
@@ -95,7 +95,7 @@ Compiler.prototype.compileTemplate = function () {
   code += '  var view = monkberry.view();\n';
   code += '\n';
 
-  if (size(this.complexSetters) > 0) {
+  if (size(this.complexUpdaters) > 0) {
     code += '  // Complex setters functions\n';
     code += '  var __cache__ = view.cache = {};\n';
     code += '  var λ = {\n';
@@ -104,7 +104,7 @@ Compiler.prototype.compileTemplate = function () {
     code += '\n';
   }
 
-  if (size(this.setters) > 0) {
+  if (size(this.updaters) > 0) {
     code += '  // Setters functions\n';
     code += '  view.set = {\n';
     code += indent(this.compileSetters(), 4) + '\n';
@@ -131,8 +131,8 @@ Compiler.prototype.compileTemplate = function () {
 Compiler.prototype.compileSetters = function () {
   var code = [];
   var _this = this;
-  Object.keys(this.setters).forEach(function (key) {
-    code.push(key + ': ' + _this.setters[key].compile());
+  Object.keys(this.updaters).forEach(function (key) {
+    code.push(key + ': ' + _this.updaters[key].compile());
   });
   return code.join(',\n');
 };
@@ -140,8 +140,8 @@ Compiler.prototype.compileSetters = function () {
 Compiler.prototype.compileComplexSetters = function () {
   var code = [];
   var _this = this;
-  Object.keys(this.complexSetters).forEach(function (key) {
-    code.push(key + ': ' + _this.complexSetters[key].compile());
+  Object.keys(this.complexUpdaters).forEach(function (key) {
+    code.push(key + ': ' + _this.complexUpdaters[key].compile());
   });
   return code.join(',\n');
 };
@@ -391,12 +391,12 @@ Compiler.prototype.lookUpOnlyOneChild = function (node) {
 };
 
 Compiler.prototype.onSetter = function (variableName) {
-  return variableName in this.setters ? this.setters[variableName] : this.setters[variableName] = new SetterCompiler([variableName]);
+  return variableName in this.updaters ? this.updaters[variableName] : this.updaters[variableName] = new SetterCompiler([variableName]);
 };
 
 Compiler.prototype.onComplexSetter = function (variables) {
   var name = uniqueName(variables);
-  return name in this.complexSetters ? this.complexSetters[name] : this.complexSetters[name] = new SetterCompiler(variables);
+  return name in this.complexUpdaters ? this.complexUpdaters[name] : this.complexUpdaters[name] = new SetterCompiler(variables);
 };
 
 Compiler.prototype.uniqid = function (counter) {

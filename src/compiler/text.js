@@ -2,18 +2,16 @@ import { sourceNode } from './sourceNode';
 
 export default function (ast) {
   ast.TextNode.prototype.compile = function (figure) {
-    this.nodeName = 'text' + figure.uniqid();
-
-    // Trim new lines and white spaces.
-    var text = this.text.replace(/^\s+|\s+$/g, '');
-
-    if (text === '') {
+    if (this.text.replace(/^\s+|\s+$/g, '') === '') {
       // Skip creating of empty text nodes.
       return null;
     }
 
+    this.nodeName = 'text' + figure.uniqid();
+
     figure.declarations.push(
-      sourceNode(this.loc, [this.nodeName, " = document.createTextNode('", text, "')"])
+      // Trim new lines and white spaces to a single whitespace.
+      sourceNode(this.loc, [this.nodeName, " = document.createTextNode('", this.text.replace(/^\s+|\s+$/g, ' '), "')"])
     );
 
     return this.nodeName;
