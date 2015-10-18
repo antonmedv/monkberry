@@ -5,6 +5,7 @@ import expression from './compiler/expression';
 import visitor from './compiler/expression/visitor';
 import document from './compiler/document';
 import element from './compiler/element';
+import attribute from './compiler/attribute';
 import text from './compiler/text';
 import if_ from './compiler/if';
 import for_ from './compiler/for';
@@ -16,6 +17,7 @@ export default class Compiler {
     // Extend AST with compilers.
     document(parser.ast);
     element(parser.ast);
+    attribute(parser.ast);
     expression(parser.ast);
     visitor(parser.ast);
     text(parser.ast);

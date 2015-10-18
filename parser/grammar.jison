@@ -306,7 +306,7 @@ AttributeValue
     :
     | TEXT
         {
-            $$ = [$1];
+            $$ = [new LiteralNode(JSON.stringify($1), createSourceLocation(@1, @1))];
         }
     | ExpressionStatement
         {
@@ -314,7 +314,7 @@ AttributeValue
         }
     | AttributeValue TEXT
         {
-            $$ = $1.concat($2);
+            $$ = $1.concat(new LiteralNode(JSON.stringify($2), createSourceLocation(@1, @1)));
         }
     | AttributeValue ExpressionStatement
         {

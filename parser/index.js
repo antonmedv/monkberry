@@ -89,12 +89,12 @@ case 1:
             return this.$;
         
 break;
-case 2: case 5: case 36: case 37: case 56: case 86:
+case 2: case 5: case 37: case 56: case 86:
 
             this.$ = [$$[$0]];
         
 break;
-case 3: case 6: case 31: case 38: case 39:
+case 3: case 6: case 31: case 39:
 
             this.$ = $$[$0-1].concat($$[$0]);
         
@@ -206,6 +206,16 @@ break;
 case 34:
 
             this.$ = new AttributeNode($$[$0-4], $$[$0-1], createSourceLocation(_$[$0-4], _$[$0]));
+        
+break;
+case 36:
+
+            this.$ = [new LiteralNode(JSON.stringify($$[$0]), createSourceLocation(_$[$0], _$[$0]))];
+        
+break;
+case 38:
+
+            this.$ = $$[$0-1].concat(new LiteralNode(JSON.stringify($$[$0]), createSourceLocation(_$[$0-1], _$[$0-1])));
         
 break;
 case 40:
