@@ -2,37 +2,45 @@
 var fs = require('fs');
 var path = require('path');
 var program = require('commander');
-var Monkberry = require('../lib/index.js');
+var Compiler = require('../lib/compiler');
 
 program
   .usage('[options] <file ...>')
   .option('-o, --output [file]', 'output file name, if not specified will write to stdout.')
+  .option('-s, --source-map', 'generate source map.')
   .option('-w, --whitespace', 'keep whitespaces')
   .parse(process.argv);
 
-var compiler = null;
+if (program.args.length == 0) {
+  program.outputHelp();
+  process.exit(0);
+}
+
+var utf8 = {encoding: 'utf8'};
+var compiler = new Compiler();
 
 program.args.forEach(function (file) {
   var name = path.parse(file).name;
-  var text = fs.readFileSync(file, {encoding: 'utf8'});
-  Monkberry(name, text, {
-    normalizeWhitespace: program.whitespace ? false : true
-  }, function (forFile) {
-    if (compiler) {
-      compiler.subTemplates.push(forFile);
-    } else {
-      compiler = forFile;
-    }
-  });
+  var code = fs.readFileSync(file, utf8);
+  compiler.addSource(name, code);
 });
 
-if (compiler) {
-  var code = compiler.compile();
-  if (program.output) {
-    fs.writeFileSync(program.output, code, {encoding: 'utf8'});
-  } else {
-    console.log(code);
-  }
+var output, node = compiler.compile();
+
+if (program.output) {
+  var file = program.output,
+    fileName = path.parse(file).name,
+    sourceMapFile = file + '.map',
+    sourceMapFileName = fileName + '.map';
+
+  output = node.toStringWithSourceMap({
+    file: sourceMapFileName
+  });
+
+  var smu = '\n' + '//# sourceMappingURL=' + sourceMapFileName + '\n';
+
+  fs.writeFileSync(file, output.code + smu, utf8);
+  fs.writeFileSync(sourceMapFile, output.map, utf8);
 } else {
-  program.outputHelp();
+  console.log(node.toString());
 }

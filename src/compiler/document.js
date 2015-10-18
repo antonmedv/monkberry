@@ -2,59 +2,32 @@ import { sourceNode } from './sourceNode';
 
 export default function (ast) {
   ast.DocumentNode.prototype.compile = function (figure) {
-    var children = this.body.map((node) => node.compile(figure));
+    figure.children = this.body.map((node) => node.compile(figure));
 
-    var sn = sourceNode(this.loc, 'function () {\n');
+    var figures = compileWalk(figure);
 
-    if (figure.declarations.length > 0) {
-      sn.add('  // Create elements\n');
-      sn.add(['  var ', figure.compileDeclarations(), ';\n']);
-      sn.add('\n');
+    var fns = [];
+    for (let [name, fn] of figures) {
+      fns.push(
+        sourceNode(this.loc, '  "' + name + '": ')
+          .add(fn)
+      );
     }
 
-    //if (figure.construct.length > 0) {
-    //  sn.add('  // Construct dom\n');
-    //  sn.add([indent(figure.construct.join('\n'), 2), '\n']);
-    //  sn.add('\n');
-    //}
-    //
-    //sn.add('  // Create view\n');
-    //sn.add('  var view = monkberry.view();\n');
-    //sn.add('\n');
-    //
-    //if (size(figure.complexSetters) > 0) {
-    //  sn.add('  // Complex setters functions\n');
-    //  sn.add('  var __cache__ = view.cache = {};\n');
-    //  sn.add('  var λ = {\n');
-    //  sn.add([indent(figure.compileComplexSetters(), 4), '\n']);
-    //  sn.add('  };\n');
-    //  sn.add('\n');
-    //}
-    //
-    //if (size(figure.setters) > 0) {
-    //  sn.add('  // Setters functions\n');
-    //  sn.add('  view.set = {\n');
-    //  sn.add([indent(figure.compileSetters(), 4), '\n']);
-    //  sn.add('  };\n');
-    //  sn.add('\n');
-    //}
-    //
-    //if (figure.updateActions.length > 0) {
-    //  sn.add('  // Extra update function\n');
-    //  sn.add('  view._update = function (__data__) {\n');
-    //  sn.add([indent(figure.compileUpdateActions(), 4), '\n']);
-    //  sn.add('  };\n');
-    //  sn.add('\n');
-    //}
-
-    sn.add('  // Set root nodes\n');
-    sn.add(['  view.nodes = [', children.join(', '), '];\n']);
-    sn.add('  return view;\n');
-
-    sn.add('}');
-
-    return sn;
+    return sourceNode(this.loc, fns).join(',\n');
   };
 }
 
+function compileWalk(figure) {
+  var figures = [];
+  var fn = figure.compile();
+
+  figures.push([figure.name, fn]);
+
+  for (let subFigure of figure.subFigures) {
+    figures.concat(compileWalk(subFigure));
+  }
+
+  return figures;
+}
 

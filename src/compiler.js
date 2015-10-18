@@ -1,30 +1,54 @@
 import { parser } from '../parser';
 import { Figure } from './figure';
+import { sourceNode } from './compiler/sourceNode';
+import expression from './compiler/expression';
 import document from './compiler/document';
 import element from './compiler/element';
-import expression from './compiler/expression';
 import text from './compiler/text';
 
-document(parser.ast);
-element(parser.ast);
-expression(parser.ast);
-text(parser.ast);
+export default class Compiler {
+  constructor() {
+    this.sources = [];
 
+    // Extend AST with compilers.
+    document(parser.ast);
+    element(parser.ast);
+    expression(parser.ast);
+    text(parser.ast);
+  }
 
-var fs = require('fs');
-var file = 'template.twig';
-var code = fs.readFileSync(__dirname + '/../html/' + file, {encoding: 'utf8'});
+  addSource(name, code) {
+    this.sources.push([name, code]);
+  }
 
-var figure = new Figure('template');
-var ast = parser.parse(code, file);
+  compile(asModule = false) {
+    var figures = sourceNode(null, '');
 
-var output  = ast.compile(figure).toStringWithSourceMap({
-  file: 'dist.js'
-});
+    for (let [name, code] of this.sources) {
+      var ast = parser.parse(code, name);
+      var figure = new Figure(name.replace(/\.\w+$/, ''));
 
-console.log(output.code);
+      figures.add(ast.compile(figure));
+    }
 
-fs.writeFileSync('dist.js', output.code, {encoding: 'utf8'});
-fs.writeFileSync('dist.js.map', output.map, {encoding: 'utf8'});
+    var output = sourceNode(null, '');
+    if (asModule) {
+      output
+        .add('module.exports = function (monkberry, document) {\n')
+        .add('  var filters = monkberry.filters;\n')
+        .add('  return {\n')
+        .add(figures)
+        .add('  };\n')
+        .add('};\n');
+    } else {
+      output
+        .add('(function (monkberry, filters, document, undefined) {\n')
+        .add('  monkberry.mount({\n')
+        .add(figures)
+        .add('  });\n')
+        .add('})(monkberry, monkberry.filters, window.document, void 0);\n');
+    }
 
-
+    return output;
+  }
+}
