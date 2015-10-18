@@ -187,4 +187,4 @@ export default function (ast) {
   ast.LiteralNode.prototype.compile = function () {
     return sourceNode(this.loc, this.value.toString());
   };
-};
+}

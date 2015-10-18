@@ -6,9 +6,9 @@
     <br>
     {{ value.indexOf(amazing + amazing) != -1 }}
 
-    {% if value %}
+    {% for key, value of value %}
         <div>
             This is true!
         </div>
-    {% endif %}
+    {% endfor %}
 </div>

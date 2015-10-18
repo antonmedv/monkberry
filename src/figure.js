@@ -1,6 +1,12 @@
 import { sourceNode, join } from './compiler/sourceNode';
 import { Updater } from './compiler/updater';
-import { size, uniqueName } from './utils';
+import { size, uniqueName, map } from './utils';
+
+export function createFigure(name, nodes) {
+  var figure = new Figure(name);
+  figure.children = map(nodes, (node) => node.compile(figure));
+  return figure;
+}
 
 export class Figure {
   constructor(name) {

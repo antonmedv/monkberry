@@ -1126,6 +1126,7 @@ parser.ast.ElementNode = ElementNode;
 parser.ast.AttributeNode = AttributeNode;
 parser.ast.ExpressionStatementNode = ExpressionStatementNode;
 parser.ast.IfStatementNode = IfStatementNode;
+parser.ast.ForStatementNode = ForStatementNode;
 parser.ast.FilterExpressionNode = FilterExpressionNode;
 parser.ast.ThisExpressionNode = ThisExpressionNode;
 parser.ast.ArrayExpressionNode = ArrayExpressionNode;

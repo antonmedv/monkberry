@@ -1,3 +1,7 @@
+export function esc(str) {
+  return JSON.stringify(str);
+}
+
 export function map(array, fn) {
   return array.map(fn).filter((item) => item !== null);
 }

@@ -1,48 +1,49 @@
 import { sourceNode } from './sourceNode';
 import { createFigure } from '../figure';
 import { collectVariables } from './expression/variable';
-import { lookUpOnlyOneChild, map } from '../utils';
+import { lookUpOnlyOneChild, map, esc } from '../utils';
 
 export default function (ast) {
-  ast.IfStatementNode.prototype.compile = function (figure) {
-    var templateName = figure.name + '.if' + figure.uniqid('template_name');
+  ast.ForStatementNode.prototype.compile = function (figure) {
+    var templateName = figure.name + '.for' + figure.uniqid('template_name');
     // TODO: Optimize when child has only one custom node. Replace templateName with that custom tag name.
 
-    var childrenName = 'child' + figure.uniqid('child_name');
+    var childrenName = 'children' + figure.uniqid('child_name');
 
     var placeholder;
     var parentNode = lookUpOnlyOneChild(this);
     if (parentNode) {
       placeholder = parentNode.nodeName;
     } else {
-      placeholder = 'if' + figure.uniqid('placeholder');
-      figure.declarations.push(sourceNode(this.loc, [placeholder, " = document.createComment('if')"]));
+      placeholder = 'for' + figure.uniqid('placeholder');
+      figure.declarations.push(sourceNode(this.loc, [placeholder, " = document.createComment('for')"]));
     }
 
-    // if (
+    // for (
 
-    var variables = collectVariables(this.test);
+    var variables = collectVariables(this.expr);
     figure.addUpdater(this.loc, variables, () => {
       return sourceNode(this.loc, [
         "      ",
-        "monkberry.insert(view, ",
+        "monkberry.foreach(view, ",
         placeholder, ", ",
         childrenName, ", ",
         `'${templateName}', `,
         "__data__, ",
-        this.test.compile(),
+        this.expr.compile(),
+        (this.options === null ? "" : [
+          ", ", esc(this.options)
+        ]),
         ")"
       ]);
     }, true);
 
-    // ) then {
+    // ) {
 
-    if (this.then.length > 0) {
-      figure.subFigures.push(createFigure(templateName, this.then));
+    if (this.body.length > 0) {
+      figure.subFigures.push(createFigure(templateName, this.body));
     }
 
-    // } else {
-    // TODO: Implement else part.
     // }
 
     return parentNode ? null : placeholder;
