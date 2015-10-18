@@ -14,7 +14,7 @@ export class Updater {
   compile() {
     var sn = sourceNode(null, 'function (__data__, ' + this.variables.join(', ') + ') {\n');
     if (this.isCacheValue) {
-      sn.add('  __cache__.' + this.variables[0] + ' = ' + this.variables[0] + ';' + '\n');
+      sn.add('      __cache__.' + this.variables[0] + ' = ' + this.variables[0] + ';' + '\n');
     }
 
     if (this.isDataDependent) {
@@ -36,11 +36,11 @@ export class Updater {
         var complex = this.complex[key];
 
         var node = sourceNode(null, '')
-          .add('if (')
+          .add('      if (')
           .add(complex.params.map((param) => '__cache__.' + param + ' !== undefined').join(' && '))
           .add(') {\n')
           .add(complex.compile())
-          .add('\n}');
+          .add('\n      }');
 
         complexCode.push(node);
       });
@@ -49,7 +49,7 @@ export class Updater {
         .add('\n');
     }
 
-    sn += '}';
+    sn.add('    }');
 
     return sn;
   }
@@ -98,7 +98,7 @@ class Complex {
     Object.keys(this.calls).forEach((functionName) => {
       var params = this.calls[functionName];
       parts.push(sourceNode(null, [
-        'λ.', functionName, '(__data__, ', params.map((param) => '__cache__.' + param).join(', '), ');'
+        '        λ.', functionName, '(__data__, ', params.map((param) => '__cache__.' + param).join(', '), ');'
       ]));
     });
 

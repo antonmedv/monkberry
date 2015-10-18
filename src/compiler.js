@@ -40,17 +40,17 @@ export default class Compiler {
     if (asModule) {
       output
         .add('module.exports = function (monkberry, document) {\n')
-        .add('  var filters = monkberry.filters;\n')
-        .add('  return {\n')
+        .add('var filters = monkberry.filters;\n')
+        .add('return {\n')
         .add(figures)
-        .add('  };\n')
+        .add('};\n')
         .add('};\n');
     } else {
       output
         .add('(function (monkberry, filters, document, undefined) {\n')
-        .add('  monkberry.mount({\n')
+        .add('monkberry.mount({\n')
         .add(figures)
-        .add('  });\n')
+        .add('\n});\n')
         .add('})(monkberry, monkberry.filters, window.document, void 0);\n');
     }
 

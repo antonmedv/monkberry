@@ -1,6 +1,6 @@
 import { sourceNode } from './compiler/sourceNode';
 import { Updater } from './compiler/updater';
-import { size } from './utils';
+import { size, uniqueName } from './utils';
 
 export class Figure {
   constructor(name) {
@@ -82,7 +82,7 @@ export class Figure {
     var parts = [];
 
     Object.keys(this.complexUpdaters).forEach((key) => {
-      parts.push(key + ': ' + this.complexUpdaters[key].compile());
+      parts.push('    ' + key + ': ' + this.complexUpdaters[key].compile());
     });
 
     return sourceNode(null, parts).join(',\n');
@@ -92,7 +92,7 @@ export class Figure {
     var parts = [];
 
     Object.keys(this.updaters).forEach((key) => {
-      parts.push(key + ': ' + this.updaters[key].compile());
+      parts.push('    ' + key + ': ' + this.updaters[key].compile());
     });
 
     return sourceNode(null, parts).join(',\n');
@@ -109,7 +109,7 @@ export class Figure {
       complexUpdater.add(callback());
 
       if (dataDependent) {
-        complexUpdater.dataDependent();
+        complexUpdater.makeDataDependent();
       }
 
       for (let variable of variables) {

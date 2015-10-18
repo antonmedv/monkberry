@@ -11,7 +11,7 @@ export default function (ast) {
 
     var variables = collectVariables(this.expression);
     figure.addUpdater(variables, () => {
-      return sourceNode(this.loc, [this.nodeName, '.textContent = ', this.expression.compile()]);
+      return sourceNode(this.loc, ['      ', this.nodeName, '.textContent = ', this.expression.compile()]);
     });
 
     return this.nodeName;
