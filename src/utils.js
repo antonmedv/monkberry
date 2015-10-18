@@ -1,3 +1,7 @@
+export function map(array, fn) {
+  return array.map(fn).filter((item) => item !== null);
+}
+
 export function size(obj) {
   var size = 0, key;
   for (key in obj) {
@@ -17,6 +21,6 @@ export function unique(a) {
   }, []);
 }
 
-export function uniquename(params) {
+export function uniqueName(params) {
   return unique(params).sort().join('_');
 }

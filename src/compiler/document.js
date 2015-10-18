@@ -1,8 +1,9 @@
 import { sourceNode } from './sourceNode';
+import { map } from '../utils';
 
 export default function (ast) {
   ast.DocumentNode.prototype.compile = function (figure) {
-    figure.children = this.body.map((node) => node.compile(figure));
+    figure.children = map(this.body, (node) => node.compile(figure));
 
     var figures = compileWalk(figure);
 
