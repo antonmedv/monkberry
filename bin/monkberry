@@ -20,27 +20,28 @@ var utf8 = {encoding: 'utf8'};
 var compiler = new Compiler();
 
 program.args.forEach(function (file) {
-  var name = path.parse(file).name;
   var code = fs.readFileSync(file, utf8);
-  compiler.addSource(name, code);
+  compiler.addSource(file, code);
 });
 
 var output, node = compiler.compile();
 
 if (program.output) {
   var file = program.output,
-    fileName = path.parse(file).name,
-    sourceMapFile = file + '.map',
-    sourceMapFileName = fileName + '.map';
+    sourceMapFile = file + '.map';
 
-  output = node.toStringWithSourceMap({
-    file: sourceMapFileName
-  });
+  if (program.sourceMap) {
+    output = node.toStringWithSourceMap({
+      file: sourceMapFile
+    });
 
-  var smu = '\n' + '//# sourceMappingURL=' + sourceMapFileName + '\n';
+    var smu = '//# sourceMappingURL=' + sourceMapFile + '\n';
 
-  fs.writeFileSync(file, output.code + smu, utf8);
-  fs.writeFileSync(sourceMapFile, output.map, utf8);
+    fs.writeFileSync(file, output.code + smu, utf8);
+    fs.writeFileSync(sourceMapFile, output.map, utf8);
+  } else {
+    fs.writeFileSync(file, node.toString(), utf8);
+  }
 } else {
   console.log(node.toString());
 }
