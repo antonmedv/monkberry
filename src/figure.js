@@ -82,7 +82,7 @@ export class Figure {
     var parts = [];
 
     Object.keys(this.complexUpdaters).forEach((key) => {
-      parts.push('    ' + key + ': ' + this.complexUpdaters[key].compile());
+      parts.push(['    ', key, ': ', this.complexUpdaters[key].compile()]);
     });
 
     return sourceNode(null, parts).join(',\n');
@@ -92,7 +92,7 @@ export class Figure {
     var parts = [];
 
     Object.keys(this.updaters).forEach((key) => {
-      parts.push('    ' + key + ': ' + this.updaters[key].compile());
+      parts.push(['    ', key, ': ', this.updaters[key].compile()]);
     });
 
     return sourceNode(null, parts).join(',\n');
