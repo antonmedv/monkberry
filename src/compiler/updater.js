@@ -1,7 +1,7 @@
 import { sourceNode } from './sourceNode';
 import { size, uniqueName } from '../utils';
 
-export default class Updater {
+export class Updater {
   constructor(variables) {
     this.variables = variables.sort();
     this.name = uniqueName(this.variables);
@@ -77,7 +77,7 @@ export default class Updater {
     }
   }
 
-  makeDataDependent = function () {
+  makeDataDependent() {
     this.isDataDependent = true;
   };
 }

@@ -1,4 +1,5 @@
 import { sourceNode } from './compiler/sourceNode';
+import { Updater } from './compiler/updater';
 import { size } from './utils';
 
 export class Figure {
@@ -97,26 +98,34 @@ export class Figure {
     return sourceNode(null, parts).join(',\n');
   }
 
-  compileExpression(expression, callback, dataDependent) {
-    dataDependent = dataDependent || false;
+  addUpdater(variables, callback, dataDependent = false) {
+    if (variables.length == 1) {
 
-    if (expression.variables.length == 1) {
-      this.onSetter(expression.variables[0]).add(callback(expression.toCode()));
-    } else if (expression.variables.length > 1) {
-      var complexSetter = this.onComplexSetter(expression.variables);
-      complexSetter.add(callback(expression.toCode()));
+      this.onUpdater(variables[0]).add(callback());
+
+    } else if (variables.length > 1) {
+
+      var complexUpdater = this.onComplexUpdater(variables);
+      complexUpdater.add(callback());
 
       if (dataDependent) {
-        complexSetter.dataDependent();
+        complexUpdater.dataDependent();
       }
 
-      for (variable of expression.variables) {
-        this.onSetter(variable).cache();
-        this.onSetter(variable).addComplex(expression.variables, complexSetter.name);
+      for (let variable of variables) {
+        this.onUpdater(variable).cache();
+        this.onUpdater(variable).addComplex(variables, complexUpdater.name);
       }
     }
+  }
 
-    return expression;
+  onUpdater(variableName) {
+    return variableName in this.updaters ? this.updaters[variableName] : this.updaters[variableName] = new Updater([variableName]);
+  }
+
+  onComplexUpdater(variables) {
+    var name = uniqueName(variables);
+    return name in this.complexUpdaters ? this.complexUpdaters[name] : this.complexUpdaters[name] = new Updater(variables);
   }
 
   uniqid(name = 'default') {

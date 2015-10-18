@@ -2,6 +2,7 @@ import { parser } from '../parser';
 import { Figure } from './figure';
 import { sourceNode } from './compiler/sourceNode';
 import expression from './compiler/expression';
+import visitor from './compiler/expression/visitor';
 import document from './compiler/document';
 import element from './compiler/element';
 import text from './compiler/text';
@@ -15,6 +16,7 @@ export default class Compiler {
     document(parser.ast);
     element(parser.ast);
     expression(parser.ast);
+    visitor(parser.ast);
     text(parser.ast);
   }
 

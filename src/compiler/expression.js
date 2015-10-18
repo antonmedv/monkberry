@@ -1,4 +1,5 @@
 import { sourceNode } from './sourceNode';
+import { collectVariables } from './expression/variable';
 
 export default function (ast) {
   ast.ExpressionStatementNode.prototype.compile = function (figure) {
@@ -8,17 +9,10 @@ export default function (ast) {
       sourceNode(this.loc, [this.nodeName, " = document.createTextNode('')"])
     );
 
-    var variables = [];
-
-    this.ast.visit(function (node) {
-      if (node.type == 'Identifier') {
-        if (variables.indexOf(node.name) == -1) {
-          variables.push(node.name);
-        }
-      }
+    var variables = collectVariables(this.expression);
+    figure.addUpdater(variables, () => {
+      return sourceNode(this.loc, [this.nodeName, '.textContent = ', this.expression.compile()]);
     });
-
-    sourceNode(this.loc, this.expression.compile());
 
     return this.nodeName;
   };
