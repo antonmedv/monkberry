@@ -32,8 +32,6 @@ export default class Compiler {
       var figure = new Figure(name.replace(/\.\w+$/, ''));
 
       figures.add(ast.compile(figure));
-
-      console.log(drawGraph(ast));
     }
 
     var output = sourceNode(null, '');
