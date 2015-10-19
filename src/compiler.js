@@ -1,14 +1,18 @@
 import { parser } from '../parser';
 import { Figure } from './figure';
+import { visitor } from './visitor';
 import { sourceNode } from './compiler/sourceNode';
 import expression from './compiler/expression';
-import visitor from './compiler/expression/visitor';
 import document from './compiler/document';
 import element from './compiler/element';
+import html from './compiler/element/html';
+import svg from './compiler/element/svg';
+import custom from './compiler/element/custom';
 import attribute from './compiler/attribute';
 import text from './compiler/text';
 import if_ from './compiler/if';
 import for_ from './compiler/for';
+import { trimWhitespaces } from './optimize/whitespace';
 
 export default class Compiler {
   constructor() {
@@ -17,12 +21,15 @@ export default class Compiler {
     // Extend AST with compilers.
     document(parser.ast);
     element(parser.ast);
+    html(parser.ast);
+    svg(parser.ast);
+    custom(parser.ast);
     attribute(parser.ast);
     expression(parser.ast);
-    visitor(parser.ast);
     text(parser.ast);
     if_(parser.ast);
     for_(parser.ast);
+    visitor(parser.ast);
   }
 
   addSource(name, code) {
@@ -34,8 +41,11 @@ export default class Compiler {
 
     for (let [name, code] of this.sources) {
       var ast = parser.parse(code, name);
-      var figure = new Figure(name.replace(/\.\w+$/, ''));
 
+      // Optimization
+      trimWhitespaces(ast);
+
+      var figure = new Figure(name.replace(/\.\w+$/, ''));
       figures.add(ast.compile(figure));
     }
 

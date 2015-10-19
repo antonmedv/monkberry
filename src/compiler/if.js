@@ -8,7 +8,7 @@ export default function (ast) {
     var templateName = figure.name + '.if' + figure.uniqid('template_name');
     // TODO: Optimize when child has only one custom node. Replace templateName with that custom tag name.
 
-    var childrenName = 'child' + figure.uniqid('child_name');
+    var childName = 'child' + figure.uniqid('child_name');
 
     var placeholder;
     var parentNode = lookUpOnlyOneChild(this);
@@ -19,6 +19,8 @@ export default function (ast) {
       figure.declarations.push(sourceNode(this.loc, [placeholder, " = document.createComment('if')"]));
     }
 
+    figure.declarations.push(sourceNode(this.loc, [childName, " = {}"]));
+
     // if (
 
     var variables = collectVariables(this.test);
@@ -27,7 +29,7 @@ export default function (ast) {
         "      ",
         "monkberry.insert(view, ",
         placeholder, ", ",
-        childrenName, ", ",
+        childName, ", ",
         `'${templateName}', `,
         "__data__, ",
         this.test.compile(),

@@ -1,4 +1,67 @@
-export default function visitor(ast) {
+export function visitor(ast) {
+  ast.DocumentNode.prototype.visit = function (callback) {
+    callback(this);
+
+    for (var i = 0; i < this.body.length; i++) {
+      this.body[i].visit(callback);
+    }
+  };
+
+  ast.TextNode.prototype.visit = function (callback) {
+    callback(this);
+  };
+
+  ast.ElementNode.prototype.visit = function (callback) {
+    callback(this);
+
+    for (let i = 0; i < this.attributes.length; i++) {
+      this.attributes[i].visit(callback);
+    }
+
+    for (let i = 0; i < this.body.length; i++) {
+      this.body[i].visit(callback);
+    }
+  };
+
+  ast.AttributeNode.prototype.visit = function (callback) {
+    callback(this);
+
+    for (let i = 0; i < this.body.length; i++) {
+      this.body[i].visit(callback);
+    }
+  };
+
+  ast.ExpressionStatementNode.prototype.visit = function (callback) {
+    callback(this);
+    this.expression.visit(callback);
+  };
+
+  ast.IfStatementNode.prototype.visit = function (callback) {
+    callback(this);
+
+    this.test.visit(callback);
+
+    for (let i = 0; i < this.then.length; i++) {
+      this.then[i].visit(callback);
+    }
+
+    if (this._else) {
+      for (let i = 0; i < this._else.length; i++) {
+        this._else[i].visit(callback);
+      }
+    }
+  };
+
+  ast.ForStatementNode.prototype.visit = function (callback) {
+    callback(this);
+
+    this.expr.visit(callback);
+
+    for (let i = 0; i < this.body.length; i++) {
+      this.body[i].visit(callback);
+    }
+  };
+
   ast.FilterExpressionNode.prototype.visit = function (callback) {
     callback(this);
 

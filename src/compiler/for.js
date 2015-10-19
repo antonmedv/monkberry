@@ -19,6 +19,8 @@ export default function (ast) {
       figure.declarations.push(sourceNode(this.loc, [placeholder, " = document.createComment('for')"]));
     }
 
+    figure.declarations.push(sourceNode(this.loc, [childrenName, " = monkberry.map()"]));
+
     // for (
 
     var variables = collectVariables(this.expr);

@@ -1,4 +1,3 @@
-<!library>
 <monkberry>
     <div>
         Monkberry Moon Delight
@@ -21,18 +20,18 @@
 </test5>
 <test6>
     <ul>
-        <for each="key, value of list">
+        {% for key, value of list %}
             <li>{{ key }}:{{ value }}</li>
-        </for>
+        {% endfor %}
     </ul>
 </test6>
-<test6.1>
+<test6a>
     <div>
-        <for each="value of list">
+        {% for value of list %}
             <p>{{ value }}{{ ext }}</p>
-        </for>
+        {% endfor %}
     </div>
-</test6.1>
+</test6a>
 <test7>
     <p>first</p>
     <p>second</p>
@@ -53,30 +52,30 @@
 <test10>
     <div>
         <p>
-            <if test="a">a</if>
+            {% if a %}a{% endif %}
         </p>
         <p>
-            <for each="b">b</for>
+            {% for b %}b{% endfor %}
         </p>
     </div>
 </test10>
 <test11>
     <div>
-        <if test="a">a</if>
-        <if test="b">b</if>
+        {% if a %}a{% endif %}
+        {% if b %}b{% endif %}
     </div>
 </test11>
 <test12>
     <div>
-        <if test="a">a</if>
-        <for each="b">i</for>
+        {% if a %}a{% endif %}
+        {% for b %}i{% endfor %}
     </div>
 </test12>
 <test-if>
     <div>
-        <if test="test">
+        {% if test %}
             true: {{ context }}
-        </if>
+        {% endif %}
     </div>
 </test-if>
 <test-filters>
@@ -87,7 +86,7 @@
 </test-expressions>
 <test-expression-if>
     <div>
-        <if test="array.indexOf(1) != -1">(one)</if>
-        <if test="array.indexOf(look) != -1">{{ look }}<p>{{ indep }}</p></if>
+        {% if array.indexOf(1) != -1 %}(one){% endif %}
+        {% if array.indexOf(look) != -1 %}{{ look }}<p>{{ indep }}</p>{% endif %}
     </div>
 </test-expression-if>

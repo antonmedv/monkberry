@@ -31,7 +31,7 @@ describe('Monkberry', function () {
     view.update({
       bar: 'bar'
     });
-    expect(view).toBe('<p>foo bar baz</p>');
+    expect(view).toBeLike('<p>foo bar baz</p>');
   });
 
   it('should properly work with text constants in attributes', function () {
@@ -62,20 +62,20 @@ describe('Monkberry', function () {
     var view = monkberry.render('test6');
 
     view.update({list: [1, 2, 3]});
-    expect(view).toBe('<ul><li>0:1</li><li>1:2</li><li>2:3</li></ul>');
+    expect(view).toBeLike('<ul><li>0:1</li><li>1:2</li><li>2:3</li></ul>');
 
     view.update({list: [1, 3]});
-    expect(view).toBe('<ul><li>0:1</li><li>1:3</li></ul>');
+    expect(view).toBeLike('<ul><li>0:1</li><li>1:3</li></ul>');
 
     view.update({list: ['a', 'b', 'c', 'd']});
-    expect(view).toBe('<ul><li>0:a</li><li>1:b</li><li>2:c</li><li>3:d</li></ul>');
+    expect(view).toBeLike('<ul><li>0:a</li><li>1:b</li><li>2:c</li><li>3:d</li></ul>');
   });
 
   it('should render arrays with externals', function () {
-    var view = monkberry.render('test6.1');
+    var view = monkberry.render('test6a');
 
     view.update({list: [1, 2, 3], ext: '.js'});
-    expect(view).toBe('<div><p>1.js</p><p>2.js</p><p>3.js</p></div>');
+    expect(view).toBeLike('<div><p>1.js</p><p>2.js</p><p>3.js</p></div>');
   });
 
   it('should correctly work with wrappers', function () {
@@ -90,10 +90,10 @@ describe('Monkberry', function () {
     var view = monkberry.render('test6');
 
     view.update({list: [1, 2, 3]});
-    expect(view).toBe('<ul><li>0:1</li><li>1:2</li><li>2:3</li></ul>');
+    expect(view).toBeLike('<ul><li>0:1</li><li>1:2</li><li>2:3</li></ul>');
 
     items[1]();
-    expect(view).toBe('<ul><li>0:1</li><li>2:3</li></ul>');
+    expect(view).toBeLike('<ul><li>0:1</li><li>2:3</li></ul>');
   });
 
   it('should properly work with more then one node on topmost level', function () {
@@ -111,30 +111,30 @@ describe('Monkberry', function () {
     expect(view).toBe('<div><p>inline</p><!--custom-inline--><p>inline</p><!--custom-inline--></div>');
   });
 
-  it('should optimize <if>/<for> tag, if it is only child', function () {
+  it('should optimize "if"/"for" tag, if it is only child', function () {
     var view = monkberry.render('test10', {a: true, b: [1]});
     expect(view).toBe('<div><p>a</p><p>b</p></div>');
   });
 
-  it('should place placeholders for multiply <if> tags', function () {
+  it('should place placeholders for multiply "if" tags', function () {
     var view = monkberry.render('test11');
     expect(view).toBe('<div><!--if--><!--if--></div>');
   });
 
-  it('should place placeholders for multiply <if> and <for> tags', function () {
+  it('should place placeholders for multiply "if" and "for" tags', function () {
     var view = monkberry.render('test12');
     expect(view).toBe('<div><!--if--><!--for--></div>');
   });
 
-  it('should properly for with <if> tags', function () {
+  it('should properly for with "if" tags', function () {
     var view = monkberry.render('test-if', {test: true, context: 'parent data'});
-    expect(view).toBe('<div> true: parent data </div>');
+    expect(view).toBeLike('<div> true: parent data </div>');
 
     view.update({test: false});
-    expect(view).toBe('<div></div>');
+    expect(view).toBeLike('<div></div>');
 
     view.update({test: true});
-    expect(view).toBe('<div> true: parent data </div>');
+    expect(view).toBeLike('<div> true: parent data </div>');
   });
 
   it('should properly for with filters', function () {
@@ -167,7 +167,7 @@ describe('Monkberry', function () {
     expect(view).toBe('<a title="150">Amazing!bc</a>');
   });
 
-  it('should work with expression in <if> tag', function () {
+  it('should work with expression in "if" tag', function () {
     var view = monkberry.render('test-expression-if', {
       array: [1, 2, 3, 4, 5],
       look: 3,

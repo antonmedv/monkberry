@@ -297,10 +297,10 @@
   function forData(data, item, key, options) {
     if (options) {
       var newData = data;
-      newData[options.valueName] = item;
+      newData[options.value] = item;
 
-      if (options.keyName) {
-        newData[options.keyName] = key;
+      if (options.key) {
+        newData[options.key] = key;
       }
 
       return newData;
