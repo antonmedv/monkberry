@@ -290,6 +290,12 @@
     }
   };
 
+  Map.prototype.forEach = function (callback) {
+    for (var i in this.items) {
+      callback(this.items[i]);
+    }
+  };
+
   /**
    *  Helper function for working with foreach loops data.
    *  Will transform data for "key, value of array" constructions.

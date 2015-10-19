@@ -1,17 +1,18 @@
-export function collectVariables(expr) {
+export function collectVariables(node) {
   var variables = [];
-
-  if (!expr.visit) {
-    throw new Error(`Can not collect variables for node "${expr.type}" type.`);
-  }
-
-  expr.visit((node) => {
-    if (node.type == 'Identifier') {
-      if (variables.indexOf(node.name) == -1) {
-        variables.push(node.name);
-      }
+  var nodes = [].concat(node);
+  nodes.forEach((node) => {
+    if (!node.visit) {
+      throw new Error('Can not collect variables for node "' + node.type + '" type.');
     }
-  });
 
+    node.visit(function (node) {
+      if (node.type == 'Identifier') {
+        if (variables.indexOf(node.name) == -1) {
+          variables.push(node.name);
+        }
+      }
+    });
+  });
   return variables;
 }

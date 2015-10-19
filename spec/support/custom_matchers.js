@@ -27,12 +27,12 @@ window.customMatchers = {
         view.appendTo(a);
         b.innerHTML = html;
 
-        result.pass = a.toString() == b.toString();
+        result.pass = a.innerHTML == b.innerHTML;
 
         if (result.pass) {
-          result.message = 'Expected "' + a.toString() + '" not to be equals "' + b.toString() + '".';
+          result.message = 'Expected "' + a.innerHTML + '" not to be equals "' + b.innerHTML + '".';
         } else {
-          result.message = 'Expected "' + a.toString() + '" to be equals "' + b.toString() + '".';
+          result.message = 'Expected "' + a.innerHTML + '" to be equals "' + b.innerHTML + '".';
         }
 
         return result;

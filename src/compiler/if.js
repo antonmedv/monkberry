@@ -41,6 +41,15 @@ export default function (ast) {
 
     if (this.then.length > 0) {
       figure.subFigures.push(createFigure(templateName, this.then));
+
+      variables = collectVariables(this.then);
+      variables.forEach((variable) => {
+        figure.onUpdater(variable).add(sourceNode(this.loc, [
+          "      ",
+          childName, ".ref && ",
+          childName, ".ref.__update__.", variable, "(__data__, ", variable, ")"
+        ]));
+      });
     }
 
     // } else {

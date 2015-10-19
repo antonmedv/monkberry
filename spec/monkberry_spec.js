@@ -185,4 +185,35 @@ describe('Monkberry', function () {
     expect(view).toBe('<div><!--if-->-1<p>independent</p><!--if--></div>');
   });
 
+
+  it('should update all values', function () {
+    var view = monkberry.render('test-parent-values', {
+      value: 1,
+      on: true,
+      each: [1, 2, 3]
+    });
+    expect(view).toBeLike('<p>1</p><p>1</p><p>111</p>');
+
+    view.update({value: 2});
+    expect(view).toBeLike('<p>2</p><p>2</p><p>222</p>');
+
+    // Complex:
+
+    view = monkberry.render('test-parent-values-complex', {
+      a: 2,
+      b: 3,
+      on: true,
+      each: [1, 2]
+    });
+    expect(view).toBeLike('<p>5</p><p>-1</p><p>66</p>');
+
+    view.update({a: 4});
+    expect(view).toBeLike('<p>7</p><p>1</p><p>1212</p>');
+
+    view.update({b: 1});
+    expect(view).toBeLike('<p>5</p><p>3</p><p>44</p>');
+
+    view.update({a: 2, b: 2});
+    expect(view).toBeLike('<p>4</p><p>0</p><p>44</p>');
+  });
 });

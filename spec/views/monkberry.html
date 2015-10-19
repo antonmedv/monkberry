@@ -21,19 +21,20 @@
 <test6>
     <ul>
         {% for key, value of list %}
-            <li>{{ key }}:{{ value }}</li>
+        <li>{{ key }}:{{ value }}</li>
         {% endfor %}
     </ul>
 </test6>
 <test6a>
     <div>
         {% for value of list %}
-            <p>{{ value }}{{ ext }}</p>
+        <p>{{ value }}{{ ext }}</p>
         {% endfor %}
     </div>
 </test6a>
 <test7>
     <p>first</p>
+
     <p>second</p>
 </test7>
 <test8>
@@ -54,6 +55,7 @@
         <p>
             {% if a %}a{% endif %}
         </p>
+
         <p>
             {% for b %}b{% endfor %}
         </p>
@@ -74,7 +76,7 @@
 <test-if>
     <div>
         {% if test %}
-            true: {{ context }}
+        true: {{ context }}
         {% endif %}
     </div>
 </test-if>
@@ -90,3 +92,13 @@
         {% if array.indexOf(look) != -1 %}{{ look }}<p>{{ indep }}</p>{% endif %}
     </div>
 </test-expression-if>
+<test-parent-values>
+    <p>{{ value }}</p>
+    <p>{% if on %}{{ value }}{% endif %}</p>
+    <p>{% for i of each %}{{ value }}{% endfor %}</p>
+</test-parent-values>
+<test-parent-values-complex>
+    <p>{{ a + b }}</p>
+    <p>{% if on %}{{ a - b }}{% endif %}</p>
+    <p>{% for i of each %}{{ a * b }}{% endfor %}</p>
+</test-parent-values-complex>
