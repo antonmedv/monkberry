@@ -46,14 +46,25 @@ export default function (ast) {
       figure.subFigures.push(createFigure(templateName, this.body));
     }
 
-    variables = collectVariables(this.body);
-    variables.forEach((variable) => {
-      figure.onUpdater(variable).add(sourceNode(this.loc, [
-        "      ", childrenName, ".forEach(function (view) {\n",
-        "        view.__update__.", variable, "(__data__, ", variable, ");\n",
-        "      })"
-      ]));
-    });
+    if (this.options !== null) {
+      variables = collectVariables(this.body);
+
+      // Remove options variables.
+      for(var i = variables.length - 1; i >= 0; i--) {
+        if(variables[i] == this.options.value || variables[i] == this.options.key) {
+          variables.splice(i, 1);
+        }
+      }
+
+      // Add to updaters.
+      variables.forEach((variable) => {
+        figure.onUpdater(variable).add(sourceNode(this.loc, [
+          "      ", childrenName, ".forEach(function (view) {\n",
+          "        view.__update__.", variable, "(__data__, ", variable, ");\n",
+          "      })"
+        ]));
+      });
+    }
 
     // }
 
