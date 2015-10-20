@@ -35,7 +35,7 @@ export default function (ast) {
         this.test.compile(),
         ")"
       ]);
-    }, true);
+    });
 
     // ) then {
 

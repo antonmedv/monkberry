@@ -112,7 +112,7 @@ export class Figure {
     return join(parts, ';\n').add(parts.length ? ';' : '');
   }
 
-  addUpdater(loc, variables, callback, dataDependent = false) {
+  addUpdater(loc, variables, callback) {
     if (variables.length == 1) {
 
       this.onUpdater(variables[0]).add(callback());
@@ -121,10 +121,6 @@ export class Figure {
 
       var complexUpdater = this.onComplexUpdater(variables);
       complexUpdater.add(callback());
-
-      if (dataDependent) {
-        complexUpdater.makeDataDependent();
-      }
 
       for (let variable of variables) {
         this.onUpdater(variable).cache();

@@ -8,20 +8,12 @@ export class Updater {
     this.operators = [];
     this.complex = {};
     this.isCacheValue = false;
-    this.isDataDependent = false;
   }
 
   compile() {
     var sn = sourceNode(null, 'function (__data__, ' + this.variables.join(', ') + ') {\n');
     if (this.isCacheValue) {
       sn.add('      __cache__.' + this.variables[0] + ' = ' + this.variables[0] + ';' + '\n');
-    }
-
-    if (this.isDataDependent) {
-      sn.add([
-        '  __data__ = monkberry.extend({',
-        this.variables.map((variable) => variable + ': ' + variable).join(', '),
-        '  }, __data__)\n']);
     }
 
     if (this.operators.length > 0) {
@@ -76,10 +68,6 @@ export class Updater {
       throw new Error('Value caching available only for setter with one variable.')
     }
   }
-
-  makeDataDependent() {
-    this.isDataDependent = true;
-  };
 }
 
 class Complex {

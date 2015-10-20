@@ -140,15 +140,6 @@
     });
   };
 
-  Monkberry.prototype.extend = function (obj, from) {
-    for (var key in from) {
-      if (from.hasOwnProperty(key)) {
-        obj[key] = from[key];
-      }
-    }
-    return obj;
-  };
-
   Monkberry.prototype.view = function () {
     return new View;
   };
