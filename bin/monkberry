@@ -8,7 +8,6 @@ program
   .usage('[options] <file ...>')
   .option('-o, --output [file]', 'output file name, if not specified will write to stdout.')
   .option('-s, --source-map', 'generate source map.')
-  .option('-w, --whitespace', 'keep whitespaces')
   .parse(process.argv);
 
 if (program.args.length == 0) {
@@ -21,7 +20,7 @@ var compiler = new Compiler();
 
 program.args.forEach(function (file) {
   var code = fs.readFileSync(file, utf8);
-  compiler.addSource(file, code);
+  compiler.addSource(path.parse(file).name, code);
 });
 
 var output, node = compiler.compile();

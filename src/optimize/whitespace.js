@@ -37,6 +37,6 @@ function trim(node, key) {
   }
 
   if (skipped) {
-    node.body = nodes;
+    node[key] = nodes;
   }
 }

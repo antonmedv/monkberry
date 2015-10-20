@@ -128,13 +128,13 @@ describe('Monkberry', function () {
 
   it('should properly for with "if" tags', function () {
     var view = monkberry.render('test-if', {test: true, context: 'parent data'});
-    expect(view).toBeLike('<div> true: parent data </div>');
+    expect(view).toBeLike('<div>true: parent data</div>');
 
     view.update({test: false});
     expect(view).toBeLike('<div></div>');
 
     view.update({test: true});
-    expect(view).toBeLike('<div> true: parent data </div>');
+    expect(view).toBeLike('<div>true: parent data</div>');
   });
 
   it('should properly for with filters', function () {
@@ -215,5 +215,17 @@ describe('Monkberry', function () {
 
     view.update({a: 2, b: 2});
     expect(view).toBeLike('<p>4</p><p>0</p><p>44</p>');
+  });
+
+  it('should update variables in nested views', function () {
+    var view = monkberry.render('test-nested-views', {
+      value: 1,
+      on: true,
+      each: [1, 2, 3]
+    });
+    expect(view).toBe('<p>1<!--if-->1<!--if-->1<!--if--></p>');
+
+    view.update({value: 7});
+    expect(view).toBe('<p>7<!--if-->7<!--if-->7<!--if--></p>');
   });
 });

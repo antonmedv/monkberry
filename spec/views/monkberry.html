@@ -75,9 +75,7 @@
 </test12>
 <test-if>
     <div>
-        {% if test %}
-        true: {{ context }}
-        {% endif %}
+        {% if test %}true: {{ context }}{% endif %}
     </div>
 </test-if>
 <test-filters>
@@ -102,3 +100,12 @@
     <p>{% if on %}{{ a - b }}{% endif %}</p>
     <p>{% for i of each %}{{ a * b }}{% endfor %}</p>
 </test-parent-values-complex>
+<test-nested-views>
+    <p>
+        {% for i of each %}
+            {% if on %}
+                {{ value }}
+            {% endif %}
+        {% endfor %}
+    </p>
+</test-nested-views>
