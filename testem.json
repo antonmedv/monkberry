@@ -6,6 +6,6 @@
     "spec/support/*.js",
     "spec/*_spec.js"
   ],
-  "before_tests": "bin/monkberry -o spec/views.js -- spec/views/*.html",
+  "before_tests": "bin/monkberry --as-library --output spec/views.js -- spec/views/*.html",
   "on_exit": "rm spec/views.js"
 }

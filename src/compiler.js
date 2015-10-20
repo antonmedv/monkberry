@@ -32,20 +32,24 @@ export default class Compiler {
     visitor(parser.ast);
   }
 
-  addSource(name, code) {
-    this.sources.push([name, code]);
+  addSource(name, code, asLibrary = false) {
+    this.sources.push([name, code, asLibrary]);
   }
 
   compile(asModule = false) {
     var figures = sourceNode(null, '');
 
-    for (let [name, code] of this.sources) {
+    for (let [name, code, asLibrary] of this.sources) {
       var ast = parser.parse(code, name);
 
       // Optimization
       trimWhitespaces(ast);
 
       var figure = new Figure(name.replace(/\.\w+$/, ''));
+      if (asLibrary) {
+        figure.perceivedAsLibrary = true;
+      }
+
       figures.add(ast.compile(figure));
     }
 

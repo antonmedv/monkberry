@@ -23,7 +23,9 @@ function compileWalk(figure) {
   var figures = [];
   var fn = figure.compile();
 
-  figures.push([figure.name, fn]);
+  if (!figure.perceivedAsLibrary) {
+    figures.push([figure.name, fn]);
+  }
 
   for (let subFigure of figure.subFigures) {
     figures = figures.concat(compileWalk(subFigure));
