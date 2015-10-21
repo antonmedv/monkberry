@@ -41,7 +41,7 @@ div.appendChild(p);
 
    ...
 
-view.update = <b>function</b> (data) {
+view.update = function (data) {
   h1.textContent = data.title;
   p.textContent = data.text;
 };
