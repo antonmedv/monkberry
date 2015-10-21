@@ -76,7 +76,7 @@ And compile your all your templates into single JavaScript file with next comman
 monkberry --source-map --output template.js templates/*.html
 ```
 
-Require generated `view.js` and `monkberry.js` files and mount template:
+Require generated `template.js` and `monkberry.js` files and mount template:
 
 ```js
 var monkberry = require('monkberry');
@@ -106,6 +106,24 @@ view.update({...});
 // or you can update only what's needed
 view.update({key: value});
 ```
+
+### Expressions
+
+### If, Else
+
+### For
+
+### Filters
+
+### Custom tags
+
+### Prerender
+
+### Wrappers
+
+### Transforms
+
+### Extentions
 
 ## Tests
 
