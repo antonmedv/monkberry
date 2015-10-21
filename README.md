@@ -15,7 +15,7 @@ npm install monkberry --save
 * Simple and minimalistic
 * Fully tested
 * One-way data flow
-* Сompiled templates
+* Precompiled templates
 * SourceMaps
 * Custom tags
 * Extremely fast!
