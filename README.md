@@ -1,7 +1,9 @@
 # Monkberry - JavaScript template engine
 [![Build Status](https://travis-ci.org/monkberry/monkberry.svg?branch=master)](https://travis-ci.org/monkberry/monkberry)
 
-Monkberry compile template to JavaScript code which will generate DOM tree and allows to update that tree with new data then its needed. 
+Monkberry compile template to JavaScript code for creating nodes with DOM API and helper methods for updating content of these nodes.
+
+<hr>
 
 ```
 npm install monkberry --save
@@ -9,7 +11,7 @@ npm install monkberry --save
 
 ## Features
 
-* Small, dependency free library
+* Small, dependency free
 * Simple and minimalistic
 * Fully tested
 * One-way data flow
@@ -19,47 +21,46 @@ npm install monkberry --save
 * Extremely fast!
 
 ## Example
-```html
-<ToDo>
-  <ul>
-    {% for tasks %}
-      <li class="{{ complete ? 'stroke' : '' }}">
-        {{ text }}
-      </li>
-    {% endfor %}
-  <ul>
-  <div>
-    Total tasks {{ tasks.length }}.  
-  </div>
-</ToDo>
-```
+
+<table>
+  <tr>
+    <td>
+<pre>
+&lt;div&gt;
+  &lt;h1&gt;{{ title }}&lt;/h1&gt;
+  &lt;p"&gt;
+    {{ text }}
+  &lt;/p&gt;
+&lt;/div&gt;
+</pre>
+    </td>
+    <td>
+<pre>
+<b>var</b> div = document.createElement(<b>'div'</b>);
+<b>var</b> h1 = document.createElement(<b>'h1'</b>);
+<b>var</b> p = document.createElement(<b>'p'</b>);
+
+div.appendChild(h1);
+div.appendChild(p);
+
+   ...
+
+view.update = <b>function</b> (data) {
+  h1.textContent = data.title;
+  p.textContent = data.text;
+};
+</pre>
+    </td>
+  </tr>
+</table>
 
 ```js
 import monkberry from 'monkberry';
-import todo from './todo.html';
+import template from './template.html';
+monkberry.mount(template);
 
-monkberry.mount(todo); // Mount template to monkberry.
-
-var view = monkberry.render('ToDo'); // Render view with DOM tree.
-
-document.body.appendChild(view.dom()); // Insert DOM tree on page.
-
-view.update({
-  tasks: [
-    {
-      text: "Task to-do",
-      complete: false
-    }, 
-    {
-      text: "Another task",
-      complete: false
-    }, 
-    {
-      text: "This task is done",
-      complete: true    
-    }
-  ]
-});
+var view = monkberry.render('template');
+document.body.appendChild(view.dom()); 
 ```
 
 ## Documentation
