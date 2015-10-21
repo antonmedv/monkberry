@@ -22,23 +22,21 @@ npm install monkberry --save
 
 ## Example
 
-<table>
-  <tr>
-    <td>
-<pre>
-&lt;div&gt;
-  &lt;h1&gt;{{ title }}&lt;/h1&gt;
-  &lt;p"&gt;
+Monkberry will compile this template:
+```html
+<div>
+  <h1>{{ title }}</h1>
+  <p>
     {{ text }}
-  &lt;/p&gt;
-&lt;/div&gt;
-</pre>
-    </td>
-    <td>
-<pre>
-<b>var</b> div = document.createElement(<b>'div'</b>);
-<b>var</b> h1 = document.createElement(<b>'h1'</b>);
-<b>var</b> p = document.createElement(<b>'p'</b>);
+  </p>
+</div>
+```
+
+To JavaScript code like this:
+```js
+var div = document.createElement('div');
+var h1 = document.createElement('h1');
+var p = document.createElement('p');
 
 div.appendChild(h1);
 div.appendChild(p);
@@ -49,11 +47,9 @@ view.update = <b>function</b> (data) {
   h1.textContent = data.title;
   p.textContent = data.text;
 };
-</pre>
-    </td>
-  </tr>
-</table>
+```
 
+Which you can use like that: 
 ```js
 import monkberry from 'monkberry';
 import template from './template.html';
@@ -61,6 +57,11 @@ monkberry.mount(template);
 
 var view = monkberry.render('template');
 document.body.appendChild(view.dom()); 
+
+view.update({
+  title: 'Monkberry',
+  text: 'JavaScript DOM template engine'
+});
 ```
 
 ## Documentation
