@@ -3,8 +3,6 @@
 
 Monkberry compile template to JavaScript code for creating nodes with DOM API and helper methods for updating content of these nodes.
 
-<hr>
-
 ```
 npm install monkberry --save
 ```
@@ -61,6 +59,53 @@ view.update({
 ```
 
 ## Documentation
+
+### Getting Started
+
+Monkberry has support for both browserify via [monkberrify](https://github.com/monkberry/monkberrify) and for webpack via [monkberry-loader](https://github.com/monkberry/monkberry-loader). 
+
+But you can also use it like CLI tool. Install Monkberry globally:
+
+```
+npm install monkberry -g
+```
+
+And compile your all your templates into single JavaScript file with next command:
+
+```
+monkberry --source-map --output template.js templates/*.html
+```
+
+Require generated `view.js` and `monkberry.js` files and mount template:
+
+```js
+var monkberry = require('monkberry');
+var template = require('./template.js');
+
+monkberry.mount(template);
+```
+
+Render that view.
+
+```js
+var view = monkberry.render('template'); 
+// or
+var view = monkberry.render('template', {...}); 
+```
+
+Next you need to attach it to the page.
+
+```js
+document.getElementById('root').appendChild(view.dom());
+```
+
+Now, to update data on page:
+
+```js
+view.update({...});
+// or you can update only what's needed
+view.update({key: value});
+```
 
 ## Tests
 
