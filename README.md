@@ -51,10 +51,6 @@ view.update = <b>function</b> (data) {
 
 Which you can use like that: 
 ```js
-import monkberry from 'monkberry';
-import template from './template.html';
-monkberry.mount(template);
-
 var view = monkberry.render('template');
 document.body.appendChild(view.dom()); 
 
