@@ -21,24 +21,26 @@ var compiler = new Compiler();
 
 program.args.forEach(function (file) {
   var code = fs.readFileSync(file, utf8);
-  compiler.addSource(file, code, program.asLibrary);
+  compiler.addSource(path.basename(file), code, program.asLibrary);
 });
 
 var output, node = compiler.compile();
 
 if (program.output) {
   var file = program.output,
-    sourceMapFile = file + '.map';
+    filename = path.basename(file),
+    sourceMapFileName = filename + '.map',
+    sourceMapPath = file + '.map';
 
   if (program.sourceMap) {
     output = node.toStringWithSourceMap({
-      file: sourceMapFile
+      file: filename
     });
 
-    var smu = '//# sourceMappingURL=' + sourceMapFile + '\n';
+    var smu = '//# sourceMappingURL=' + sourceMapFileName + '\n';
 
     fs.writeFileSync(file, output.code + smu, utf8);
-    fs.writeFileSync(sourceMapFile, output.map, utf8);
+    fs.writeFileSync(sourceMapPath, output.map, utf8);
   } else {
     fs.writeFileSync(file, node.toString(), utf8);
   }

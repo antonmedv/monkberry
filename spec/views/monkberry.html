@@ -90,6 +90,13 @@
         {% if array.indexOf(look) != -1 %}{{ look }}<p>{{ indep }}</p>{% endif %}
     </div>
 </test-expression-if>
+<test-update-if>
+    <div>
+        {% if test %}
+            {{ value }}
+        {% endif %}
+    </div>
+</test-update-if>
 <test-parent-values>
     <p>{{ value }}</p>
     <p>{% if on %}{{ value }}{% endif %}</p>

@@ -28,7 +28,7 @@ export class Figure {
 
     if (this.declarations.length > 0) {
       sn.add('  // Create elements\n')
-        .add(['  ', this.compileDeclarations(), ';\n'])
+        .add(['  ', this.compileDeclarations(), '\n'])
         .add('\n');
     }
 

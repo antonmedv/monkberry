@@ -3,17 +3,18 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Monkberry Counter Example</title>
-    <script src="../../monkberry.js"></script>
-    <script src="view.js"></script>
+    <style>
+        section {
+            font-size: 24px;
+        }
+        button {
+            margin: 10px;
+        }
+    </style>
 </head>
 <body>
-<script>
-    var view = monkberry.render('view', {
-        title: 'Monkberry Counter Example'
-    });
-    document.body.appendChild(view.dom());
-
-    view.update({on: true});
-</script>
+<script src="../../monkberry.js"></script>
+<script src="view.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

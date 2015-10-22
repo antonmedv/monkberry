@@ -54,10 +54,9 @@
 
   Monkberry.prototype.insert = function (parent, node, child/*.ref*/, template, data, test) {
     if (child.ref) {
-      if (test) {
-        child.ref.update(data);
-      }
-      else {
+      child.ref.update(data);
+
+      if (!test) {
         child.ref.remove();
       }
     } else if (test) {

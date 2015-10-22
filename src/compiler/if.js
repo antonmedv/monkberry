@@ -16,15 +16,15 @@ export default function (ast) {
       placeholder = parentNode.nodeName;
     } else {
       placeholder = 'if' + figure.uniqid('placeholder');
-      figure.declarations.push(sourceNode(this.loc, ["var ", placeholder, " = document.createComment('if');"]));
+      figure.declarations.push(sourceNode(null, ["var ", placeholder, " = document.createComment('if');"]));
     }
 
     figure.declarations.push(sourceNode(null, ["var ", childName, " = {};"]));
 
     // if (
 
-    var variables = collectVariables(this.test);
-    figure.addUpdater(this.loc, variables, () => {
+    var variablesOfExpression = collectVariables(this.test);
+    figure.addUpdater(this.loc, variablesOfExpression, () => {
       return sourceNode(this.loc, [
         "      ",
         "monkberry.insert(view, ",
@@ -42,8 +42,12 @@ export default function (ast) {
     if (this.then.length > 0) {
       figure.subFigures.push(createFigure(templateName, this.then));
 
-      variables = collectVariables(this.then);
-      variables.forEach((variable) => {
+      var variablesOfBody = collectVariables(this.then);
+
+      // Delete variables from expression to prevent double updating.
+      variablesOfBody = variablesOfBody.filter((v) => variablesOfExpression.indexOf(v) == -1);
+
+      variablesOfBody.forEach((variable) => {
         figure.onUpdater(variable).add(sourceNode(this.loc, [
           "      ",
           childName, ".ref && ",

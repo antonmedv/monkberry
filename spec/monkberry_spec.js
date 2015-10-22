@@ -185,6 +185,19 @@ describe('Monkberry', function () {
     expect(view).toBe('<div><!--if-->-1<p>independent</p><!--if--></div>');
   });
 
+  it('should update "if" tag anyway', function () {
+    var view = monkberry.render('test-update-if', {
+      test: true,
+      value: 'old'
+    });
+    expect(view).toBe('<div>old</div>');
+
+    view.update({test: false, value: 'new'});
+    expect(view).toBe('<div></div>');
+
+    view.update({test: true});
+    expect(view).toBe('<div>new</div>');
+  });
 
   it('should update all values', function () {
     var view = monkberry.render('test-parent-values', {

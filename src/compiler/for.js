@@ -16,15 +16,15 @@ export default function (ast) {
       placeholder = parentNode.nodeName;
     } else {
       placeholder = 'for' + figure.uniqid('placeholder');
-      figure.declarations.push(sourceNode(this.loc, ["var ", placeholder, " = document.createComment('for');"]));
+      figure.declarations.push(sourceNode(null, ["var ", placeholder, " = document.createComment('for');"]));
     }
 
     figure.declarations.push(sourceNode(null, ["var ", childrenName, " = monkberry.map();"]));
 
     // for (
 
-    var variables = collectVariables(this.expr);
-    figure.addUpdater(this.loc, variables, () => {
+    var variablesOfExpression = collectVariables(this.expr);
+    figure.addUpdater(this.loc, variablesOfExpression, () => {
       return sourceNode(this.loc, [
         "      ",
         "monkberry.foreach(view, ",
@@ -47,17 +47,20 @@ export default function (ast) {
     }
 
     if (this.options !== null) {
-      variables = collectVariables(this.body);
+      var variablesOfBody = collectVariables(this.body);
 
       // Remove options variables.
-      for(var i = variables.length - 1; i >= 0; i--) {
-        if(variables[i] == this.options.value || variables[i] == this.options.key) {
-          variables.splice(i, 1);
+      for(var i = variablesOfBody.length - 1; i >= 0; i--) {
+        if(variablesOfBody[i] == this.options.value || variablesOfBody[i] == this.options.key) {
+          variablesOfBody.splice(i, 1);
         }
       }
 
+      // Delete variables from expression to prevent double updating.
+      variablesOfBody = variablesOfBody.filter((v) => variablesOfExpression.indexOf(v) == -1);
+
       // Add to updaters.
-      variables.forEach((variable) => {
+      variablesOfBody.forEach((variable) => {
         figure.onUpdater(variable).add(sourceNode(this.loc, [
           "      ", childrenName, ".forEach(function (view) {\n",
           "        view.__update__.", variable, "(__data__, ", variable, ");\n",

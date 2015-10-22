@@ -1,10 +1,24 @@
 <h1>
     {{ title }}
 </h1>
-<div>
-    {% if on %}
-        <div>
-            {{ on ? 'true' : 'false' }}
-        </div>
-    {% endif %}
-</div>
+<section>
+    <button id="plus">+</button>
+    <span>
+        Count: {{ count }}
+    </span>
+    <button id="minus">-</button>
+    <div>
+        {% if count < 0 %}
+            Counter is negative.
+        {% endif %}
+        {% if count >= 0 %}
+            <ul>
+                {% for key, value of count | toArray %}
+                    <li>
+                        {{ key + 1 }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</section>
