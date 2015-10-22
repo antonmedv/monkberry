@@ -5,10 +5,12 @@ import { lookUpOnlyOneChild, map } from '../utils';
 
 export default function (ast) {
   ast.IfStatementNode.prototype.compile = function (figure) {
-    var templateName = figure.name + '.if' + figure.uniqid('template_name');
+    var templateNameForThen = figure.name + '.if' + figure.uniqid('template_name');
+    var templateNameForElse = templateNameForThen + '.else';
     // TODO: Optimize when child has only one custom node. Replace templateName with that custom tag name.
 
-    var childName = 'child' + figure.uniqid('child_name');
+    var childNameForThen = 'child' + figure.uniqid('child_name');
+    var childNameForElse = 'child' + figure.uniqid('child_name');
 
     var placeholder;
     var parentNode = lookUpOnlyOneChild(this);
@@ -16,50 +18,69 @@ export default function (ast) {
       placeholder = parentNode.nodeName;
     } else {
       placeholder = 'if' + figure.uniqid('placeholder');
-      figure.declarations.push(sourceNode(null, ["var ", placeholder, " = document.createComment('if');"]));
+      figure.declare(["var ", placeholder, " = document.createComment('if');"]);
     }
 
-    figure.declarations.push(sourceNode(null, ["var ", childName, " = {};"]));
+    figure.declare(["var ", childNameForThen, " = {};"]);
+
+    if (this._else) {
+      figure.declare(["var ", childNameForElse, " = {};"]);
+    }
 
     // if (
 
     var variablesOfExpression = collectVariables(this.test);
-    figure.addUpdater(this.loc, variablesOfExpression, () => {
-      return sourceNode(this.loc, [
-        "      ",
-        "monkberry.insert(view, ",
-        placeholder, ", ",
-        childName, ", ",
-        `'${templateName}', `,
-        "__data__, ",
-        this.test.compile(),
-        ")"
-      ]);
-    });
+
+    compileTest(figure, this.loc, this._else ? "result = " : "", placeholder, templateNameForThen, childNameForThen, this.test.compile(), variablesOfExpression);
+
+    if (this._else) {
+      compileTest(figure, this.loc, "", placeholder, templateNameForElse, childNameForElse, "!result", variablesOfExpression);
+    }
 
     // ) then {
 
-    if (this.then.length > 0) {
-      figure.subFigures.push(createFigure(templateName, this.then));
-
-      var variablesOfBody = collectVariables(this.then);
-
-      // Delete variables from expression to prevent double updating.
-      variablesOfBody = variablesOfBody.filter((v) => variablesOfExpression.indexOf(v) == -1);
-
-      variablesOfBody.forEach((variable) => {
-        figure.onUpdater(variable).add(sourceNode(this.loc, [
-          "      ",
-          childName, ".ref && ",
-          childName, ".ref.__update__.", variable, "(__data__, ", variable, ")"
-        ]));
-      });
-    }
+    compileBody(figure, this.loc, templateNameForThen, childNameForThen, this.then, variablesOfExpression);
 
     // } else {
-    // TODO: Implement else part.
+
+    if (this._else) {
+      compileBody(figure, this.loc, templateNameForElse, childNameForElse, this._else, variablesOfExpression);
+    }
+
     // }
 
     return parentNode ? null : placeholder;
   };
+}
+
+function compileTest(figure, loc, prepend, placeholder, templateName, childName, result, variablesOfExpression) {
+  figure.addUpdater(loc, variablesOfExpression, () => {
+    return sourceNode(loc, ["      ",
+      prepend,
+      "monkberry.insert(view, ",
+      placeholder, ", ",
+      childName, ", ",
+      `'${templateName}', `,
+      "__data__, ",
+      result,
+      ")"
+    ]);
+  });
+}
+
+function compileBody(figure, loc, templateName, childName, body, variablesOfExpression) {
+  figure.subFigures.push(createFigure(templateName, body));
+
+  var variablesOfBody = collectVariables(body);
+
+  // Delete variables from expression to prevent double updating.
+  variablesOfBody = variablesOfBody.filter((v) => variablesOfExpression.indexOf(v) == -1);
+
+  variablesOfBody.forEach((variable) => {
+    figure.onUpdater(variable).add(sourceNode(loc, [
+      "      ",
+      childName, ".ref && ",
+      childName, ".ref.__update__.", variable, "(__data__, ", variable, ")"
+    ]));
+  });
 }

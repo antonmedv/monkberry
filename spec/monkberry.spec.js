@@ -126,17 +126,6 @@ describe('Monkberry', function () {
     expect(view).toBe('<div><!--if--><!--for--></div>');
   });
 
-  it('should properly for with "if" tags', function () {
-    var view = monkberry.render('test-if', {test: true, context: 'parent data'});
-    expect(view).toBeLike('<div>true: parent data</div>');
-
-    view.update({test: false});
-    expect(view).toBeLike('<div></div>');
-
-    view.update({test: true});
-    expect(view).toBeLike('<div>true: parent data</div>');
-  });
-
   it('should properly for with filters', function () {
     monkberry.filters.append = function (value, text) {
       return value + text;
@@ -165,38 +154,6 @@ describe('Monkberry', function () {
     view.update({more: {amazing: 'Amazing!'}});
 
     expect(view).toBe('<a title="150">Amazing!bc</a>');
-  });
-
-  it('should work with expression in "if" tag', function () {
-    var view = monkberry.render('test-expression-if', {
-      array: [1, 2, 3, 4, 5],
-      look: 3,
-      indep: 'independent'
-    });
-    expect(view).toBe('<div>(one)<!--if-->3<p>independent</p><!--if--></div>');
-
-    view.update({look: 2});
-    expect(view).toBe('<div>(one)<!--if-->2<p>independent</p><!--if--></div>');
-
-    view.update({look: -1});
-    expect(view).toBe('<div>(one)<!--if--><!--if--></div>');
-
-    view.update({array: [-1]});
-    expect(view).toBe('<div><!--if-->-1<p>independent</p><!--if--></div>');
-  });
-
-  it('should update "if" tag anyway', function () {
-    var view = monkberry.render('test-update-if', {
-      test: true,
-      value: 'old'
-    });
-    expect(view).toBe('<div>old</div>');
-
-    view.update({test: false, value: 'new'});
-    expect(view).toBe('<div></div>');
-
-    view.update({test: true});
-    expect(view).toBe('<div>new</div>');
   });
 
   it('should update all values', function () {

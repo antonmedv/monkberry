@@ -54,9 +54,9 @@
 
   Monkberry.prototype.insert = function (parent, node, child/*.ref*/, template, data, test) {
     if (child.ref) {
-      child.ref.update(data);
-
-      if (!test) {
+      if (test) {
+        child.ref.update(data);
+      } else {
         child.ref.remove();
       }
     } else if (test) {
@@ -83,6 +83,8 @@
         child.ref = null;
       };
     }
+
+    return test;
   };
 
   Monkberry.prototype.render = function (name, values, no_cache) {

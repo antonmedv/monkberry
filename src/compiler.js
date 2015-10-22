@@ -59,14 +59,14 @@ export default class Compiler {
         .add('module.exports = function (monkberry, document) {\n')
         .add('var filters = monkberry.filters;\n')
         .add('return {\n')
-        .add(figures)
+        .add(figures.join(',\n'))
         .add('};\n')
         .add('};\n');
     } else {
       output
         .add('(function (monkberry, filters, document, undefined) {\n')
         .add('monkberry.mount({\n')
-        .add(figures)
+        .add(figures.join(',\n'))
         .add('\n});\n')
         .add('})(monkberry, monkberry.filters, window.document, void 0);\n');
     }

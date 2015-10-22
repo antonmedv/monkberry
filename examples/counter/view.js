@@ -10,9 +10,7 @@ monkberry.mount({
   var text5 = document.createTextNode('');
   var button6 = document.createElement('button');
   var div7 = document.createElement('div');
-  var if0 = document.createComment('if');
   var child0 = {};
-  var if1 = document.createComment('if');
   var child1 = {};
 
   // Construct dom
@@ -23,8 +21,6 @@ monkberry.mount({
   span4.appendChild(text5);
   button6.appendChild(document.createTextNode("-"));
   button6.setAttribute("id", "minus");
-  div7.appendChild(if0);
-  div7.appendChild(if1);
   section2.appendChild(button3);
   section2.appendChild(span4);
   section2.appendChild(button6);
@@ -40,8 +36,8 @@ monkberry.mount({
     },
     count: function (__data__, count) {
       text5.textContent = count;
-      monkberry.insert(view, if0, child0, 'view.if0', __data__, (count) < (0));
-      monkberry.insert(view, if1, child1, 'view.if1', __data__, (count) >= (0));
+      result = monkberry.insert(view, div7, child0, 'view.if0', __data__, (count) < (0));
+      monkberry.insert(view, div7, child1, 'view.if0.else', __data__, !result);
     },
     key: function (__data__, key) {
       child1.ref && child1.ref.__update__.key(__data__, key);
@@ -60,7 +56,7 @@ monkberry.mount({
   view.nodes = [document.createTextNode(" Counter is negative. ")];
   return view;
 },
-"view.if1": function () {
+"view.if0.else": function () {
   // Create elements
   var ul0 = document.createElement('ul');
   var children0 = monkberry.map();
@@ -71,7 +67,7 @@ monkberry.mount({
   // Update functions
   view.__update__ = {
     count: function (__data__, count) {
-      monkberry.foreach(view, ul0, children0, 'view.if1.for0', __data__, filters.toArray(count), {"key":"key","value":"value"});
+      monkberry.foreach(view, ul0, children0, 'view.if0.else.for0', __data__, filters.toArray(count), {"key":"key","value":"value"});
     }
   };
 
@@ -79,7 +75,7 @@ monkberry.mount({
   view.nodes = [ul0];
   return view;
 },
-"view.if1.for0": function () {
+"view.if0.else.for0": function () {
   // Create elements
   var li0 = document.createElement('li');
   var text1 = document.createTextNode('');

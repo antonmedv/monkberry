@@ -1,0 +1,32 @@
+<If>
+    <div>
+        {% if test %}true: {{ context }}{% endif %}
+    </div>
+</If>
+<IfElse>
+    <div>
+        {% if test %}
+            then
+        {% else %}
+            else
+        {% endif %}
+    </div>
+</IfElse>
+<IfExpr>
+    <div>
+        {% if array.indexOf(1) != -1 %}
+            (one)
+        {% endif %}
+        {% if array.indexOf(look) != -1 %}
+            {{ look }}
+            <p>{{ indep }}</p>
+        {% endif %}
+    </div>
+</IfExpr>
+<IfUpdate>
+    <div>
+        {% if test %}
+            {{ value }}
+        {% endif %}
+    </div>
+</IfUpdate>

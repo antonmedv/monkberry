@@ -10,8 +10,7 @@
     <div>
         {% if count < 0 %}
             Counter is negative.
-        {% endif %}
-        {% if count >= 0 %}
+        {% else %}
             <ul>
                 {% for key, value of count | toArray %}
                     <li>

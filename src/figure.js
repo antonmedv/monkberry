@@ -76,6 +76,10 @@ export class Figure {
     return sn;
   }
 
+  declare(nodes) {
+    this.declarations.push(sourceNode(null, nodes));
+  }
+
   compileDeclarations() {
     return sourceNode(null, this.declarations).join('\n  ');
   }
@@ -115,7 +119,7 @@ export class Figure {
   addUpdater(loc, variables, callback) {
     if (variables.length == 1) {
 
-      this.onUpdater(variables[0]).add(callback());
+      return this.onUpdater(variables[0]).add(callback());
 
     } else if (variables.length > 1) {
 
@@ -126,6 +130,8 @@ export class Figure {
         this.onUpdater(variable).cache();
         this.onUpdater(variable).addComplex(loc, variables, complexUpdater.name);
       }
+
+      return complexUpdater;
     }
   }
 
