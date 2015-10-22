@@ -6,7 +6,7 @@ export default function (ast) {
     this.nodeName = this.name + figure.uniqid();
 
     figure.declarations.push(sourceNode(this.loc, [
-      this.nodeName, " = document.createElementNS('http://www.w3.org/2000/svg', '", this.name, "')"
+      "var ", this.nodeName, " = document.createElementNS('http://www.w3.org/2000/svg', '", this.name, "');"
     ]));
 
     if (this.name == 'svg') {

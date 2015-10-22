@@ -3,7 +3,7 @@
   "version": "3.0.0",
   "description": "JavaScript DOM Template Engine",
   "bin": "./bin/monkberry",
-  "main": "lib/index.js",
+  "main": "lib/compiler.js",
   "scripts": {
     "test": "node_modules/.bin/testem ci -l phantomjs",
     "compile:jison": "node_modules/.bin/jison parser/grammar.jison -o parser/index.js",

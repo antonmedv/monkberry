@@ -6,7 +6,7 @@ export default function (ast) {
     this.nodeName = 'text' + figure.uniqid();
 
     figure.declarations.push(
-      sourceNode(this.loc, [this.nodeName, " = document.createTextNode('')"])
+      sourceNode(null, ["var ", this.nodeName, " = document.createTextNode('');"])
     );
 
     var variables = collectVariables(this.expression);

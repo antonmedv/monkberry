@@ -15,10 +15,10 @@ export default function (ast) {
       placeholder = parentNode.nodeName;
     } else {
       placeholder = 'custom' + figure.uniqid('placeholder');
-      figure.declarations.push(sourceNode(this.loc, [placeholder, " = document.createComment('" + customNodeName + "')"]));
+      figure.declarations.push(sourceNode(this.loc, ["var ", placeholder, " = document.createComment('" + customNodeName + "');"]));
     }
 
-    figure.declarations.push(sourceNode(this.loc, [childName, " = {}"]));
+    figure.declarations.push(sourceNode(this.loc, ["var ", childName, " = {};"]));
     figure.updateActions.push(sourceNode(this.loc, [
         "      ",
         "monkberry.insert(view, ",

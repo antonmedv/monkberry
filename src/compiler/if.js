@@ -16,10 +16,10 @@ export default function (ast) {
       placeholder = parentNode.nodeName;
     } else {
       placeholder = 'if' + figure.uniqid('placeholder');
-      figure.declarations.push(sourceNode(this.loc, [placeholder, " = document.createComment('if')"]));
+      figure.declarations.push(sourceNode(this.loc, ["var ", placeholder, " = document.createComment('if');"]));
     }
 
-    figure.declarations.push(sourceNode(this.loc, [childName, " = {}"]));
+    figure.declarations.push(sourceNode(null, ["var ", childName, " = {};"]));
 
     // if (
 

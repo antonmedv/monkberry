@@ -16,10 +16,10 @@ export default function (ast) {
       placeholder = parentNode.nodeName;
     } else {
       placeholder = 'for' + figure.uniqid('placeholder');
-      figure.declarations.push(sourceNode(this.loc, [placeholder, " = document.createComment('for')"]));
+      figure.declarations.push(sourceNode(this.loc, ["var ", placeholder, " = document.createComment('for');"]));
     }
 
-    figure.declarations.push(sourceNode(this.loc, [childrenName, " = monkberry.map()"]));
+    figure.declarations.push(sourceNode(null, ["var ", childrenName, " = monkberry.map();"]));
 
     // for (
 

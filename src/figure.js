@@ -28,7 +28,7 @@ export class Figure {
 
     if (this.declarations.length > 0) {
       sn.add('  // Create elements\n')
-        .add(['  var ', this.compileDeclarations(), ';\n'])
+        .add(['  ', this.compileDeclarations(), ';\n'])
         .add('\n');
     }
 
@@ -77,7 +77,7 @@ export class Figure {
   }
 
   compileDeclarations() {
-    return sourceNode(null, this.declarations).join(',\n    ');
+    return sourceNode(null, this.declarations).join('\n  ');
   }
 
   compileDomConstruction() {

@@ -1,5 +1,6 @@
 /src/
 /spec/
+/examples/
 .gitignore
 .travis.yml
 README.md

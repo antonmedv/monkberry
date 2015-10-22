@@ -6,7 +6,7 @@ export default function (ast) {
     this.nodeName = this.name + figure.uniqid();
 
     figure.declarations.push(
-      sourceNode(this.loc, [this.nodeName, " = document.createElement('", this.name, "')"])
+      sourceNode(this.loc, ["var ", this.nodeName, " = document.createElement('", this.name, "');"])
     );
 
     var children = map(this.body, (node) => {

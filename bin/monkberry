@@ -21,7 +21,7 @@ var compiler = new Compiler();
 
 program.args.forEach(function (file) {
   var code = fs.readFileSync(file, utf8);
-  compiler.addSource(path.parse(file).name, code, program.asLibrary);
+  compiler.addSource(file, code, program.asLibrary);
 });
 
 var output, node = compiler.compile();
