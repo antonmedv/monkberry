@@ -233,6 +233,8 @@ That expression will be compiled to next JavaScript:
 upper(replace(lower(text), /.../, '$1'));
 ```
 
+Filters can be used in expressions, `if` and `for` statements.
+
 ### Custom tags
 
 ### Prerender
