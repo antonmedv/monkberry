@@ -8,12 +8,18 @@ export class Updater {
     this.operators = [];
     this.complex = {};
     this.isCacheValue = false;
+    this.declareVariableName = null;
   }
 
   compile() {
     var sn = sourceNode(null, 'function (__data__, ' + this.variables.join(', ') + ') {\n');
+
     if (this.isCacheValue) {
       sn.add('      __cache__.' + this.variables[0] + ' = ' + this.variables[0] + ';' + '\n');
+    }
+
+    if (this.declareVariableName) {
+      sn.add('      var ' + this.declareVariableName + ';\n');
     }
 
     if (this.operators.length > 0) {
@@ -48,6 +54,7 @@ export class Updater {
 
   add(code) {
     this.operators.push(code);
+    return this;
   }
 
   addComplex(loc, params, functionName) {
@@ -59,6 +66,7 @@ export class Updater {
     }
 
     this.complex[complexName].add(functionName, [loc, params]);
+    return this;
   }
 
   cache() {
@@ -67,6 +75,12 @@ export class Updater {
     } else {
       throw new Error('Value caching available only for setter with one variable.')
     }
+    return this;
+  }
+
+  declareVariable(name) {
+    this.declareVariableName = name;
+    return this;
   }
 }
 

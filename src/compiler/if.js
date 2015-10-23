@@ -31,7 +31,7 @@ export default function (ast) {
 
     var variablesOfExpression = collectVariables(this.test);
 
-    compileTest(figure, this.loc, this._else ? "result = " : "", placeholder, templateNameForThen, childNameForThen, this.test.compile(), variablesOfExpression);
+    compileTest(figure, this.loc, this._else ? "result = " : "", placeholder, templateNameForThen, childNameForThen, this.test.compile(), variablesOfExpression).declareVariable(this._else ? "result" : false);
 
     if (this._else) {
       compileTest(figure, this.loc, "", placeholder, templateNameForElse, childNameForElse, "!result", variablesOfExpression);
@@ -54,7 +54,7 @@ export default function (ast) {
 }
 
 function compileTest(figure, loc, prepend, placeholder, templateName, childName, result, variablesOfExpression) {
-  figure.addUpdater(loc, variablesOfExpression, () => {
+  return figure.addUpdater(loc, variablesOfExpression, () => {
     return sourceNode(loc, ["      ",
       prepend,
       "monkberry.insert(view, ",
