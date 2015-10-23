@@ -58,44 +58,6 @@ describe('Monkberry', function () {
     expect(view).toBe('<div class="updated second"></div>');
   });
 
-  it('should render arrays', function () {
-    var view = monkberry.render('test6');
-
-    view.update({list: [1, 2, 3]});
-    expect(view).toBeLike('<ul><li>0:1</li><li>1:2</li><li>2:3</li></ul>');
-
-    view.update({list: [1, 3]});
-    expect(view).toBeLike('<ul><li>0:1</li><li>1:3</li></ul>');
-
-    view.update({list: ['a', 'b', 'c', 'd']});
-    expect(view).toBeLike('<ul><li>0:a</li><li>1:b</li><li>2:c</li><li>3:d</li></ul>');
-  });
-
-  it('should render arrays with externals', function () {
-    var view = monkberry.render('test6a');
-
-    view.update({list: [1, 2, 3], ext: '.js'});
-    expect(view).toBeLike('<div><p>1.js</p><p>2.js</p><p>3.js</p></div>');
-  });
-
-  it('should correctly work with wrappers', function () {
-    var items = [];
-    monkberry.wrappers['test6.for0'] = function (view) {
-      items.push(function () {
-        view.remove();
-      });
-      return view;
-    };
-
-    var view = monkberry.render('test6');
-
-    view.update({list: [1, 2, 3]});
-    expect(view).toBeLike('<ul><li>0:1</li><li>1:2</li><li>2:3</li></ul>');
-
-    items[1]();
-    expect(view).toBeLike('<ul><li>0:1</li><li>2:3</li></ul>');
-  });
-
   it('should properly work with more then one node on topmost level', function () {
     var view = monkberry.render('test7');
     expect(view).toBe('<p>first</p><p>second</p>');

@@ -1,0 +1,28 @@
+<For>
+    <ul>
+        {% for key, value of list %}
+        <li>{{ key }}:{{ value }}</li>
+        {% endfor %}
+    </ul>
+</For>
+<ForA>
+    <div>
+        {% for value of list %}
+        <p>{{ value }}{{ ext }}</p>
+        {% endfor %}
+    </div>
+</ForA>
+<ForObject>
+    <div>
+        {% for key, value of obj %}
+            {{ key }}: {{ value }};
+        {% endfor %}
+    </div>
+</ForObject>
+<ForObjectWithoutOptions>
+    <div>
+        {% for obj %}
+            {{ name }};
+        {% endfor %}
+    </div>
+</ForObjectWithoutOptions>

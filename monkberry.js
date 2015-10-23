@@ -7,16 +7,18 @@
   }
 
   Monkberry.prototype.foreach = function (parent, node, map, template, data, array, options) {
-    var i, j, len, keys, transform, childrenSize = map.length;
+    var i, j, len, keys, transform, arrayLength, childrenSize = map.length;
 
     if (Array.isArray(array)) {
       transform = transformArray;
+      arrayLength = array.length;
     } else {
       transform = transformObject;
       keys = Object.keys(array);
+      arrayLength = keys.length;
     }
 
-    len = childrenSize - array.length;
+    len = childrenSize - arrayLength;
     for (i in map.items) {
       if (len-- > 0) {
         map.items[i].remove();
@@ -31,7 +33,7 @@
       j++;
     }
 
-    for (j = childrenSize, len = array.length; j < len; j++) {
+    for (j = childrenSize, len = arrayLength; j < len; j++) {
       // Render new view.
       var view = this.render(template);
 
@@ -326,7 +328,7 @@
 
       return t;
     } else {
-      return keys[i];
+      return array[keys[i]];
     }
   }
 
