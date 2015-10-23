@@ -109,7 +109,60 @@ view.update({key: value});
 
 ### Expressions
 
+You can use and JavaScript extention inside `{{` and `}}` mustache.
+
+```html
+<div class="greetings {{ visible ? '' : 'hidden' }}">
+  Hello, {{ user.name + "!" }}
+</div>
+```
+
 ### If, Else
+Can be any valid JavaScrpt expression, just like in your scripts. Inside `if` or `else` block you can use any variables like in JavaScript.
+```twig
+{% if count < 0 || count > 10 %}
+  ...
+{% else %}
+  ...
+{% endif %}
+```
+Any number on variables in `if`:
+```
+{% if array.indexOf(search) != -1 %}
+  ...
+{% endif %}
+```
+
+> Note what Monkberry update only one of `if`/`else` block.
+> ```html
+> {% if check %}
+>   Then {{ value }}!
+> {% else %}
+>   Else {{ value }}!
+> {% endif %}
+> ```
+> Render that template:
+> ```js
+> var view = monkberry.render('example', {
+>   check: true,
+>   value: 'one'
+> });
+> ```
+> View will be `Then one!`. When if you update view:
+> ```js
+> view.update({
+>   check: false,
+>   value: 'two'
+> });
+> ```
+> View will be `Else two!`. But if you update only `check`, variable of then part will be same as before.
+> ```js
+> view.update({check: true});
+> ```
+> View will be `Then one!`. 
+>
+> This is happens becouse Monkberry does not stores variables you update, it stores only DOM nodes.
+> Monkberry will update only one part of `if`/`else`.
 
 ### For
 
