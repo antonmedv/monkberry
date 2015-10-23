@@ -7,7 +7,14 @@
   }
 
   Monkberry.prototype.foreach = function (parent, node, map, template, data, array, options) {
-    var i, j, len, childrenSize = map.length;
+    var i, j, len, keys, transform, childrenSize = map.length;
+
+    if (Array.isArray(array)) {
+      transform = transformArray;
+    } else {
+      transform = transformObject;
+      keys = Object.keys(array);
+    }
 
     len = childrenSize - array.length;
     for (i in map.items) {
@@ -20,7 +27,7 @@
 
     j = 0;
     for (i in map.items) {
-      map.items[i].update(forData(data, array[j], j, options));
+      map.items[i].update(transform(data, array, keys, j, options));
       j++;
     }
 
@@ -40,7 +47,7 @@
       }
 
       // Set view data (note what it must be after adding nodes to DOM).
-      view.update(forData(data, array[j], j, options));
+      view.update(transform(data, array, keys, j, options));
 
       // Remember to remove from children map on view remove.
       i = map.push(view);
@@ -292,18 +299,34 @@
    *  Helper function for working with foreach loops data.
    *  Will transform data for "key, value of array" constructions.
    */
-  function forData(data, item, key, options) {
+
+  function transformArray(data, array, keys, i, options) {
     if (options) {
-      var newData = data;
-      newData[options.value] = item;
+      var t = data;
+      t[options.value] = array[i];
 
       if (options.key) {
-        newData[options.key] = key;
+        t[options.key] = i;
       }
 
-      return newData;
+      return t;
     } else {
-      return item;
+      return i;
+    }
+  }
+
+  function transformObject(data, array, keys, i, options) {
+    if (options) {
+      var t = data;
+      t[options.value] = array[keys[i]];
+
+      if (options.key) {
+        t[options.key] = keys[i];
+      }
+
+      return t;
+    } else {
+      return keys[i];
     }
   }
 
