@@ -1,6 +1,6 @@
 import { visitor } from '../visitor'
 
-export function trimWhitespaces(ast) {
+export function whitespace(ast) {
   ast.visit((node) => {
     if (node.type == 'Document') {
       trim(node, 'body');

@@ -2,12 +2,13 @@
 var fs = require('fs');
 var path = require('path');
 var program = require('commander');
-var Compiler = require('../lib/compiler');
+var Monkberry = require('../lib/index');
 
 program
   .usage('[options] <file ...>')
   .option('-o, --output [file]', 'output file name, if not specified will write to stdout.')
   .option('-s, --source-map', 'generate source map.')
+  .option('-p, --parser [type]', 'parser to use', 'monk')
   .option('--as-library', 'compile only custom tags.')
   .parse(process.argv);
 
@@ -17,11 +18,11 @@ if (program.args.length == 0) {
 }
 
 var utf8 = {encoding: 'utf8'};
-var compiler = new Compiler();
+var compiler = new Monkberry.Compiler();
 
 program.args.forEach(function (file) {
   var code = fs.readFileSync(file, utf8);
-  compiler.addSource(path.basename(file), code, program.asLibrary);
+  compiler.addSource(path.basename(file), code, program.parser, program.asLibrary);
 });
 
 var output, node = compiler.compile();
