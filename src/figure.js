@@ -18,7 +18,7 @@ export class Figure {
     this.complexUpdaters = {};
     this.updaters = {};
     this.variables = {};
-    this.updateActions = [];
+    this.renderActions = [];
     this.subFigures = [];
     this.perceivedAsLibrary = false;
   }
@@ -59,10 +59,10 @@ export class Figure {
         .add('\n');
     }
 
-    if (this.updateActions.length > 0) {
-      sn.add('  // Extra update function\n')
-      .add('  view.onUpdate = function (__data__) {\n')
-      .add([this.compileUpdateActions(), '\n'])
+    if (this.renderActions.length > 0) {
+      sn.add('  // Extra render actions\n')
+      .add('  view.onRender = function () {\n')
+      .add([this.compileRenderActions(), '\n'])
       .add('  };\n')
       .add('\n');
     }
@@ -108,12 +108,12 @@ export class Figure {
     return sourceNode(null, parts).join(',\n');
   }
 
-  compileUpdateActions() {
+  compileRenderActions() {
     var parts = [];
-    for (var control of this.updateActions) {
+    for (var control of this.renderActions) {
       parts.push(control);
     }
-    return join(parts, ';\n').add(parts.length ? ';' : '');
+    return join(parts, '\n');
   }
 
   addUpdater(loc, variables, callback) {

@@ -119,6 +119,10 @@
         view.update(values);
       }
 
+      if (view.onRender) {
+        view.onRender();
+      }
+
       view.wrapped = view.wrapped || {};
       if (this.wrappers[name] && !view.wrapped[name]) {
         view = this.wrappers[name](view);
@@ -190,9 +194,6 @@
           _this.__update__[key](data, data[key]);
         }
       });
-    }
-    if (_this.onUpdate) {
-      _this.onUpdate(data);
     }
   };
 

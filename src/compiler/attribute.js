@@ -4,6 +4,29 @@ import { esc } from '../utils';
 
 export default function (ast) {
   ast.AttributeNode.prototype.compile = function (figure, nodeName) {
+    let [expr, defaults] = this.compileToExpression();
+
+    var variables = collectVariables(expr);
+
+    if (variables.length == 0) {
+      figure.construct.push(sourceNode(this.loc, [
+        nodeName, '.setAttribute(', esc(this.name), ', ', expr.compile(), ');'
+      ]));
+    } else {
+      figure.addUpdater(this.loc, variables, () => sourceNode(this.loc, [
+        '      ', nodeName, '.setAttribute(', esc(this.name), ', ', expr.compile(), ')'
+      ]));
+
+      if (defaults.length > 0) {
+        figure.construct.push(sourceNode(this.loc, [
+          nodeName, '.setAttribute(', esc(this.name), ', ', join(defaults, ' + '), ');'
+        ]));
+      }
+    }
+
+  };
+
+  ast.AttributeNode.prototype.compileToExpression = function () {
     var expr, defaults = [];
 
     var pushDefaults = (node) => {
@@ -29,24 +52,7 @@ export default function (ast) {
       }
     }
 
-    var variables = collectVariables(expr);
-
-    if (variables.length == 0) {
-      figure.construct.push(sourceNode(this.loc, [
-        nodeName, '.setAttribute(', esc(this.name), ', ', expr.compile(), ');'
-      ]));
-    } else {
-      figure.addUpdater(this.loc, variables, () => sourceNode(this.loc, [
-        '      ', nodeName, '.setAttribute(', esc(this.name), ', ', expr.compile(), ')'
-      ]));
-
-      if (defaults.length > 0) {
-        figure.construct.push(sourceNode(this.loc, [
-          nodeName, '.setAttribute(', esc(this.name), ', ', join(defaults, ' + '), ');'
-        ]));
-      }
-    }
-
+    return [expr, defaults];
   };
 }
 

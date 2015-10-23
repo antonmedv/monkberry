@@ -1,7 +1,7 @@
 import { sourceNode } from '../sourceNode';
 import { createFigure } from '../../figure';
 import { collectVariables } from '../expression/variable';
-import { lookUpOnlyOneChild, map } from '../../utils';
+import { lookUpOnlyOneChild, map, unique } from '../../utils';
 
 export default function (ast) {
   ast.ElementNode.prototype.compileCustom = function (figure) {
@@ -15,20 +15,48 @@ export default function (ast) {
       placeholder = parentNode.nodeName;
     } else {
       placeholder = 'custom' + figure.uniqid('placeholder');
-      figure.declarations.push(sourceNode(this.loc, ["var ", placeholder, " = document.createComment('" + customNodeName + "');"]));
+      figure.declare(["var ", placeholder, " = document.createComment('" + customNodeName + "');"]);
     }
+    figure.declare(["var ", childName, " = {};"]);
 
-    figure.declarations.push(sourceNode(this.loc, ["var ", childName, " = {};"]));
-    figure.updateActions.push(sourceNode(this.loc, [
-        "      ",
+    var customData = [];
+
+    var variables = [];
+    for (var attr of this.attributes) {
+      var [expr, ] = attr.compileToExpression();
+      variables = variables.concat(collectVariables(expr));
+
+      customData.push(sourceNode(this.loc, ["'", attr.name, "': ", expr.compile()]));
+    }
+    variables = unique(variables);
+
+    if (variables.length == 0) {
+
+      figure.renderActions.push(sourceNode(this.loc, ["      ",
         "monkberry.insert(view, ",
         placeholder, ", ",
         childName, ", ",
         `'${templateName}', `,
-        "__data__, ",
+        "{", customData.join(', '), "}, ",
         "true",
-        ")"
+        ");"
       ]));
+
+    } else {
+
+      figure.addUpdater(this.loc, variables, () => {
+        return sourceNode(this.loc, ["      ",
+          "monkberry.insert(view, ",
+          placeholder, ", ",
+          childName, ", ",
+          `'${templateName}', `,
+          "{", customData.join(', '), "}, ",
+          "true",
+          ")"
+        ]);
+      });
+
+    }
 
     if (this.body.length > 0) {
       figure.subFigures.push(createFigure(templateName, this.body));

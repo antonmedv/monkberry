@@ -63,16 +63,6 @@ describe('Monkberry', function () {
     expect(view).toBe('<p>first</p><p>second</p>');
   });
 
-  it('should render custom tags', function () {
-    var view = monkberry.render('test8', {text: 'for custom tags'});
-    expect(view).toBe('<div><p>for custom tags</p></div>');
-  });
-
-  it('should render inline custom tags', function () {
-    var view = monkberry.render('test9', {});
-    expect(view).toBe('<div><p>inline</p><!--custom-inline--><p>inline</p><!--custom-inline--></div>');
-  });
-
   it('should optimize "if"/"for" tag, if it is only child', function () {
     var view = monkberry.render('test10', {a: true, b: [1]});
     expect(view).toBe('<div><p>a</p><p>b</p></div>');
