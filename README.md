@@ -127,14 +127,14 @@ Can be any valid JavaScrpt expression, just like in your scripts. Inside `if` or
 {% endif %}
 ```
 Any number on variables in `if`:
-```
+```twig
 {% if array.indexOf(search) != -1 %}
   ...
 {% endif %}
 ```
 
 > Note what Monkberry update only one of `if`/`else` block.
-> ```html
+> ```twig
 > {% if check %}
 >   Then {{ value }}!
 > {% else %}
@@ -166,7 +166,72 @@ Any number on variables in `if`:
 
 ### For
 
+You can loop other arrays and objects as well. 
+
+```twig
+{% for array %}
+  {{ name }}
+{% endfor %}
+```
+In this form body of `for` has access only for variables iterating on.
+```js
+view.update({
+  array: [
+    {name: 'Anton'},
+    ...
+  ]
+});
+```
+
+To access outer scope specify iterator name.
+
+```twig
+{% for user of array %}
+  {{ user.name }}
+{% endfor %}
+```
+
+Also you can specify key name.
+```twig
+{% for key, user of array %}
+  {{ key }}: {{ user.name }}
+{% endfor %}
+```
+
 ### Filters
+
+Any expression support filter statement.
+```twig
+Hello, {{ user.name | upper }}
+```
+
+You need to define that filter.
+```js
+monkberry.filters.upper = function (text) {
+  return text.toUpperCase();
+};
+```
+
+Also you can specify parameters for filters.
+```js
+monkberry.filters.replace = function (text, from, to) {
+  return text.replace(from, to);
+};
+```
+
+```twig
+{{ text | replace(/.../, '$1') }}
+```
+
+And you can combine filters.
+```twig
+{{ text | lower | replace(/.../, '$1') | upper }}
+```
+
+That expression will be compiled to next JavaScript:
+```js
+upper(replace(lower(text), /.../, '$1'));
+```
 
 ### Custom tags
 
@@ -176,7 +241,7 @@ Any number on variables in `if`:
 
 ### Transforms
 
-### Extentions
+### Parsers
 
 ## Tests
 
