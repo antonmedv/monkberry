@@ -10,6 +10,7 @@ program
   .option('-s, --source-map', 'generate source map.')
   .option('-p, --parser [type]', 'parser to use', 'monk')
   .option('--as-library', 'compile only custom tags.')
+  .option('--transform [require]', 'transform for ast.')
   .parse(process.argv);
 
 if (program.args.length == 0) {
@@ -19,6 +20,15 @@ if (program.args.length == 0) {
 
 var utf8 = {encoding: 'utf8'};
 var compiler = new Monkberry.Compiler();
+
+try {
+  var transform = program.transform;
+  var name = path.parse(transform).name;
+  compiler.transforms[name] = require(transform);
+} catch (error) {
+  console.error('Can not require transform `' + transform + '`.');
+  throw error;
+}
 
 program.args.forEach(function (file) {
   var code = fs.readFileSync(file, utf8);

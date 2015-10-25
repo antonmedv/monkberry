@@ -1,5 +1,3 @@
-import { visitor } from '../visitor'
-
 export function whitespace(ast) {
   ast.visit((node) => {
     if (node.type == 'Document') {

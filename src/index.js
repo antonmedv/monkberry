@@ -57,7 +57,7 @@ export class Compiler {
         var ast = parser.parse(code, name);
 
         // Transforms
-        Object.keys(this.transforms).forEach((key) => this.transforms[key](ast));
+        Object.keys(this.transforms).forEach((key) => this.transforms[key](ast, parser));
 
         var figure = new Figure(name.replace(/\.\w+$/, ''));
         if (asLibrary) {
