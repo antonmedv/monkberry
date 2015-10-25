@@ -47,7 +47,7 @@ view.update = function (data) {
 };
 ```
 
-Which you can use like that: 
+Which can be used like that: 
 ```js
 var view = monkberry.render('template');
 document.body.appendChild(view.dom()); 
@@ -64,13 +64,13 @@ view.update({
 
 Monkberry has support for both browserify via [monkberrify](https://github.com/monkberry/monkberrify) and for webpack via [monkberry-loader](https://github.com/monkberry/monkberry-loader). 
 
-But you can also use it like CLI tool. Install Monkberry globally:
+Monkberry can be used like CLI tool. Install Monkberry globally:
 
 ```
 npm install monkberry -g
 ```
 
-And compile your all your templates into single JavaScript file with next command:
+To compile all templates into single JavaScript file with source map run next command:
 
 ```
 monkberry --source-map --output template.js templates/*.html
@@ -93,23 +93,23 @@ var view = monkberry.render('template');
 var view = monkberry.render('template', {...}); 
 ```
 
-Next you need to attach it to the page.
+Attach generated DOM nodes to the page.
 
 ```js
 document.getElementById('root').appendChild(view.dom());
 ```
 
-Now, to update data on page:
+Now, to update data of view on page:
 
 ```js
 view.update({...});
-// or you can update only what's needed
+// or update only what's needed
 view.update({key: value});
 ```
 
 ### Expressions
 
-You can use and JavaScript extention inside `{{` and `}}` mustache.
+Monkberry perceives everything inside `{{` and `}}` mustache as JavaScript expression.
 
 ```html
 <div class="greetings {{ visible ? '' : 'hidden' }}">
@@ -118,7 +118,7 @@ You can use and JavaScript extention inside `{{` and `}}` mustache.
 ```
 
 ### If, Else
-Can be any valid JavaScrpt expression, just like in your scripts. Inside `if` or `else` block you can use any variables like in JavaScript.
+Can be any valid JavaScrpt expressions.
 ```twig
 {% if count < 0 || count > 10 %}
   ...
@@ -148,32 +148,32 @@ Any number on variables in `if`:
 >   value: 'one'
 > });
 > ```
-> View will be `Then one!`. When if you update view:
+> View will be `Then one!`. When if update view:
 > ```js
 > view.update({
 >   check: false,
 >   value: 'two'
 > });
 > ```
-> View will be `Else two!`. But if you update only `check`, variable of then part will be same as before.
+> View will be `Else two!`. But if update only `check`, variable of then part will be same as before.
 > ```js
 > view.update({check: true});
 > ```
 > View will be `Then one!`. 
 >
-> This is happens becouse Monkberry does not stores variables you update, it stores only DOM nodes.
+> This is happens becouse Monkberry does not stores variables passed to `update` function, it stores only DOM nodes.
 > Monkberry will update only one part of `if`/`else`.
 
 ### For
 
-You can loop other arrays and objects as well. 
+Monkberry can loop other arrays and objects as well. 
 
 ```twig
 {% for array %}
   {{ name }}
 {% endfor %}
 ```
-In this form body of `for` has access only for variables iterating on.
+In this form, body of `for` has access only for variables iterating on.
 ```js
 view.update({
   array: [
@@ -191,7 +191,7 @@ To access outer scope specify iterator name.
 {% endfor %}
 ```
 
-Also you can specify key name.
+Also key can be specified.
 ```twig
 {% for key, user of array %}
   {{ key }}: {{ user.name }}
@@ -205,14 +205,14 @@ Any expression support filter statement.
 Hello, {{ user.name | upper }}
 ```
 
-You need to define that filter.
+To define that filter:
 ```js
 monkberry.filters.upper = function (text) {
   return text.toUpperCase();
 };
 ```
 
-Also you can specify parameters for filters.
+Also Monkberry understand parameters for filters:
 ```js
 monkberry.filters.replace = function (text, from, to) {
   return text.replace(from, to);
@@ -223,7 +223,7 @@ monkberry.filters.replace = function (text, from, to) {
 {{ text | replace(/.../, '$1') }}
 ```
 
-And you can combine filters.
+And allow to combine filters:
 ```twig
 {{ text | lower | replace(/.../, '$1') | upper }}
 ```
@@ -236,6 +236,44 @@ upper(replace(lower(text), /.../, '$1'));
 Filters can be used in expressions, `if` and `for` statements.
 
 ### Custom tags
+
+Any template mounted to Monkberry can be called as custom tag. 
+
+```js
+monkberry.mount(require('./views/block.html'));
+```
+
+Inside another template possible to insert that `block` templace as custom tag:
+
+```html
+<div>
+  <block/>
+</div>
+```
+
+One file can contains several definitions of custom tags:
+```html
+<my-tag>
+  ...
+</my-tag>
+<my-second-tag>
+  ...
+</my-second-tag>
+```
+
+Custom tags may contains variables:
+```twig
+<greet>
+  {{ value }}, {{ name }}!
+</greet>
+```
+
+To render that custom tag, specify variables as attributes:
+
+```twig
+<greet value="Hello" name="world">
+<greet value="Hello" name="{{ user.name }}">
+```
 
 ### Prerender
 
