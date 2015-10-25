@@ -23,8 +23,10 @@ var compiler = new Monkberry.Compiler();
 
 try {
   var transform = program.transform;
-  var name = path.parse(transform).name;
-  compiler.transforms[name] = require(transform);
+  if (transform) {
+    var name = path.parse(transform).name;
+    compiler.transforms[name] = require(transform);
+  }
 } catch (error) {
   console.error('Can not require transform `' + transform + '`.');
   throw error;
