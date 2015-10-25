@@ -10,7 +10,7 @@ export default function (ast) {
 
     if (variables.length == 0) {
       figure.construct.push(sourceNode(this.loc, [
-        nodeName, '.setAttribute(', esc(this.name), ', ', expr.compile(), ');'
+        nodeName, '.setAttribute(', esc(this.name), ', ', (expr ? expr.compile() : '""'), ');'
       ]));
     } else {
       figure.addUpdater(this.loc, variables, () => sourceNode(this.loc, [
@@ -35,7 +35,9 @@ export default function (ast) {
       }
     };
 
-    if (this.body.length == 1) {
+    if (!this.body) {
+      expr = null;
+    } else if (this.body.length == 1) {
 
       expr = extract(this.body[0]);
 

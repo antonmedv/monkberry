@@ -150,4 +150,9 @@ describe('Monkberry', function () {
     view.update({value: 7});
     expect(view).toBe('<p>7<!--if-->7<!--if-->7<!--if--></p>');
   });
+
+  it('should render empty attributes', function () {
+    var view = monkberry.render('EmptyAttr');
+    expect(view).toBe('<input type="checkbox" value="" checked="">');
+  });
 });

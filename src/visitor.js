@@ -26,8 +26,10 @@ export function visitor(ast) {
   ast.AttributeNode.prototype.visit = function (callback) {
     callback(this);
 
-    for (let i = 0; i < this.body.length; i++) {
-      this.body[i].visit(callback);
+    if (this.body) {
+      for (let i = 0; i < this.body.length; i++) {
+        this.body[i].visit(callback);
+      }
     }
   };
 
