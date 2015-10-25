@@ -277,11 +277,73 @@ To render that custom tag, specify variables as attributes:
 
 ### Prerender
 
+To speedup render Monkberry can prerender DOM nodes to use them in future.
+
+```js
+monkberry.prerender('template', 10); // Preprender template 10 times.
+```
+
+Then next `render` call will use one of these prerendered views:
+```js
+monkberry.render('template', {...}); // Will use already created DOM nodes.
+```
+
+This is very usefull to do then browser waiting some xhr request.
+
+To get info about prerendered template in runtime, use `monkberry.pool.store`.
+
 ### Wrappers
+
+Every template in Monkbeery when rendered can be "wrapped" by function.
+
+For example we have a template `logo.html`:
+```twig
+<div>
+  <i class="svg-icon"></i>
+</div>
+```
+
+And we want to insert SVG nodes inside `i` tag on render. This is can be done via wrappers:
+```js
+monkberry.wrappers.logo = function (view) {
+  view.dom().querySelector('.svg-icon').appendChild(svgIconNodes);
+  return view;
+};
+```
+
+Wrappers usefull to monipulate view'n nodes, adding event listeners and a lot of other staff.
 
 ### Transforms
 
+Transformers allow to modify [AST](https://en.wikipedia.org/wiki/Abstract_syntax_tree) before compilation of templates. 
+List of AST nodes can be founded here: [ast.js](https://github.com/monkberry/monkberry/blob/master/parsers/ast.js)
+Example of transform which trim whitespaces: [whitespace.js](https://github.com/monkberry/monkberry/blob/master/src/optimize/whitespace.js)
+
+Add transforms to Monkbeery before compilation:
+```js
+import { Compiler } from 'monkberry';
+import { myTransform } from './myTransform';
+
+var compiler = new Compiler();
+compiler.transforms.custom = myTransform;
+```
+
 ### Parsers
+
+Now Monkberry support only one type of parser, mustage like (`monk` named). But it can be extender with custom parsers. Every parser must return valid [AST](https://github.com/monkberry/monkberry/blob/master/parsers/ast.js) tree.
+
+```js
+import { Compiler } from 'monkberry';
+import { myParser } from './parser';
+
+var compiler = new Compiler();
+compiler.parsers.myParser = myTransform;
+
+compiler.addSource('template', code, 'myParser');
+compiler.addSource('another', code, 'monk');
+
+var output = compiler.compile();
+```
 
 ## Tests
 
