@@ -311,7 +311,7 @@ monkberry.wrappers.logo = function (view) {
 };
 ```
 
-Wrappers usefull to monipulate view'n nodes, adding event listeners and a lot of other staff.
+Wrappers usefull to manipulate view's nodes, adding event listeners and a lot of other staff.
 
 ### Transforms
 
