@@ -1,6 +1,6 @@
 {
   "name": "monkberry",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "JavaScript DOM Template Engine",
   "bin": "./bin/monkberry",
   "main": "lib/index.js",

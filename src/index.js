@@ -59,7 +59,7 @@ export class Compiler {
         // Transforms
         Object.keys(this.transforms).forEach((key) => this.transforms[key](ast, parser));
 
-        var figure = new Figure(name.replace(/\.\w+$/, ''));
+        var figure = new Figure(this.getTemplateName(name));
         if (asLibrary) {
           figure.perceivedAsLibrary = true;
         }
@@ -90,5 +90,9 @@ export class Compiler {
     }
 
     return output;
+  }
+
+  getTemplateName(name) {
+    return name.split('/').pop().replace(/\.\w+$/, '');
   }
 }
