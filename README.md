@@ -18,6 +18,26 @@ npm install monkberry --save
 * Custom tags
 * Extremely fast!
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Table of Contents
+
+  - [Example](#example)
+  - [Documentation](#documentation)
+    - [Getting Started](#getting-started)
+    - [Expressions](#expressions)
+    - [If, Else](#if-else)
+    - [For](#for)
+    - [Filters](#filters)
+    - [Custom tags](#custom-tags)
+    - [Prerender](#prerender)
+    - [Wrappers](#wrappers)
+    - [Transforms](#transforms)
+    - [Parsers](#parsers)
+  - [Tests](#tests)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Example
 
 Monkberry will compile this template:
