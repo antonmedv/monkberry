@@ -35,7 +35,7 @@
 
     for (j = childrenSize, len = arrayLength; j < len; j++) {
       // Render new view.
-      var view = this.render(template);
+      var view = this._render(template);
 
       // Set view hierarchy.
       view.parent = parent;
@@ -70,7 +70,7 @@
       }
     } else if (test) {
       // Render new view.
-      var view = this.render(template);
+      var view = this._render(template);
 
       // Set view hierarchy.
       view.parent = parent;
@@ -96,13 +96,20 @@
     return test;
   };
 
-  Monkberry.prototype.render = function (name, values, no_cache) {
-    no_cache = no_cache || false;
+  Monkberry.prototype.render = function (name, values, noCache) {
+    return this._render(name, values, noCache);
+  };
+
+  /**
+   * This method is used only for private rendering of views.
+   */
+  Monkberry.prototype._render = function (name, values, noCache) {
+    noCache = noCache || false;
 
     if (this.templates[name]) {
       var view;
 
-      if (no_cache) {
+      if (noCache) {
         view = this.templates[name]();
         view.name = name;
         view.pool = this.pool;
@@ -123,7 +130,6 @@
         view.onRender();
       }
 
-      view.wrapped = view.wrapped || {};
       if (this.wrappers[name] && !view.wrapped[name]) {
         view = this.wrappers[name](view);
         view.wrapped[name] = true;
@@ -170,13 +176,9 @@
     this.parent = null; // Parent view.
     this.nested = []; // Nested views.
     this.nodes = []; // Root DOM nodes.
+    this.wrapped = {}; // List of already applied wrappers.
+    this.onRender = null; // Function to call on render.
   }
-
-  View.prototype.appendTo = function (toNode) {
-    for (var i = 0, len = this.nodes.length; i < len; i++) {
-      toNode.appendChild(this.nodes[i]);
-    }
-  };
 
   View.prototype.update = function (data) {
     var _this = this, keys = typeof data === 'object' ? Object.keys(data) : [];
@@ -194,6 +196,12 @@
           _this.__update__[key](data, data[key]);
         }
       });
+    }
+  };
+
+  View.prototype.appendTo = function (toNode) {
+    for (var i = 0, len = this.nodes.length; i < len; i++) {
+      toNode.appendChild(this.nodes[i]);
     }
   };
 
@@ -220,7 +228,8 @@
     }
   };
 
-  View.prototype.remove = function () {
+  View.prototype.remove = function (force) {
+    force = force || false;
     // Remove appended nodes.
     var i = this.nodes.length;
     while (i--) {
@@ -233,7 +242,7 @@
     // Remove all nested views.
     i = this.nested.length;
     while (i--) {
-      this.nested[i].remove();
+      this.nested[i].remove(force);
     }
     // Remove this view from parent's nested views.
     if (this.parent) {
@@ -241,7 +250,9 @@
       this.parent.nested.splice(i, 1);
     }
     // Store view in pool for reuse in future.
-    this.pool.push(this.name, this);
+    if (!force) {
+      this.pool.push(this.name, this);
+    }
   };
 
   /**
