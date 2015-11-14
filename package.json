@@ -1,17 +1,21 @@
 {
   "name": "monkberry",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "JavaScript DOM Template Engine",
-  "bin": "./bin/monkberry",
+  "bin": "bin/monkberry",
   "main": "lib/index.js",
+  "browser": "./monkberry.js",
   "scripts": {
     "test": "node_modules/.bin/testem ci -l phantomjs",
-    "compile:parsers": "parsers/build.sh",
     "compile": "node_modules/.bin/babel -d lib/ src/",
     "build": "node_modules/.bin/babel -w -d lib/ src/",
-    "prepublish": "npm run compile && npm run compile:parsers"
+    "prepublish": "npm run compile"
   },
-  "browser": "./monkberry.js",
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/monkberry/monkberry.git"
@@ -19,7 +23,8 @@
   "keywords": [
     "dom",
     "template",
-    "view"
+    "view",
+    "ui"
   ],
   "author": "Anton Medvedev <anton@medv.io>",
   "license": "MIT",
@@ -29,14 +34,15 @@
   "homepage": "https://github.com/monkberry/monkberry#readme",
   "dependencies": {
     "commander": "^2.8.1",
+    "monkberry-parser": "^1.0.1",
     "source-map": "^0.5.1"
   },
   "devDependencies": {
     "asciitree": "^1.0.0",
-    "babel": "^5.8.23",
+    "babel-cli": "^6.1.18",
+    "babel-preset-es2015": "^6.1.18",
     "jasmine": "^2.3.2",
-    "jison": "^0.4.15",
-    "preprocessor": "^1.4.0",
-    "testem": "^0.9.4"
+    "testem": "^0.9.4",
+    "through": "^2.3.8"
   }
 }

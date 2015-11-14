@@ -1,4 +1,4 @@
-import { parser as monk } from '../parsers/monk';
+import { parser } from 'monkberry-parser';
 import { Figure } from './figure';
 import { visitor } from './visitor';
 import { sourceNode } from './compiler/sourceNode';
@@ -17,11 +17,11 @@ import { whitespace } from './optimize/whitespace';
 export class Compiler {
   constructor() {
     this.sources = [];
-    this.parsers = {monk};
+    this.parsers = {'default': parser};
     this.transforms = {whitespace};
   }
 
-  addSource(name, code, parser = 'monk', asLibrary = false) {
+  addSource(name, code, parser = 'default', asLibrary = false) {
     this.sources.push([name, code, parser, asLibrary]);
   }
 
@@ -67,7 +67,7 @@ export class Compiler {
         figures.add(ast.compile(figure));
 
       } else {
-        throw Error(`Unknown parser ${parser}.`);
+        throw Error(`Unknown parser ${parserType}.`);
       }
     }
 

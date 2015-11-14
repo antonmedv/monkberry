@@ -8,7 +8,7 @@ program
   .usage('[options] <file ...>')
   .option('-o, --output [file]', 'output file name, if not specified will write to stdout.')
   .option('-s, --source-map', 'generate source map.')
-  .option('-p, --parser [type]', 'parser to use', 'monk')
+  .option('-p, --parser [type]', 'parser to use', 'default')
   .option('--as-library', 'compile only custom tags.')
   .option('--transform [require]', 'transform for ast.')
   .parse(process.argv);
