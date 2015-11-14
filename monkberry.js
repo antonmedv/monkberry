@@ -35,7 +35,7 @@
 
     for (j = childrenSize, len = arrayLength; j < len; j++) {
       // Render new view.
-      var view = this._render(template);
+      var view = this.render(template);
 
       // Set view hierarchy.
       view.parent = parent;
@@ -70,7 +70,7 @@
       }
     } else if (test) {
       // Render new view.
-      var view = this._render(template);
+      var view = this.render(template);
 
       // Set view hierarchy.
       view.parent = parent;
@@ -97,13 +97,6 @@
   };
 
   Monkberry.prototype.render = function (name, values, noCache) {
-    return this._render(name, values, noCache);
-  };
-
-  /**
-   * This method is used only for private rendering of views.
-   */
-  Monkberry.prototype._render = function (name, values, noCache) {
     noCache = noCache || false;
 
     if (this.templates[name]) {
