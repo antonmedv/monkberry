@@ -35,6 +35,7 @@ npm install monkberry --save
     - [Transforms](#transforms)
     - [Parsers](#parsers)
   - [Tests](#tests)
+  - [Benchmarks](#benchmarks)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -371,3 +372,11 @@ Monkberry uses [Jasmine](http://jasmine.github.io) and [testem](https://github.c
 ```
 testem ci
 ```
+
+## Benchmarks
+
+Benchmarks covers a few use cases, and compare Monkberry with [React](https://facebook.github.io/react/) and [temple-wat](https://github.com/KosyanMedia/temple).
+Also it's contains real site code for soft/hard update tests.
+
+* [monkberry.github.io/benchmark](http://monkberry.github.io/benchmark/)
+* [github.com/monkberry/benchmark](https://github.com/monkberry/benchmark)
