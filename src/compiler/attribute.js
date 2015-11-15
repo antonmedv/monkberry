@@ -2,6 +2,8 @@ import { sourceNode, join } from './sourceNode';
 import { collectVariables } from './expression/variable';
 import { esc } from '../utils';
 
+const plainAttributes = ['id', 'value', 'checked', 'selected'];
+
 export default function (ast) {
   ast.AttributeNode.prototype.compile = function (figure, nodeName) {
     let [expr, defaults] = this.compileToExpression();
@@ -10,21 +12,29 @@ export default function (ast) {
 
     if (variables.length == 0) {
       figure.construct.push(sourceNode(this.loc, [
-        nodeName, '.setAttribute(', esc(this.name), ', ', (expr ? expr.compile() : '""'), ');'
+        attr(this.loc, nodeName, this.name, (expr ? expr.compile() : '""')), ';'
       ]));
     } else {
       figure.addUpdater(this.loc, variables, () => sourceNode(this.loc, [
-        '      ', nodeName, '.setAttribute(', esc(this.name), ', ', expr.compile(), ')'
+        '      ', attr(this.loc, nodeName, this.name, expr.compile())
       ]));
 
       if (defaults.length > 0) {
         figure.construct.push(sourceNode(this.loc, [
-          nodeName, '.setAttribute(', esc(this.name), ', ', join(defaults, ' + '), ');'
+          attr(this.loc, nodeName, this.name, join(defaults, ' + ')), ';'
         ]));
       }
     }
 
   };
+
+  function attr(loc, nodeName, attrName, value) {
+    if (plainAttributes.indexOf(attrName) != -1) {
+      return sourceNode(loc, [nodeName, '.', attrName, ' = ', value]);
+    } else {
+      return sourceNode(loc, [nodeName, '.setAttribute(', esc(attrName), ', ', value, ')']);
+    }
+  }
 
   ast.AttributeNode.prototype.compileToExpression = function () {
     var expr, defaults = [];
@@ -56,12 +66,12 @@ export default function (ast) {
 
     return [expr, defaults];
   };
-}
 
-function extract(node) {
-  if (node.type == 'ExpressionStatement') {
-    return node.expression;
-  } else {
-    return node;
+  function extract(node) {
+    if (node.type == 'ExpressionStatement') {
+      return node.expression;
+    } else {
+      return node;
+    }
   }
 }

@@ -256,6 +256,34 @@
     }
   };
 
+  View.prototype.getElementById = function (id) {
+    for(var i = 0; i < this.nodes.length; i++) {
+      if (this.nodes[i].id == id) {
+        return this.nodes[i];
+      }
+
+      var element = this.nodes[i].getElementById(id);
+      if (element) {
+        return element;
+      }
+    }
+    return null;
+  };
+
+  View.prototype.querySelector = function (query) {
+    for(var i = 0; i < this.nodes.length; i++) {
+      if (this.nodes[i].matches(query)) {
+        return this.nodes[i];
+      }
+
+      var element = this.nodes[i].querySelector(query);
+      if (element) {
+        return element;
+      }
+    }
+    return null;
+  };
+
   /**
    * Pool stores pre rendered views for faster template
    * rendering and removed views for reuseing DOM nodes.
