@@ -171,6 +171,7 @@
     this.nodes = []; // Root DOM nodes.
     this.wrapped = {}; // List of already applied wrappers.
     this.onRender = null; // Function to call on render.
+    this.onRemove = null; // Function to call on remove.
   }
 
   View.prototype.update = function (data) {

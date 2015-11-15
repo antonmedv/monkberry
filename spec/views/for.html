@@ -1,14 +1,14 @@
 <For>
     <ul>
         {% for key, value of list %}
-        <li>{{ key }}:{{ value }}</li>
+            <li>{{ key }}:{{ value }}</li>
         {% endfor %}
     </ul>
 </For>
 <ForA>
     <div>
         {% for value of list %}
-        <p>{{ value }}{{ ext }}</p>
+            <p>{{ value }}{{ ext }}</p>
         {% endfor %}
     </div>
 </ForA>
@@ -26,3 +26,18 @@
         {% endfor %}
     </div>
 </ForObjectWithoutOptions>
+<ForWithCustomTag>
+    <div>
+        <MyUl list="{{ list }}"/>
+    </div>
+</ForWithCustomTag>
+<MyUl>
+    <ul>
+        {% for element of list %}
+        <MyLi props="{{ element }}"/>
+        {% endfor %}
+    </ul>
+</MyUl>
+<MyLi>
+    <li>{{ props.id + ':' + props.value }}</li>
+</MyLi>

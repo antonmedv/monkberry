@@ -58,4 +58,36 @@ describe('For tags', function () {
     expect(view).toBeLike('<div>a; b; c; </div>');
   });
 
+  it('should delete old items from childred map with custom tag', function () {
+    var view = monkberry.render('ForWithCustomTag');
+
+    view.update({list: [
+      {
+        id: 1,
+        value: 'a'
+      },
+      {
+        id: 2,
+        value: 'b'
+      },
+      {
+        id: 3,
+        value: 'c'
+      }
+    ]});
+    expect(view).toBe('<div><ul><li>1:a</li><!--MyLi--><li>2:b</li><!--MyLi--><li>3:c</li><!--MyLi--></ul></div>');
+
+    view.update({list: [
+      {
+        id: 1,
+        value: 'a'
+      },
+      {
+        id: 3,
+        value: 'c'
+      }
+    ]});
+    expect(view).toBe('<div><ul><li>1:a</li><!--MyLi--><li>3:c</li><!--MyLi--></ul></div>');
+  });
+
 });
