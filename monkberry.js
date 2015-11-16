@@ -179,18 +179,30 @@
     this.wrapped = {}; // List of already applied wrappers.
     this.onRender = null; // Function to call on render.
     this.onRemove = null; // Function to call on remove.
+    this.onUpdate = null; // Function to call on update.
   }
 
   View.prototype.update = function (data) {
-    var _this = this, keys = typeof data === 'object' ? Object.keys(data) : [];
+    var _this = this;
+
+    // Prepare data.
+    if (_this.onUpdate) {
+      _this.onUpdate(data);
+    }
+
+    // Collect keys.
+    var keys = typeof data === 'object' ? Object.keys(data) : [];
+
+    // Clear cache to prevent double updating.
     if (_this.__cache__) {
-      // Clear cache to prevent double updating.
       keys.forEach(function (key) {
         if (key in _this.__cache__) {
           delete _this.__cache__[key];
         }
       });
     }
+
+    // Update view.
     if (_this.__update__) {
       keys.forEach(function (key) {
         if (_this.__update__.hasOwnProperty(key)) {
@@ -257,7 +269,7 @@
   };
 
   View.prototype.getElementById = function (id) {
-    for(var i = 0; i < this.nodes.length; i++) {
+    for (var i = 0; i < this.nodes.length; i++) {
       if (this.nodes[i].id == id) {
         return this.nodes[i];
       }
@@ -271,7 +283,7 @@
   };
 
   View.prototype.querySelector = function (query) {
-    for(var i = 0; i < this.nodes.length; i++) {
+    for (var i = 0; i < this.nodes.length; i++) {
       if (this.nodes[i].matches(query)) {
         return this.nodes[i];
       }

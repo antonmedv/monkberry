@@ -61,10 +61,10 @@ export class Figure {
 
     if (this.renderActions.length > 0) {
       sn.add('  // Extra render actions\n')
-      .add('  view.onRender = function () {\n')
-      .add([this.compileRenderActions(), '\n'])
-      .add('  };\n')
-      .add('\n');
+        .add('  view.onRender = function () {\n')
+        .add([this.compileRenderActions(), '\n'])
+        .add('  };\n')
+        .add('\n');
     }
 
     sn.add('  // Set root nodes\n');
