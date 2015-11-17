@@ -1,4 +1,4 @@
-import { parser } from '../../parser/src/index';
+import { parser } from 'monkberry-parser';
 import { Figure } from './figure';
 import { visitor } from './visitor';
 import { sourceNode } from './compiler/sourceNode';
