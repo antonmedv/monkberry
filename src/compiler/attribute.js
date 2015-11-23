@@ -3,6 +3,7 @@ import { collectVariables } from './expression/variable';
 import { esc } from '../utils';
 
 const plainAttributes = ['id', 'value', 'checked', 'selected'];
+const booleanAttributes = ['checked', 'selected'];
 
 export default function (ast) {
   ast.AttributeNode.prototype.compile = function (figure, nodeName) {
@@ -12,7 +13,7 @@ export default function (ast) {
 
     if (variables.length == 0) {
       figure.construct.push(sourceNode(this.loc, [
-        attr(this.loc, nodeName, this.name, (expr ? expr.compile() : '""')), ';'
+        attr(this.loc, nodeName, this.name, (expr ? expr.compile() : defaultAttrValue(this.name))), ';'
       ]));
     } else {
       figure.addUpdater(this.loc, variables, () => sourceNode(this.loc, [
@@ -33,6 +34,14 @@ export default function (ast) {
       return sourceNode(loc, [nodeName, '.', attrName, ' = ', value]);
     } else {
       return sourceNode(loc, [nodeName, '.setAttribute(', esc(attrName), ', ', value, ')']);
+    }
+  }
+
+  function defaultAttrValue(attrName) {
+    if (booleanAttributes.indexOf(attrName) != -1) {
+      return 'true';
+    } else {
+      return '""';
     }
   }
 

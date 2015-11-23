@@ -6,6 +6,12 @@
     "spec/support/*.js",
     "spec/*.spec.js"
   ],
+  "watch_files": [
+    "lib/*.js",
+    "lib/**/*.js",
+    "bin/monkberry",
+    "spec/views/*.html"
+  ],
   "before_tests": "bin/monkberry --as-library --output spec/views.js -- spec/views/*.html",
   "on_exit": "rm spec/views.js"
 }

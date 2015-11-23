@@ -23,7 +23,7 @@ describe('Monkberry', function () {
       value: 'Value'
     });
 
-    expect(view).toBe('<input type="text" value="Value">');
+    expect(view.querySelector('input').value).toEqual('Value');
   });
 
   it('should properly work with text constants in text nodes', function () {
@@ -153,6 +153,8 @@ describe('Monkberry', function () {
 
   it('should render empty attributes', function () {
     var view = monkberry.render('EmptyAttr');
-    expect(view).toBe('<input type="checkbox" value="" checked="">');
+
+    expect(view).toBe('<input type="checkbox" value="">');
+    expect(view.querySelector('input').checked).toEqual(true);
   });
 });
