@@ -366,7 +366,7 @@
 
       return t;
     } else {
-      return i;
+      return array[i];
     }
   }
 
