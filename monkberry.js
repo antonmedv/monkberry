@@ -161,7 +161,7 @@
   };
 
   Monkberry.prototype.view = function () {
-    return new View;
+    return new Monkberry.View;
   };
 
   Monkberry.prototype.map = function () {
@@ -171,7 +171,7 @@
   /**
    * Main class for view.
    */
-  function View() {
+  Monkberry.View = function View() {
     this.name = ''; // Name of template.
     this.parent = null; // Parent view.
     this.nested = []; // Nested views.
@@ -182,7 +182,7 @@
     this.onUpdate = null; // Function to call on update.
   }
 
-  View.prototype.update = function (data) {
+  Monkberry.View.prototype.update = function (data) {
     var _this = this;
 
     // Prepare data.
@@ -212,13 +212,13 @@
     }
   };
 
-  View.prototype.appendTo = function (toNode) {
+  Monkberry.View.prototype.appendTo = function (toNode) {
     for (var i = 0, len = this.nodes.length; i < len; i++) {
       toNode.appendChild(this.nodes[i]);
     }
   };
 
-  View.prototype.insertBefore = function (toNode) {
+  Monkberry.View.prototype.insertBefore = function (toNode) {
     for (var i = 0, len = this.nodes.length; i < len; i++) {
       if (toNode.parentNode) {
         toNode.parentNode.insertBefore(this.nodes[i], toNode);
@@ -229,7 +229,7 @@
     }
   };
 
-  View.prototype.dom = function (toNode) {
+  Monkberry.View.prototype.dom = function (toNode) {
     if (this.nodes.length == 1) {
       return this.nodes[0];
     } else {
@@ -241,7 +241,7 @@
     }
   };
 
-  View.prototype.remove = function (force) {
+  Monkberry.View.prototype.remove = function (force) {
     force = force || false;
     // Remove appended nodes.
     var i = this.nodes.length;
@@ -268,7 +268,7 @@
     }
   };
 
-  View.prototype.getElementById = function (id) {
+  Monkberry.View.prototype.getElementById = function (id) {
     for (var i = 0; i < this.nodes.length; i++) {
       if (this.nodes[i].id == id) {
         return this.nodes[i];
@@ -282,7 +282,7 @@
     return null;
   };
 
-  View.prototype.querySelector = function (query) {
+  Monkberry.View.prototype.querySelector = function (query) {
     for (var i = 0; i < this.nodes.length; i++) {
       if (this.nodes[i].matches(query)) {
         return this.nodes[i];

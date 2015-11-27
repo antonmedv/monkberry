@@ -157,4 +157,10 @@ describe('Monkberry', function () {
     expect(view).toBe('<input type="checkbox" value="">');
     expect(view.nodes[0].checked).toEqual(true);
   });
+
+  it('should render attributes without quotes', function () {
+    var view = monkberry.render('AttrWithoutQuotes', {name: 'name'});
+
+    expect(view).toBe('<div class="name"></div>');
+  });
 });

@@ -1,6 +1,6 @@
 {
   "name": "monkberry",
-  "version": "3.0.6",
+  "version": "3.0.7",
   "description": "JavaScript DOM Template Engine",
   "bin": "bin/monkberry",
   "main": "lib/index.js",
@@ -34,17 +34,17 @@
   },
   "homepage": "https://github.com/monkberry/monkberry#readme",
   "dependencies": {
-    "commander": "^2.8.1",
-    "monkberry-parser": "^1.0.1",
-    "source-map": "^0.5.1"
+    "commander": "^2.9.0",
+    "monkberry-parser": "^1.0.2",
+    "source-map": "^0.5.3"
   },
   "devDependencies": {
     "asciitree": "^1.0.0",
-    "babel-cli": "^6.1.18",
-    "babel-preset-es2015": "^6.1.18",
+    "babel-cli": "^6.2.4",
+    "babel-preset-es2015": "^6.2.4",
     "doctoc": "^0.15.0",
     "jasmine": "^2.3.2",
-    "testem": "^0.9.4",
+    "testem": "^0.9.11",
     "through": "^2.3.8"
   }
 }
