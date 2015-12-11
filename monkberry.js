@@ -1,4 +1,9 @@
 (function (document) {
+  /**
+   * Monkberry.
+   * @class
+   * @constructor
+   */
   function Monkberry() {
     this.pool = new Pool();
     this.templates = {};
@@ -96,12 +101,20 @@
     return test;
   };
 
+  /**
+   * Render template to view.
+   * @param {string} name - Template name.
+   * @param {Object} values - Data to update view.
+   * @param {boolean} noCache - Do not take views from pool.
+   * @return {Monkberry.View}
+   */
   Monkberry.prototype.render = function (name, values, noCache) {
     return this._render(name, values, noCache);
   };
 
   /**
    * This method is used only for private rendering of views.
+   * @private
    */
   Monkberry.prototype._render = function (name, values, noCache) {
     noCache = noCache || false;
@@ -141,12 +154,21 @@
     }
   };
 
+  /**
+   * Prerepder view for future usage.
+   * @param {string} name - Template name.
+   * @param {number} times - Times of prerender.
+   */
   Monkberry.prototype.prerender = function (name, times) {
     while (times--) {
       this.pool.push(name, this.render(name, undefined, true));
     }
   };
 
+  /**
+   * Mount template into monkberry.
+   * @param {Object} templates
+   */
   Monkberry.prototype.mount = function (templates) {
     var _this = this;
 
@@ -170,6 +192,7 @@
 
   /**
    * Main class for view.
+   * @class
    */
   Monkberry.View = function View() {
     this.name = ''; // Name of template.
@@ -179,16 +202,14 @@
     this.wrapped = {}; // List of already applied wrappers.
     this.onRender = null; // Function to call on render.
     this.onRemove = null; // Function to call on remove.
-    this.onUpdate = null; // Function to call on update.
-  }
+  };
 
+  /**
+   * Updates view. You can specify only part of data what is needs to be updated.
+   * @param {Object} data
+   */
   Monkberry.View.prototype.update = function (data) {
     var _this = this;
-
-    // Prepare data.
-    if (_this.onUpdate) {
-      _this.onUpdate(data);
-    }
 
     // Collect keys.
     var keys = typeof data === 'object' ? Object.keys(data) : [];
@@ -212,12 +233,18 @@
     }
   };
 
+  /**
+   * @param {Element} toNode
+   */
   Monkberry.View.prototype.appendTo = function (toNode) {
     for (var i = 0, len = this.nodes.length; i < len; i++) {
       toNode.appendChild(this.nodes[i]);
     }
   };
 
+  /**
+   * @param {Element} toNode
+   */
   Monkberry.View.prototype.insertBefore = function (toNode) {
     for (var i = 0, len = this.nodes.length; i < len; i++) {
       if (toNode.parentNode) {
@@ -229,7 +256,11 @@
     }
   };
 
-  Monkberry.View.prototype.dom = function (toNode) {
+  /**
+   * Return rendered node, or DocumentFragment of rendered nodes if more then one root node in template.
+   * @returns {Element|DocumentFragment}
+   */
+  Monkberry.View.prototype.createDocument = function () {
     if (this.nodes.length == 1) {
       return this.nodes[0];
     } else {
@@ -241,6 +272,18 @@
     }
   };
 
+  /**
+   * @deprecated since version 3.1.0. Use createDocument() instead.
+   * @returns {Element|DocumentFragment}
+   */
+  Monkberry.View.prototype.dom = function () {
+    return this.createDocument();
+  };
+
+  /**
+   * Remove view from DOM.
+   * @param {boolean} force - If true, do not put this view into pool.
+   */
   Monkberry.View.prototype.remove = function (force) {
     force = force || false;
     // Remove appended nodes.
@@ -268,6 +311,10 @@
     }
   };
 
+  /**
+   * @param {string} id
+   * @returns {Element}
+   */
   Monkberry.View.prototype.getElementById = function (id) {
     for (var i = 0; i < this.nodes.length; i++) {
       if (this.nodes[i].id == id) {
@@ -282,6 +329,10 @@
     return null;
   };
 
+  /**
+   * @param {string} query
+   * @returns {Element}
+   */
   Monkberry.View.prototype.querySelector = function (query) {
     for (var i = 0; i < this.nodes.length; i++) {
       if (this.nodes[i].matches(query)) {
@@ -350,10 +401,10 @@
     }
   };
 
-  /**
-   *  Helper function for working with foreach loops data.
-   *  Will transform data for "key, value of array" constructions.
-   */
+  //
+  // Helper function for working with foreach loops data.
+  // Will transform data for "key, value of array" constructions.
+  //
 
   function transformArray(data, array, keys, i, options) {
     if (options) {
