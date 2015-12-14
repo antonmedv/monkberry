@@ -34,6 +34,16 @@ npm install monkberry --save
     - [Wrappers](#wrappers)
     - [Transforms](#transforms)
     - [Parsers](#parsers)
+  - [API Reference](#api-reference)
+    - [Monkberry](#monkberry)
+      - [monkberry.render(name, [values, [noCache]])](#monkberryrendername-values-nocache)
+      - [monkberry.prerender(name, times)](#monkberryprerendername-times)
+      - [monkberry.mount(templates)](#monkberrymounttemplates)
+    - [Monkberry.View](#monkberryview)
+      - [view.appendTo(toNode)](#viewappendtotonode)
+      - [view.insertBefore(toNode)](#viewinsertbeforetonode)
+      - [view.createDocument()](#viewcreatedocument)
+      - [view.update(data)](#viewupdatedata)
   - [Tests](#tests)
   - [Benchmarks](#benchmarks)
 
@@ -365,6 +375,105 @@ compiler.addSource('another', code, 'monk');
 
 var output = compiler.compile();
 ```
+
+
+
+## API Reference
+
+Monkberry API strictly follows [semantic versioning](http://semver.org).  
+
+### Monkberry
+
+Then using Monkberry via `require('monkberry')` single instance returned. 
+To create a new Monkberry object or extend prototype use `monkberry.constructor`.
+  
+#### monkberry.render(name, [values, [noCache]])
+
+Generates DOM nodes, and returns new `Monkberry.View` instance.
+
+* `name`: `string` - name of template.
+* `values`: `Object` - Optional. Data to update view.
+* `noCache`: `boolean` - Optional. Use or not cached view from pool.
+
+#### monkberry.prerender(name, times)
+
+Generates views for future calls of render method.
+
+* `name`: `string` - name of template.
+* `times`: `number` - how many times.
+
+#### monkberry.mount(templates)
+
+Add template to monkberry.
+
+* `templates`: `Object` - monkberry compiled templates.
+
+Example:
+
+```js
+monkberry.mount(require('./template.monk'));
+``` 
+ 
+### Monkberry.View
+
+#### view.appendTo(toNode)
+
+Append rendered view nodes to specified node.
+
+* `toNode`: `Element` - DOM node.
+
+#### view.insertBefore(toNode)
+
+Insert rendered view nodes before specified node.
+
+* `toNode`: `Element` - DOM node.
+
+#### view.createDocument()
+
+Return view's nodes. Note what if your template contains more then one root element, `createDocument` function will 
+return `DocumentFragment` what contains all these nodes. If you have only one root node, it will be returned as is.
+
+#### view.update(data)
+
+Update rendered template with new data. You can specify only part of data to update or update entire data.
+
+* `data`: `Object|Array` - values to update in template.
+
+Example:
+
+```js
+var data = {
+    title: 'Title #1',
+    content: '...'
+};
+```
+
+var view = monkberry.render('...', data);
+
+view.update({title: 'Title #2'});
+```
+
+#### view.remove([force])
+
+Remove view's nodes from document, and puts it to pool for future reuse.
+
+* `force`: `boolean` - Optional. False be default. If true, removed view will not be putted into pool.
+
+
+#### view.getElementById(id)
+
+Get element by id.
+
+* `id`: `string` - id of element.
+
+#### view.querySelector(query)
+
+Select node by query.
+
+* `query`: `string` - query to select node.
+
+> Note what this function uses [Element.matches()](https://developer.mozilla.org/en-US/docs/Web/API/Element/matches) for checking root nodes.
+
 
 ## Tests
 
