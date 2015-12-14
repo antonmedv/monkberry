@@ -30,6 +30,7 @@ npm install monkberry --save
     - [For](#for)
     - [Filters](#filters)
     - [Custom tags](#custom-tags)
+    - [Event Handling](#event-handling)
     - [Prerender](#prerender)
     - [Wrappers](#wrappers)
     - [Transforms](#transforms)
@@ -307,6 +308,27 @@ To render that custom tag, specify variables as attributes:
 ```twig
 <greet value="Hello" name="world">
 <greet value="Hello" name="{{ user.name }}">
+```
+
+### Event Handling
+
+There are a few ways to deal with event handling in Monkberry.
+Add event listener to node directly: 
+ 
+```js
+view.querySelector('.button').addEventListener('click', function (event) {
+    ...
+});
+```
+
+But this is difficult when dealing with conditions and loops (it's is possible to solve if using [wrappers](#wrappers)).
+
+Better approach is to use [event delegating](https://github.com/monkberry/events).
+
+```js
+view.on('click', '.button', function (event) {
+    ...
+});
 ```
 
 ### Prerender
