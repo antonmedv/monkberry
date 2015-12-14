@@ -44,6 +44,9 @@ npm install monkberry --save
       - [view.insertBefore(toNode)](#viewinsertbeforetonode)
       - [view.createDocument()](#viewcreatedocument)
       - [view.update(data)](#viewupdatedata)
+      - [view.remove([force])](#viewremoveforce)
+      - [view.getElementById(id)](#viewgetelementbyidid)
+      - [view.querySelector(query)](#viewqueryselectorquery)
   - [Tests](#tests)
   - [Benchmarks](#benchmarks)
 
@@ -446,7 +449,6 @@ var data = {
     title: 'Title #1',
     content: '...'
 };
-```
 
 var view = monkberry.render('...', data);
 
