@@ -35,7 +35,7 @@
   "homepage": "https://github.com/monkberry/monkberry#readme",
   "dependencies": {
     "commander": "^2.9.0",
-    "monkberry-parser": "^1.0.2",
+    "monkberry-parser": "^3.1.2Update ",
     "source-map": "^0.5.3"
   },
   "devDependencies": {
