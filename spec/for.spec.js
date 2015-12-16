@@ -108,4 +108,15 @@ describe('For tags', function () {
     expect(view).toBe('<div><ul><li>1:a</li><!--MyLi--><li>3:c</li><!--MyLi--></ul></div>');
   });
 
+  it('should not expose local variables', function () {
+    var view = monkberry.render('ForLocaleVariableExpose');
+
+    view.update({
+      as: ['a', 'b'],
+      bs: [1, 2],
+      b: 'GLOBAL'
+    });
+    expect(view).toBeLike('<section><i><b>1</b><b>2</b></i><i><b>1</b><b>2</b></i></section>');
+  });
+
 });

@@ -56,6 +56,8 @@ export default function (ast) {
         }
       }
 
+      // TODO: Properly collect local variables in templates and delete `hasOwnProperty` check in `forEach`.
+
       // Delete variables from expression to prevent double updating.
       variablesOfBody = variablesOfBody.filter((v) => variablesOfExpression.indexOf(v) == -1);
 
@@ -63,7 +65,7 @@ export default function (ast) {
       variablesOfBody.forEach((variable) => {
         figure.onUpdater(variable).add(sourceNode(this.loc, [
           "      ", childrenName, ".forEach(function (view) {\n",
-          "        view.__update__.", variable, "(__data__, ", variable, ");\n",
+          "        if (view.__update__.hasOwnProperty('", variable, "')) view.__update__.", variable, "(__data__, ", variable, ");\n",
           "      })"
         ]));
       });

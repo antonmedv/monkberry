@@ -41,3 +41,14 @@
 <MyLi>
     <li>{{ props.id + ':' + props.value }}</li>
 </MyLi>
+<ForLocaleVariableExpose>
+    <section>
+        {% for a of as %}
+            <i>
+                {% for b of bs %}
+                    <b>{{ b }}</b>
+                {% endfor %}
+            </i>
+        {% endfor %}
+    </section>
+</ForLocaleVariableExpose>
