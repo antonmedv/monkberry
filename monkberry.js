@@ -335,7 +335,7 @@
    */
   Monkberry.View.prototype.querySelector = function (query) {
     for (var i = 0; i < this.nodes.length; i++) {
-      if (this.nodes[i].matches(query)) {
+      if (this.nodes[i].matches && this.nodes[i].matches(query)) {
         return this.nodes[i];
       }
 
