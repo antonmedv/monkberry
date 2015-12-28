@@ -335,6 +335,7 @@
    */
   Monkberry.View.prototype.querySelector = function (query) {
     for (var i = 0; i < this.nodes.length; i++) {
+      // TODO: Use polyfill for work in Opera 12.16.
       if (this.nodes[i].matches && this.nodes[i].matches(query)) {
         return this.nodes[i];
       }
