@@ -2,7 +2,6 @@
   /**
    * Monkberry.
    * @class
-   * @constructor
    */
   function Monkberry() {
     this.pool = new Pool();
