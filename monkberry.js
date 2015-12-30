@@ -317,14 +317,20 @@
    */
   Monkberry.View.prototype.getElementById = function (id) {
     for (var i = 0; i < this.nodes.length; i++) {
-      if (this.nodes[i].id == id) {
-        return this.nodes[i];
-      }
+      var node = this.nodes[i];
 
-      var element = this.nodes[i].getElementById(id);
-      if (element) {
-        return element;
-      }
+      do {
+        if (node.id == id) {
+          return node;
+        }
+
+        // Iterate over children.
+        node = node.firstChild || node.nextSibling || function () {
+            while ((node = node.parentNode) && !node.nextSibling);
+            return node ? node.nextSibling : null;
+          }();
+      } while (node);
+
     }
     return null;
   };
@@ -335,7 +341,6 @@
    */
   Monkberry.View.prototype.querySelector = function (query) {
     for (var i = 0; i < this.nodes.length; i++) {
-      // TODO: Use polyfill for work in Opera 12.16.
       if (this.nodes[i].matches && this.nodes[i].matches(query)) {
         return this.nodes[i];
       }

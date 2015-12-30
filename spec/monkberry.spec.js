@@ -163,4 +163,21 @@ describe('Monkberry', function () {
 
     expect(view).toBe('<div class="name"></div>');
   });
+
+  it('should work querySelector', function () {
+    var view = monkberry.render('Query');
+    view.appendTo(document.body);
+
+    expect(view.querySelector('.foo').getAttribute('id')).toEqual('one');
+    expect(view.querySelector('.boo').getAttribute('id')).toEqual('two');
+    expect(view.querySelector('.baz').getAttribute('id')).toEqual('three');
+  });
+
+  it('should work getElementById', function () {
+    var view = monkberry.render('Query');
+
+    expect(view.getElementById('one').getAttribute('id')).toEqual('one');
+    expect(view.getElementById('two').getAttribute('id')).toEqual('two');
+    expect(view.getElementById('three').getAttribute('id')).toEqual('three');
+  });
 });

@@ -496,7 +496,7 @@ Select node by query.
 
 * `query`: `string` - query to select node.
 
-> Note what this function uses [Element.matches()](https://developer.mozilla.org/en-US/docs/Web/API/Element/matches) for checking root nodes.
+> Note what this function uses [Element.matches()](https://developer.mozilla.org/en-US/docs/Web/API/Element/matches) for checking root nodes. Include polyfill for matches if you use it.
 
 
 ## Tests
