@@ -85,7 +85,7 @@ view.update = function (data) {
 Which can be used like that: 
 ```js
 var view = monkberry.render('template');
-document.body.appendChild(view.dom()); 
+view.appendTo(document.body); 
 
 view.update({
   title: 'Monkberry',
@@ -131,7 +131,7 @@ var view = monkberry.render('template', {...});
 Attach generated DOM nodes to the page.
 
 ```js
-document.getElementById('root').appendChild(view.dom());
+document.getElementById('root').appendChild(view.createDocument());
 ```
 
 Now, to update data of view on page:
@@ -362,7 +362,7 @@ For example we have a template `logo.html`:
 And we want to insert SVG nodes inside `i` tag on render. This is can be done via wrappers:
 ```js
 monkberry.wrappers.logo = function (view) {
-  view.dom().querySelector('.svg-icon').appendChild(svgIconNodes);
+  view.querySelector('.svg-icon').appendChild(svgIconNodes);
   return view;
 };
 ```
@@ -372,7 +372,7 @@ Wrappers usefull to manipulate view's nodes, adding event listeners and a lot of
 ### Transforms
 
 Transformers allow to modify [AST](https://en.wikipedia.org/wiki/Abstract_syntax_tree) before compilation of templates. 
-List of AST nodes can be founded here: [ast.js](https://github.com/monkberry/monkberry/blob/master/parsers/ast.js)
+List of AST nodes can be founded here: [ast.js](https://github.com/monkberry/parser/blob/master/src/ast.js)
 Example of transform which trim whitespaces: [whitespace.js](https://github.com/monkberry/monkberry/blob/master/src/optimize/whitespace.js)
 
 Add transforms to Monkbeery before compilation:
@@ -386,7 +386,7 @@ compiler.transforms.custom = myTransform;
 
 ### Parsers
 
-Now Monkberry support only one type of parser, mustage like (`monk` named). But it can be extender with custom parsers. Every parser must return valid [AST](https://github.com/monkberry/monkberry/blob/master/parsers/ast.js) tree.
+Now Monkberry support only one type of parser, mustage like (`monk` named). But it can be extender with custom parsers. Every parser must return valid [AST](https://github.com/monkberry/parser/blob/master/src/ast.js) tree.
 
 ```js
 import { Compiler } from 'monkberry';
