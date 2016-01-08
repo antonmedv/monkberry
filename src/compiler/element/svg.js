@@ -9,12 +9,6 @@ export default function (ast) {
       "var ", this.nodeName, " = document.createElementNS('http://www.w3.org/2000/svg', '", this.name, "');"
     ]));
 
-    if (this.name == 'svg') {
-      this.construct.push(sourceNode(this.loc, [
-        this.nodeName, ".setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:xlink', 'http://www.w3.org/1999/xlink');"
-      ]));
-    }
-
     var children = map(this.body, (node) => {
       node.parent = this; // This is needed for backward lookup then optimizing "if" and "for".
       return node.compile(figure);
