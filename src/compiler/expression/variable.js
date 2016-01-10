@@ -1,3 +1,5 @@
+import { config } from '../../config';
+
 export function collectVariables(node) {
   var variables = [];
   if (node) {
@@ -9,7 +11,7 @@ export function collectVariables(node) {
 
       node.visit(function (node) {
         if (node.type == 'Identifier') {
-          if (variables.indexOf(node.name) == -1) {
+          if (variables.indexOf(node.name) == -1 && config.globals.indexOf(node.name) == -1) {
             variables.push(node.name);
           }
         }

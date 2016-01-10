@@ -1,6 +1,7 @@
 import { parser } from 'monkberry-parser';
 import { Figure } from './figure';
 import { visitor } from './visitor';
+import { config } from './config';
 import { sourceNode } from './compiler/sourceNode';
 import expression from './compiler/expression';
 import document from './compiler/document';
@@ -19,6 +20,7 @@ export class Compiler {
     this.sources = [];
     this.parsers = {'default': parser};
     this.transforms = {whitespace};
+    this.globals = [];
   }
 
   addSource(name, code, parser = 'default', asLibrary = false) {
@@ -45,8 +47,13 @@ export class Compiler {
     });
   }
 
+  updateConfig() {
+    config.globals = this.globals;
+  }
+
   compile(asModule = false) {
     this.enhanceParsers();
+    this.updateConfig();
 
     var figures = sourceNode(null, '');
 

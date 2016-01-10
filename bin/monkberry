@@ -11,6 +11,7 @@ program
   .option('-p, --parser [type]', 'parser to use', 'default')
   .option('--as-library', 'compile only custom tags.')
   .option('--transform [require]', 'transform for ast.')
+  .option('--globals [variable, ...]', 'comma separated list of global variables.')
   .parse(process.argv);
 
 if (program.args.length == 0) {
@@ -30,6 +31,10 @@ try {
 } catch (error) {
   console.error('Can not require transform `' + transform + '`.');
   throw error;
+}
+
+if (program.globals) {
+  compiler.globals = program.globals.split(',').map(v => v.trim());
 }
 
 program.args.forEach(function (file) {

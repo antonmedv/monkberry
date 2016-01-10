@@ -83,3 +83,14 @@
         <div id="three" class="baz"></div>
     </div>
 </Query>
+<Globals>
+    <i>
+        {{ host == window.location.host ? 'expr' : '' }},
+        {% if host == window.location.host %}if{% endif %},
+        {% for i of [host == window.location.host] %}{{ i ? 'for' : '' }}{% endfor %},
+        <i class="{{ host == window.location.host ? 'attr' : '' }}"></i>,
+        <custom host={{ host == window.location.host }}>
+            {{ host ? 'custom' : '' }}
+        </custom>
+    </i>
+</Globals>

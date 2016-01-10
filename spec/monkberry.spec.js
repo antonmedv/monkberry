@@ -180,4 +180,10 @@ describe('Monkberry', function () {
     expect(view.getElementById('two').getAttribute('id')).toEqual('two');
     expect(view.getElementById('three').getAttribute('id')).toEqual('three');
   });
+
+  it('should support global variables', function () {
+    var view = monkberry.render('Globals', {host: window.location.host});
+
+    expect(view).toBeLike('<i>expr, if<!--if-->, for<!--for-->, <i class="attr"></i>, custom<!--custom--></i>');
+  });
 });
