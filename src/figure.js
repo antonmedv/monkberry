@@ -117,7 +117,9 @@ export class Figure {
   }
 
   addUpdater(loc, variables, callback) {
-    if (variables.length == 1) {
+    if (variables.length == 0) {
+      throw new Error('Updaters must have at least one variable.');
+    } else if (variables.length == 1) {
 
       return this.onUpdater(variables[0]).add(callback());
 

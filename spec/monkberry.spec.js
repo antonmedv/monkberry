@@ -186,4 +186,9 @@ describe('Monkberry', function () {
 
     expect(view).toBeLike('<i>expr, if<!--if-->, for<!--for-->, <i class="attr"></i>, custom<!--custom--></i>');
   });
+
+  it('should support expressions without variables', function () {
+    var view = monkberry.render('EmptyExpression');
+    expect(view).toBe('7');
+  });
 });

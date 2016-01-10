@@ -10,9 +10,12 @@ export default function (ast) {
     );
 
     var variables = collectVariables(this.expression);
-    figure.addUpdater(this.loc, variables, () => {
-      return sourceNode(this.loc, ['      ', this.nodeName, '.textContent = ', this.expression.compile()]);
-    });
+
+    if (variables.length == 0) {
+      figure.construct.push(sourceNode(this.loc, [this.nodeName, '.textContent = ', this.expression.compile(), ';']));
+    } else {
+      figure.addUpdater(this.loc, variables, () => sourceNode(this.loc, ['      ', this.nodeName, '.textContent = ', this.expression.compile()]));
+    }
 
     return this.nodeName;
   };
