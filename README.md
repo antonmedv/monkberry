@@ -31,6 +31,7 @@ npm install monkberry --save
     - [Filters](#filters)
     - [Custom tags](#custom-tags)
     - [Event Handling](#event-handling)
+    - [Globals](#globals)
     - [Prerender](#prerender)
     - [Wrappers](#wrappers)
     - [Transforms](#transforms)
@@ -330,6 +331,13 @@ view.on('click', '.button', function (event) {
     ...
 });
 ```
+
+### Globals
+
+Monkberry also support global variables. This is very usefull if using `window` variable inside of templates. 
+Or if using translation function like this: `{{ __('greeting') + userName }}`. 
+
+To do it, you need to specify globals as array of variables names for compiler to pass. Read monkberry loaders docs for more info.   
 
 ### Prerender
 
