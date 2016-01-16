@@ -107,12 +107,20 @@ export class Compiler {
   }
 
   drawAstTree() {
+    this.enhanceParsers();
+
     if (this.sources.length > 0) {
       let [name, code, parserType, ] = this.sources[0];
       if (parserType in this.parsers) {
+
         var parser = this.parsers[parserType];
         var ast = parser.parse(code, name);
+
+        // Transforms
+        Object.keys(this.transforms).forEach((key) => this.transforms[key](ast, parser));
+
         return drawGraph(ast);
+
       } else {
         throw new Error(`Unknown parser type: ${parserType}.`)
       }

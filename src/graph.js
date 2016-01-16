@@ -1,8 +1,8 @@
 import asciitree from 'asciitree';
 
 export function drawGraph(ast) {
-  return asciitree(
-    ast.body[0],
+  return ast.body.map((root) => asciitree(
+    root,
     function (node) {
       if (node.type) {
         switch (node.type) {
@@ -64,5 +64,5 @@ export function drawGraph(ast) {
         return [];
       }
     }
-  );
+  )).filter((tree) => tree != '""').join('\n\n');
 }
