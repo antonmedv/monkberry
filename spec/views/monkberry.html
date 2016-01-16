@@ -97,3 +97,6 @@
 <EmptyExpression>
     {{ 1 + 2 * 3 }}
 </EmptyExpression>
+<DefaultValue>
+    <div id="{{ id || foo }}" class="{{ boo || 'default' }}">{{ content || 'emp' + 'ty' }}</div>
+</DefaultValue>

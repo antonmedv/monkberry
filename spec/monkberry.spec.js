@@ -191,4 +191,17 @@ describe('Monkberry', function () {
     var view = monkberry.render('EmptyExpression');
     expect(view).toBe('7');
   });
+
+  it('should insert default values on render', function () {
+    var view = monkberry.render('DefaultValue');
+    expect(view).toBe('<div class="default">empty</div>');
+
+    view.update({
+      id: null,
+      foo: 'foo',
+      boo: 'boo',
+      content: 'content'
+    });
+    expect(view).toBe('<div class="boo" id="foo">content</div>');
+  });
 });

@@ -5,8 +5,17 @@ export default function (ast) {
   ast.ExpressionStatementNode.prototype.compile = function (figure) {
     this.nodeName = 'text' + figure.uniqid();
 
+    let defaultValue = `''`;
+
+    if (this.expression.type == 'LogicalExpression' && this.expression.operator == '||') {
+      // Add as default right side of "||" expression if there are no variables.
+      if (collectVariables(this.expression.right) == 0) {
+        defaultValue = this.expression.right.compile();
+      }
+    }
+
     figure.declarations.push(
-      sourceNode(null, ["var ", this.nodeName, " = document.createTextNode('');"])
+      sourceNode(null, `var ${this.nodeName} = document.createTextNode(${defaultValue});`)
     );
 
     var variables = collectVariables(this.expression);

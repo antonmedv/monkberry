@@ -70,6 +70,11 @@ export default function (ast) {
     var pushDefaults = (node) => {
       if (node.type == 'Literal') {
         defaults.push(node.compile());
+      } else if (node.type == 'ExpressionStatement' && node.expression.type == 'LogicalExpression' && node.expression.operator == '||') {
+        // Add as default right side of "||" expression if there are no variables.
+        if (collectVariables(node.expression.right) == 0) {
+          defaults.push(node.expression.right.compile());
+        }
       }
     };
 
@@ -78,6 +83,7 @@ export default function (ast) {
     } else if (this.body.length == 1) {
 
       expr = extract(this.body[0]);
+      pushDefaults(this.body[0]);
 
     } else if (this.body.length >= 2) {
 
