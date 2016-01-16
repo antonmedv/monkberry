@@ -1,6 +1,6 @@
 import { sourceNode, join } from './sourceNode';
 import { collectVariables } from './expression/variable';
-import { esc } from '../utils';
+import { esc, arrayToObject } from '../utils';
 
 const plainAttributes = ['id', 'value', 'checked', 'selected'];
 const booleanAttributes = ['checked', 'selected'];
@@ -27,6 +27,18 @@ export default function (ast) {
       }
     }
 
+  };
+
+  ast.SpreadAttributeNode.prototype.compile = function (figure, nodeName) {
+    let attr = this.identifier.name;
+    figure.addUpdater(this.loc, [attr], () => sourceNode(this.log, [
+      `      for (var property in ${attr}) if (${attr}.hasOwnProperty(property)) {\n`,
+      `        if (property in ${esc(arrayToObject(plainAttributes))})\n`,
+      `          ${nodeName}[property] = ${attr}[property];\n`,
+      `        else\n`,
+      `          ${nodeName}.setAttribute(property, ${attr}[property]);\n`,
+      `      }`
+    ]));
   };
 
   function attr(loc, nodeName, attrName, value) {

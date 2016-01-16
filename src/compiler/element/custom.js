@@ -19,43 +19,52 @@ export default function (ast) {
     }
     figure.declare(["var ", childName, " = {};"]);
 
-    var customData = [];
+    var defaultData = [];
+    var hasUpdater = false;
 
-    var variables = [];
-    for (var attr of this.attributes) {
-      var [expr, ] = attr.compileToExpression();
-      variables = variables.concat(collectVariables(expr));
+    // Collect info about variables and attributes.
+    for (let attr of this.attributes) {
+      if (attr.type == 'SpreadAttribute') {
 
-      customData.push(sourceNode(this.loc, ["'", attr.name, "': ", expr.compile()]));
+        figure.addUpdater(this.loc, [attr.identifier.name], () => {
+          return sourceNode(this.loc, [
+            `      monkberry.insert(view, ${placeholder}, ${childName}, '${templateName}', ${attr.identifier.name}, true)`
+          ]);
+        });
+        hasUpdater = true;
+
+      } else {
+        // TODO: Add support for default value in attributes attr={{ value || 'default' }}.
+        let [expr, ] = attr.compileToExpression();
+        let variables = collectVariables(expr);
+
+        let data = sourceNode(this.loc, [`'${attr.name}': ${ expr.compile()}`]);
+
+        if (variables.length == 0) {
+          defaultData.push(data);
+        } else {
+
+          figure.addUpdater(this.loc, variables, () => {
+            return sourceNode(this.loc, [
+              `      monkberry.insert(view, ${placeholder}, ${childName}, '${templateName}', {${data}}, true)`
+            ]);
+          });
+          hasUpdater = true;
+
+        }
+      }
     }
-    variables = unique(variables);
 
-    if (variables.length == 0) {
+    if (!hasUpdater || defaultData.length > 0) {
+      let data = '{}';
 
-      figure.renderActions.push(sourceNode(this.loc, ["      ",
-        "monkberry.insert(view, ",
-        placeholder, ", ",
-        childName, ", ",
-        `'${templateName}', `,
-        "{", customData.join(', '), "}, ",
-        "true",
-        ");"
+      if(defaultData.length > 0) {
+        data = `{${defaultData.join(', ')}}`;
+      }
+
+      figure.renderActions.push(sourceNode(this.loc, [
+        `      monkberry.insert(view, ${placeholder}, ${childName}, '${templateName}', ${data}, true);`
       ]));
-
-    } else {
-
-      figure.addUpdater(this.loc, variables, () => {
-        return sourceNode(this.loc, ["      ",
-          "monkberry.insert(view, ",
-          placeholder, ", ",
-          childName, ", ",
-          `'${templateName}', `,
-          "{", customData.join(', '), "}, ",
-          "true",
-          ")"
-        ]);
-      });
-
     }
 
     if (this.body.length > 0) {

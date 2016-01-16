@@ -12,6 +12,7 @@ program
   .option('--as-library', 'compile only custom tags.')
   .option('--transform [require]', 'transform for ast.')
   .option('--globals [variable, ...]', 'comma separated list of global variables.')
+  .option('--draw-ast', 'draw ast tree of file.')
   .parse(process.argv);
 
 if (program.args.length == 0) {
@@ -41,6 +42,11 @@ program.args.forEach(function (file) {
   var code = fs.readFileSync(file, utf8);
   compiler.addSource(path.basename(file), code, program.parser, program.asLibrary);
 });
+
+if (program.drawAst) {
+  console.log(compiler.drawAstTree());
+  process.exit(0);
+}
 
 var output, node = compiler.compile();
 

@@ -33,6 +33,11 @@ export function visitor(ast) {
     }
   };
 
+  ast.SpreadAttributeNode.prototype.visit = function (callback) {
+    callback(this);
+    this.identifier.visit(callback);
+  };
+
   ast.ExpressionStatementNode.prototype.visit = function (callback) {
     callback(this);
     this.expression.visit(callback);

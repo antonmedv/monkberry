@@ -1,0 +1,30 @@
+<SpreadElementAttributes>
+    <div {{...attr}}></div>
+</SpreadElementAttributes>
+<SpreadAttributesOverride>
+    <div id="foo" {{...attr}}></div>
+</SpreadAttributesOverride>
+<SpreadAttributesWithVar>
+    <div id="{{ id }}" {{...attr}}></div>
+</SpreadAttributesWithVar>
+
+<SpreadCustom>
+    <i>{{ foo }}</i>
+    <i>{{ boo }}</i>
+    <i>{{ bar }}</i>
+</SpreadCustom>
+<SpreadCustomAttributes>
+    <div>
+        <SpreadCustom {{...attr}}/>
+    </div>
+</SpreadCustomAttributes>
+<SpreadCustomAttributesWithConst>
+    <div>
+        <SpreadCustom {{...attr}} foo="foo"/>
+    </div>
+</SpreadCustomAttributesWithConst>
+<SpreadCustomAttributesWithVar>
+    <div>
+        <SpreadCustom {{...attr}} foo="{{ foo }}"/>
+    </div>
+</SpreadCustomAttributesWithVar>

@@ -40,3 +40,11 @@ export function lookUpOnlyOneChild(node) {
   }
   return null;
 }
+
+export function arrayToObject(array, value = 1) {
+  var obj = {};
+  for (var i = 0; i < array.length; i++) {
+    obj[array[i]] = value;
+  }
+  return obj;
+}

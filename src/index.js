@@ -14,6 +14,7 @@ import text from './compiler/text';
 import if_ from './compiler/if';
 import for_ from './compiler/for';
 import { whitespace } from './optimize/whitespace';
+import { drawGraph } from './graph';
 
 export class Compiler {
   constructor() {
@@ -97,6 +98,21 @@ export class Compiler {
     }
 
     return output;
+  }
+
+  drawAstTree() {
+    if (this.sources.length > 0) {
+      let [name, code, parserType, ] = this.sources[0];
+      if (parserType in this.parsers) {
+        var parser = this.parsers[parserType];
+        var ast = parser.parse(code, name);
+        return drawGraph(ast);
+      } else {
+        throw new Error(`Unknown parser type: ${parserType}.`)
+      }
+    } else {
+      throw new Error('No sources.');
+    }
   }
 
   getTemplateName(name) {
