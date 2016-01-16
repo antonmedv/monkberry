@@ -21,7 +21,7 @@ export default function (ast) {
   };
 
   ast.FilterExpressionNode.prototype.compile = function () {
-    var sn = sourceNode(this.loc, ['filters.', this.callee.compile(), '(']);
+    var sn = sourceNode(this.loc, ['__filters.', this.callee.compile(), '(']);
 
     for (let i = 0; i < this.arguments.length; i++) {
       if (i !== 0) {

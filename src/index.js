@@ -1,5 +1,6 @@
 import { parser } from 'monkberry-parser';
 import { Figure } from './figure';
+import { Root } from './figure/root';
 import { visitor } from './visitor';
 import { config } from './config';
 import { sourceNode } from './compiler/sourceNode';
@@ -56,6 +57,7 @@ export class Compiler {
     this.enhanceParsers();
     this.updateConfig();
 
+    var root = new Root();
     var figures = sourceNode(null, '');
 
     for (let [name, code, parserType, asLibrary] of this.sources) {
@@ -67,7 +69,8 @@ export class Compiler {
         // Transforms
         Object.keys(this.transforms).forEach((key) => this.transforms[key](ast, parser));
 
-        var figure = new Figure(this.getTemplateName(name));
+        var figure = new Figure(this.getTemplateName(name), root);
+
         if (asLibrary) {
           figure.perceivedAsLibrary = true;
         }
@@ -83,18 +86,21 @@ export class Compiler {
     if (asModule) {
       output
         .add('module.exports = function (monkberry, document) {\n')
-        .add('var filters = monkberry.filters;\n')
+        .add('var __filters = monkberry.filters;\n')
+        .add(root.compile())
         .add('return {\n')
         .add(figures.join(',\n'))
         .add('};\n')
         .add('};\n');
     } else {
       output
-        .add('(function (monkberry, filters, document, undefined) {\n')
+        .add('(function (monkberry, document) {\n')
+        .add('var __filters = monkberry.filters;\n')
+        .add(root.compile())
         .add('monkberry.mount({\n')
         .add(figures.join(',\n'))
         .add('\n});\n')
-        .add('})(monkberry, monkberry.filters, window.document, void 0);\n');
+        .add('})(monkberry, window.document);\n');
     }
 
     return output;

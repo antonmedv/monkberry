@@ -1,5 +1,4 @@
 import { sourceNode } from '../sourceNode';
-import { createFigure } from '../../figure';
 import { collectVariables } from '../expression/variable';
 import { lookUpOnlyOneChild, map, unique } from '../../utils';
 
@@ -68,7 +67,7 @@ export default function (ast) {
     }
 
     if (this.body.length > 0) {
-      figure.subFigures.push(createFigure(templateName, this.body));
+      figure.subFigures.push(figure.createFigure(templateName, this.body));
     }
 
     return parentNode ? null : placeholder;

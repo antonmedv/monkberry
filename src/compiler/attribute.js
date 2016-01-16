@@ -30,15 +30,22 @@ export default function (ast) {
   };
 
   ast.SpreadAttributeNode.prototype.compile = function (figure, nodeName) {
-    let attr = this.identifier.name;
-    figure.addUpdater(this.loc, [attr], () => sourceNode(this.log, [
-      `      for (var property in ${attr}) if (${attr}.hasOwnProperty(property)) {\n`,
-      `        if (property in ${esc(arrayToObject(plainAttributes))})\n`,
-      `          ${nodeName}[property] = ${attr}[property];\n`,
-      `        else\n`,
-      `          ${nodeName}.setAttribute(property, ${attr}[property]);\n`,
-      `      }`
+    figure.root.addFunction('__spread', sourceNode(null, [
+      `function (node, attr) {\n`,
+      `  for (var property in attr) if (attr.hasOwnProperty(property)) {\n`,
+      `    if (property in ${esc(arrayToObject(plainAttributes))}) {\n`,
+      `      node[property] = attr[property];\n`,
+      `    } else {\n`,
+      `      node.setAttribute(property, attr[property]);\n`,
+      `    }\n`,
+      `  }\n`,
+      `}`
     ]));
+
+    let attr = this.identifier.name;
+    figure.addUpdater(this.loc, [attr], () =>
+      sourceNode(this.loc, [`      __spread(${nodeName}, ${attr})`])
+    );
   };
 
   function attr(loc, nodeName, attrName, value) {

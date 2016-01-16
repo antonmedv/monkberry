@@ -2,17 +2,13 @@ import { sourceNode, join } from './compiler/sourceNode';
 import { Updater } from './compiler/updater';
 import { size, uniqueName, map } from './utils';
 
-export function createFigure(name, nodes) {
-  var figure = new Figure(name);
-  figure.children = map(nodes, (node) => node.compile(figure));
-  return figure;
-}
-
 export class Figure {
-  constructor(name) {
+  constructor(name, root) {
     this.name = name;
+    this.root = root;
     this.uniqCounters = {};
     this.children = [];
+    this.functions = {};
     this.declarations = [];
     this.construct = [];
     this.complexUpdaters = {};
@@ -21,6 +17,12 @@ export class Figure {
     this.renderActions = [];
     this.subFigures = [];
     this.perceivedAsLibrary = false;
+  }
+
+  createFigure(name, nodes) {
+    var figure = new Figure(name, this.root);
+    figure.children = map(nodes, (node) => node.compile(figure));
+    return figure;
   }
 
   compile() {
@@ -80,6 +82,18 @@ export class Figure {
     this.declarations.push(sourceNode(null, nodes));
   }
 
+  compileFunctions() {
+    if (Object.keys(this.functions).length > 0) {
+      var defn = [];
+      Object.keys(this.functions).forEach((key) => {
+        defn.push(sourceNode(null, `${key} = ${this.functions[key]}`));
+      });
+      return sourceNode(null, 'var ').add(join(defn, ',\n')).add(';\n');
+    } else {
+      return sourceNode(null, '');
+    }
+  }
+
   compileDeclarations() {
     return sourceNode(null, this.declarations).join('\n  ');
   }
@@ -114,6 +128,12 @@ export class Figure {
       parts.push(control);
     }
     return join(parts, '\n');
+  }
+
+  addFunction(name, source) {
+    if (!(name in this.functions)) {
+      this.functions[name] = source;
+    }
   }
 
   addUpdater(loc, variables, callback) {

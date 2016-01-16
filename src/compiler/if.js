@@ -1,5 +1,4 @@
 import { sourceNode } from './sourceNode';
-import { createFigure } from '../figure';
 import { collectVariables } from './expression/variable';
 import { lookUpOnlyOneChild, map } from '../utils';
 
@@ -69,7 +68,7 @@ function compileTest(figure, loc, prepend, placeholder, templateName, childName,
 }
 
 function compileBody(figure, loc, templateName, childName, body, variablesOfExpression) {
-  figure.subFigures.push(createFigure(templateName, body));
+  figure.subFigures.push(figure.createFigure(templateName, body));
 
   var variablesOfBody = collectVariables(body);
 
