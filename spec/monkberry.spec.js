@@ -204,4 +204,9 @@ describe('Monkberry', function () {
     });
     expect(view).toBe('<div class="boo" id="foo">content</div>');
   });
+
+  it('should ignore all html comments', function () {
+    var view = monkberry.render('Comment');
+    expect(view).toBe('<span>Moon</span>');
+  });
 });

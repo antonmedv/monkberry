@@ -11,6 +11,10 @@ export function visitor(ast) {
     callback(this);
   };
 
+  ast.CommentNode.prototype.visit = function (callback) {
+    callback(this);
+  };
+
   ast.ElementNode.prototype.visit = function (callback) {
     callback(this);
 
