@@ -47,6 +47,10 @@ export function visitor(ast) {
     this.expression.visit(callback);
   };
 
+  ast.ImportStatementNode.prototype.visit = function (callback) {
+    callback(this);
+  };
+
   ast.IfStatementNode.prototype.visit = function (callback) {
     callback(this);
 

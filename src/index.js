@@ -13,6 +13,7 @@ import custom from './compiler/element/custom';
 import attribute from './compiler/attribute';
 import text from './compiler/text';
 import comment from './compiler/comment';
+import import_ from './compiler/import';
 import if_ from './compiler/if';
 import for_ from './compiler/for';
 import { whitespace } from './optimize/whitespace';
@@ -44,6 +45,7 @@ export class Compiler {
       expression(parser.ast);
       text(parser.ast);
       comment(parser.ast);
+      import_(parser.ast);
       if_(parser.ast);
       for_(parser.ast);
       visitor(parser.ast);
