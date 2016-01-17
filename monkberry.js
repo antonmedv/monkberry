@@ -245,13 +245,15 @@
    * @param {Element} toNode
    */
   Monkberry.View.prototype.insertBefore = function (toNode) {
-    for (var i = 0, len = this.nodes.length; i < len; i++) {
-      if (toNode.parentNode) {
+    if (toNode.parentNode) {
+      for (var i = 0, len = this.nodes.length; i < len; i++) {
         toNode.parentNode.insertBefore(this.nodes[i], toNode);
-      } else {
-        throw new Error("Can not insert child view into parent node." +
-          "You need append your view first and then update.");
       }
+    } else {
+      throw new Error(
+        "Can not insert child view into parent node. " +
+        "You need append your view first and then update."
+      );
     }
   };
 

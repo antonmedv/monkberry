@@ -77,6 +77,10 @@ export function visitor(ast) {
     }
   };
 
+  ast.UnsafeStatementNode.prototype.visit = function (callback) {
+    callback(this);
+  };
+
   ast.FilterExpressionNode.prototype.visit = function (callback) {
     callback(this);
 
