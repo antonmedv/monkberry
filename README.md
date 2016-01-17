@@ -28,14 +28,18 @@ npm install monkberry --save
     - [Expressions](#expressions)
     - [If, Else](#if-else)
     - [For](#for)
+    - [Default values](#default-values)
     - [Filters](#filters)
     - [Custom tags](#custom-tags)
+    - [Spread attributes](#spread-attributes)
+    - [Importing](#importing)
     - [Event Handling](#event-handling)
     - [Globals](#globals)
     - [Prerender](#prerender)
     - [Wrappers](#wrappers)
     - [Transforms](#transforms)
     - [Parsers](#parsers)
+    - [Comments](#comments)
   - [API Reference](#api-reference)
     - [Monkberry](#monkberry)
       - [monkberry.render(name, [values, [noCache]])](#monkberryrendername-values-nocache)
@@ -234,6 +238,42 @@ Also key can be specified.
 {% endfor %}
 ```
 
+### Default values
+
+Render of view contains two phase: node creation and update of node contents with data.
+
+```js
+var view = monkberry.render('template', data);
+// Equals to:
+var view = monkberry.render('template');
+view.update(data);
+```
+
+Some times data for view does not available and it's use full to place come data as default.
+Best way to do it is use logical _OR_ operator `||`.
+
+```twig
+<div class="foo {{ modify || 'baz' }}">
+    {{ content || "No content" }}
+</div>
+```
+
+In this case on first phase of render view will be filled with default data:
+
+```twig
+<div class="foo baz">
+    No content
+</div>
+```
+
+Note if you will use some variable in right side of _OR_ operator, what can't be used as default data.
+  
+```twig
+{{ content || "No content" + foo }}
+```
+
+
+
 ### Filters
 
 Any expression support filter statement.
@@ -310,6 +350,61 @@ To render that custom tag, specify variables as attributes:
 <greet value="Hello" name="world">
 <greet value="Hello" name="{{ user.name }}">
 ```
+
+### Spread attributes
+
+Spread attributes allow easily convert object into node attributes.  
+The properties of the object that you pass in are copied onto the node's attributes.
+
+```twig
+<input {{...attr}}/>
+```
+
+```js
+var view = monkberry.render('template', {attr: {
+  id: 'foo', 
+  value: 'baz'
+}});
+```
+
+You can combine it with other attributes.
+
+```twig
+<input {{...attr}} value={{ value }}/>
+```
+
+Note what later updates of attributes override previous ones.
+
+```js
+view.update({value: 'baz'});
+// ...
+view.update({attr: {value: 'new baz'}}); // Will override previous value.
+```
+
+Spread operator also works well with custom attributes. In fact, this is best way to pass data into custom tag. 
+ 
+```twig
+<my-tag {{...attr}}/>
+``` 
+ 
+```twig
+<my-tag>
+    <input type={{ type }} value={{ value }}>
+</my-tag>
+``` 
+
+### Importing
+
+It is possible to require template within another template. 
+  
+```twig
+{% import './path/to/template.html' %}
+
+    <template/>
+ 
+```
+
+Import statement will require that template and automatically mount it to monkberry.
 
 ### Event Handling
 
@@ -410,6 +505,15 @@ var output = compiler.compile();
 ```
 
 
+### Comments
+
+You can use standard html comments.
+ 
+```twig
+<!-- Comment does here -->
+```
+
+Comments will be cut out from template. 
 
 ## API Reference
 
