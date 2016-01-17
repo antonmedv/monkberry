@@ -39,6 +39,7 @@ npm install monkberry --save
     - [Wrappers](#wrappers)
     - [Transforms](#transforms)
     - [Parsers](#parsers)
+    - [Unsafe](#unsafe)
     - [Comments](#comments)
   - [API Reference](#api-reference)
     - [Monkberry](#monkberry)
