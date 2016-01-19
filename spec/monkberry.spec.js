@@ -209,4 +209,33 @@ describe('Monkberry', function () {
     var view = monkberry.render('Comment');
     expect(view).toBe('<span>Moon</span>');
   });
+
+  it('should work with first level non-elements', function () {
+    var view = monkberry.render('FirstLevelStatements');
+    var node = document.createElement('div');
+    view.appendTo(node);
+    view.update({
+      cond: true,
+      loop: [1,2,3],
+      tag: true,
+      xss: 'ok'
+    });
+    expect(node).toDOM(' text <div class="if">ok</div><!--if--><div class="for">ok</div><div class="for">ok</div><div class="for">ok</div><!--for--><div class="custom">ok</div><!--first-level-tag--><i class="unsafe">ok</i><!--unsafe-->');
+  });
+
+  it('should throw exception if user try to use querySelector on first level non-elements', function () {
+    var view = monkberry.render('FirstLevelStatements');
+    var node = document.createElement('div');
+    view.appendTo(node);
+    view.update({
+      cond: true,
+      loop: [1,2,3],
+      tag: true,
+      xss: 'ok'
+    });
+
+    expect(function () {
+      view.querySelector('.if');
+    }).toThrow('Can not use querySelector with non-element nodes on first level.');
+  });
 });

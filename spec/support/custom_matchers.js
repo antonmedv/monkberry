@@ -38,5 +38,24 @@ window.customMatchers = {
         return result;
       }
     };
+  },
+  toDOM: function () {
+    return {
+      compare: function (dom, html) {
+        var a = dom, b = document.createElement('div'), result = {};
+
+        b.innerHTML = html;
+
+        result.pass = a.isEqualNode(b);
+
+        if (result.pass) {
+          result.message = 'Expected "' + a.innerHTML + '" not to be equals "' + b.innerHTML + '".';
+        } else {
+          result.message = 'Expected "' + a.innerHTML + '" to be equals "' + b.innerHTML + '".';
+        }
+
+        return result;
+      }
+    };
   }
 };

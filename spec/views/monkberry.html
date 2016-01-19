@@ -104,3 +104,16 @@
     <!-- comment with <tags> and {{ expr }}, {% tags %}, --, #, //, >. Anton Medvedev (c). -->
     <span>Moon</span>
 </Comment>
+<FirstLevelStatements>
+    text
+    {% if cond %}
+        <div class="if">ok</div>
+    {% endif %}
+    {% for loop %}
+        <div class="for">ok</div>
+    {% endfor %}
+    <first-level-tag on="{{ tag }}">
+        <div class="custom">ok</div>
+    </first-level-tag>
+    {% unsafe "<i class='unsafe'>" + xss + "</i>" %}
+</FirstLevelStatements>

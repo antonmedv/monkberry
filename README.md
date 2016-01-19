@@ -607,12 +607,6 @@ Remove view's nodes from document, and puts it to pool for future reuse.
 * `force`: `boolean` - Optional. False be default. If true, removed view will not be putted into pool.
 
 
-#### view.getElementById(id)
-
-Get element by id.
-
-* `id`: `string` - id of element.
-
 #### view.querySelector(query)
 
 Select node by query.
@@ -620,6 +614,23 @@ Select node by query.
 * `query`: `string` - query to select node.
 
 > Note what this function uses [Element.matches()](https://developer.mozilla.org/en-US/docs/Web/API/Element/matches) for checking root nodes. Include polyfill for matches if you use it.
+
+> Note what querySelector can not work with template which have if/for/custom node on first level.
+> ```twig
+> {% if cond %}
+>     ...
+> {% endif %}
+> ```
+> You will got exception like this: `Can not use querySelector with non-element nodes on first level.`
+> 
+> Solution is to wrap such statement into another node:
+> ```twig
+> <div>
+>     {% if cond %}
+>         ...
+>     {% endif %}
+> </div>
+> ``` 
 
 
 ## Tests

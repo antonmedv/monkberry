@@ -315,6 +315,7 @@
   /**
    * @param {string} id
    * @returns {Element}
+   * @deprecated Use querySelector instead of.
    */
   Monkberry.View.prototype.getElementById = function (id) {
     for (var i = 0; i < this.nodes.length; i++) {
@@ -346,9 +347,15 @@
         return this.nodes[i];
       }
 
-      var element = this.nodes[i].querySelector(query);
-      if (element) {
-        return element;
+      if (this.nodes[i].nodeType === 8) {
+        throw 'Can not use querySelector with non-element nodes on first level.';
+      }
+
+      if (this.nodes[i].querySelector) {
+        var element = this.nodes[i].querySelector(query);
+        if (element) {
+          return element;
+        }
       }
     }
     return null;
