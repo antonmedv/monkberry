@@ -614,6 +614,7 @@ Select node by query.
 
 > Note what this function uses [Element.matches()](https://developer.mozilla.org/en-US/docs/Web/API/Element/matches) for checking root nodes. Include polyfill for matches if you use it.
 
+If you template contains more then one nodes on first level, `querySelector` will look other all subtrees. Array of all top level nodes can be accessed by `view.nodes[]` array. 
 
 > Note what querySelector can not work with template which have if/for/custom node on first level.
 > ```twig
