@@ -54,6 +54,7 @@ npm install monkberry --save
       - [view.remove([force])](#viewremoveforce)
       - [view.querySelector(query)](#viewqueryselectorquery)
   - [Tests](#tests)
+  - [Plugins](#plugins)
   - [Benchmarks](#benchmarks)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -640,6 +641,10 @@ Monkberry uses [Jasmine](http://jasmine.github.io) and [testem](https://github.c
 ```
 testem ci
 ```
+
+## Plugins
+
+* Atom Text Editor: [language-monkberry](https://atom.io/packages/language-monkberry)
 
 ## Benchmarks
 
