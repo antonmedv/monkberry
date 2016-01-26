@@ -18,13 +18,14 @@ import if_ from './compiler/if';
 import for_ from './compiler/for';
 import unsafe from './compiler/unsafe';
 import { whitespace } from './optimize/whitespace';
+import { entity } from './transform/entity';
 import { drawGraph } from './graph';
 
 export class Compiler {
   constructor() {
     this.sources = [];
     this.parsers = {'default': parser};
-    this.transforms = {whitespace};
+    this.transforms = {whitespace, entity};
     this.globals = [];
   }
 

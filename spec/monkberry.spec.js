@@ -238,4 +238,10 @@ describe('Monkberry', function () {
       view.querySelector('.if');
     }).toThrow('Can not use querySelector with non-element nodes on first level.');
   });
+
+  it('should replace HTML entities with Unicode symbols', function () {
+    var view = monkberry.render('HtmlEntity');
+    expect(view).toBe(' "&amp;\'&lt;&gt;©£±¶ — € ♥&amp;notExists; ');
+  });
+
 });
