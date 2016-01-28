@@ -36,6 +36,7 @@ npm install monkberry --save
     - [Event Handling](#event-handling)
     - [Globals](#globals)
     - [Prerender](#prerender)
+    - [Pool](#pool)
     - [Wrappers](#wrappers)
     - [Transforms](#transforms)
     - [Parsers](#parsers)
@@ -46,6 +47,8 @@ npm install monkberry --save
       - [monkberry.render(name, [values, [noCache]])](#monkberryrendername-values-nocache)
       - [monkberry.prerender(name, times)](#monkberryprerendername-times)
       - [monkberry.mount(templates)](#monkberrymounttemplates)
+      - [monkberry.createPool()](#monkberrycreatepool)
+      - [monkberry.getPoolInfo()](#monkberrygetpoolinfo)
     - [Monkberry.View](#monkberryview)
       - [view.appendTo(toNode)](#viewappendtotonode)
       - [view.insertBefore(toNode)](#viewinsertbeforetonode)
@@ -452,6 +455,22 @@ This is very usefull to do then browser waiting some xhr request.
 
 To get info about prerendered template in runtime, use `monkberry.pool.store`.
 
+
+### Pool
+
+If you have big application with a lot of template within, it may be a problem what two templates have same names.
+
+To solve this problem create a "pool of templates":
+
+```js
+var pool = monkberry.createPool();
+```
+
+This allow to have templates with same names. `createPool` method creates new Monkberry instance. 
+ 
+> Note what filters remain same.
+
+
 ### Wrappers
 
 Every template in Monkbeery when rendered can be "wrapped" by function.
@@ -561,6 +580,15 @@ Example:
 ```js
 monkberry.mount(require('./template.monk'));
 ``` 
+ 
+#### monkberry.createPool()
+
+Return new Monkberry instance.
+  
+#### monkberry.getPoolInfo()
+ 
+Gets info about prerendered templates in pool/monkberry.
+
  
 ### Monkberry.View
 

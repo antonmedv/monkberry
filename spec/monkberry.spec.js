@@ -1,5 +1,5 @@
 describe('Monkberry', function () {
-  beforeEach(function() {
+  beforeEach(function () {
     jasmine.addMatchers(customMatchers);
   });
 
@@ -216,7 +216,7 @@ describe('Monkberry', function () {
     view.appendTo(node);
     view.update({
       cond: true,
-      loop: [1,2,3],
+      loop: [1, 2, 3],
       tag: true,
       xss: 'ok'
     });
@@ -229,7 +229,7 @@ describe('Monkberry', function () {
     view.appendTo(node);
     view.update({
       cond: true,
-      loop: [1,2,3],
+      loop: [1, 2, 3],
       tag: true,
       xss: 'ok'
     });
@@ -242,6 +242,61 @@ describe('Monkberry', function () {
   it('should replace HTML entities with Unicode symbols', function () {
     var view = monkberry.render('HtmlEntity');
     expect(view).toBe(' "&amp;\'&lt;&gt;©£±¶ — € ♥&amp;notExists; ');
+  });
+
+  it('should create new Monkberry with createPool', function () {
+    var p1 = monkberry.createPool();
+    var p2 = monkberry.createPool();
+
+    monkberry.filters.upperCase = function (value) {
+      return value.toUpperCase();
+    };
+
+    p1.mount(function (m, d) {
+      return {
+        template: function () {
+          // Create elements
+          var div0 = d.createElement('div');
+
+          // Construct dom
+          div0.textContent = m.filters.upperCase('template 1');
+
+          // Create view
+          var view = m.view();
+
+          // Set root nodes
+          view.nodes = [div0];
+          return view;
+        }
+      };
+    });
+
+    p2.mount(function (m, d) {
+      return {
+        template: function () {
+          // Create elements
+          var div0 = d.createElement('div');
+
+          // Construct dom
+          div0.textContent = m.filters.upperCase('template 2');
+
+          // Create view
+          var view = m.view();
+
+          // Set root nodes
+          view.nodes = [div0];
+          return view;
+        }
+      };
+    });
+
+    p1.prerender('template');
+    var view1 = p1.render('template');
+    p2.prerender('template');
+    var view2 = p2.render('template');
+
+    expect(view1).toBe('<div>TEMPLATE 1</div');
+    expect(view2).toBe('<div>TEMPLATE 2</div>');
   });
 
 });

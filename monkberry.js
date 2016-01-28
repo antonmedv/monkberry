@@ -181,6 +181,29 @@
     });
   };
 
+  /**
+   * Create new Monkberry instance with separate pool, templates and wrappers.
+   * Note what filters will be same.
+   * @returns {Monkberry}
+   */
+  Monkberry.prototype.createPool = function () {
+    var pool = new Monkberry();
+    pool.filters = this.filters;
+    return pool;
+  };
+
+  /**
+   * Get info about prerendered templates.
+   * @returns {Object}
+   */
+  Monkberry.prototype.getPoolInfo = function () {
+    var name, info = {};
+    for(name in this.pool.store) {
+      info[name] = this.pool.store[name].length;
+    }
+    return info;
+  };
+
   Monkberry.prototype.view = function () {
     return new Monkberry.View;
   };
@@ -318,23 +341,7 @@
    * @deprecated Use querySelector instead of.
    */
   Monkberry.View.prototype.getElementById = function (id) {
-    for (var i = 0; i < this.nodes.length; i++) {
-      var node = this.nodes[i];
-
-      do {
-        if (node.id == id) {
-          return node;
-        }
-
-        // Iterate over children.
-        node = node.firstChild || node.nextSibling || function () {
-            while ((node = node.parentNode) && !node.nextSibling);
-            return node ? node.nextSibling : null;
-          }();
-      } while (node);
-
-    }
-    return null;
+    return this.querySelector('#' + id);
   };
 
   /**
