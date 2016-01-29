@@ -75,4 +75,60 @@ describe('Regression', function () {
     }).toThrow('Can not use querySelector with non-element nodes on first level.');
   });
 
+
+  it('if with custom tag', function () {
+    var view = monkberry.render('ReIfCustom', {test: true});
+    expect(view).toBe('<div><div> Custom tag </div><!--Tag--></div>');
+
+    view.update({test: false});
+    expect(view).toBe('<div></div>');
+
+    view.update({test: true});
+    expect(view).toBe('<div><div> Custom tag </div><!--Tag--></div>');
+  });
+
+  it('if with block tag', function () {
+    var view = monkberry.render('ReIfBlock', {test: true});
+    expect(view).toBe('<div><i>1</i><!--block--><i>2</i><!--block--></div>');
+
+    view.update({test: false});
+    expect(view).toBe('<div></div>');
+
+    view.update({test: true});
+    expect(view).toBe('<div><i>1</i><!--block--><i>2</i><!--block--></div>');
+  });
+
+  it('if with unsafe tag', function () {
+    var view = monkberry.render('ReIfUnsafe', {test: true});
+    expect(view).toBe('<div><div><i>unsafe</i></div></div>');
+
+    view.update({test: false});
+    expect(view).toBe('<div></div>');
+
+    view.update({test: true});
+    expect(view).toBe('<div><div><i>unsafe</i></div></div>');
+  });
+
+  it('if with custom tag', function () {
+    var view = monkberry.render('ReForCustom', {array: [1,2,3]});
+    expect(view).toBe('<div><div> Custom tag </div><!--Tag--><div> Custom tag </div><!--Tag--><div> Custom tag </div><!--Tag--></div>');
+
+    view.update({array: []});
+    expect(view).toBe('<div></div>');
+
+    view.update({array: [1,3]});
+    expect(view).toBe('<div><div> Custom tag </div><!--Tag--><div> Custom tag </div><!--Tag--></div>');
+  });
+
+  it('if with block tag', function () {
+    var view = monkberry.render('ReForBlock', {array: [1,2,3]});
+    expect(view).toBe('<div><i>1</i><!--block--><i>2</i><!--block--><i>1</i><!--block--><i>2</i><!--block--><i>1</i><!--block--><i>2</i><!--block--></div>');
+
+    view.update({array: []});
+    expect(view).toBe('<div></div>');
+
+    view.update({array: [1,3]});
+    expect(view).toBe('<div><i>1</i><!--block--><i>2</i><!--block--><i>1</i><!--block--><i>2</i><!--block--></div>');
+  });
+
 });

@@ -19,4 +19,17 @@ describe('Block tags', function () {
     expect(view).toBe('<div><i>data</i><!--block--><i>data</i><!--block--></div>');
   });
 
+  it('should be optimized when inside if tag', function () {
+    var view = monkberry.render('OptimizeNestedBlockInIf', {cond: true});
+    expect(view).toBe('<div> true </div>');
+
+    view.update({cond: false});
+    expect(view).toBe('<div> false </div>');
+
+    expect(monkberry.templates['OptimizeNestedBlockInIf.then']).toBeDefined();
+    expect(monkberry.templates['OptimizeNestedBlockInIf.otherwise']).toBeDefined();
+    expect(monkberry.templates['OptimizeNestedBlockInIf.if0']).not.toBeDefined();
+    expect(monkberry.templates['OptimizeNestedBlockInIf.if0.else']).not.toBeDefined();
+  });
+
 });

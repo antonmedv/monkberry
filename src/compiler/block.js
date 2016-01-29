@@ -1,10 +1,10 @@
 import { sourceNode } from './sourceNode';
 import { collectVariables } from './expression/variable';
-import { lookUpOnlyOneChild, map, esc } from '../utils';
+import { lookUpOnlyOneChild, getStringLiteralValue, map, esc } from '../utils';
 
 export default function (ast) {
   ast.BlockStatementNode.prototype.compile = function (figure) {
-    let blockName = getStringLiteralValue(this.name.value);
+    let blockName = getStringLiteralValue(this.name);
     let template = `${figure.name}.${blockName}`;
     let child = 'child' + figure.uniqid('child_name');
 
@@ -35,8 +35,4 @@ export default function (ast) {
 
     return parentNode ? null : placeholder;
   };
-}
-
-function getStringLiteralValue(value) {
-  return value.replace(/^["']/, '').replace(/["']$/, '');
 }

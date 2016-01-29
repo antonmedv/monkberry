@@ -30,3 +30,42 @@
     </first-level-tag>
     {% unsafe "<i class='unsafe'>" + xss + "</i>" %}
 </FirstLevelStatements>
+<ReIfCustom>
+    <div>
+        {% if test %}
+            <Tag/>
+        {% endif %}
+    </div>
+</ReIfCustom>
+<ReIfBlock>
+    <div>
+        {% if test %}
+            {% block "1" %}<i>1</i>{% endblock %}
+            {% block "2" %}<i>2</i>{% endblock %}
+        {% endif %}
+    </div>
+</ReIfBlock>
+<ReIfUnsafe>
+    <div>
+        {% if test %}
+            <div>
+                {% unsafe "<i>unsafe</i>" %}
+            </div>
+        {% endif %}
+    </div>
+</ReIfUnsafe>
+<ReForCustom>
+    <div>
+        {% for array %}
+            <Tag/>
+        {% endfor %}
+    </div>
+</ReForCustom>
+<ReForBlock>
+    <div>
+        {% for array %}
+            {% block "1" %}<i>1</i>{% endblock %}
+            {% block "2" %}<i>2</i>{% endblock %}
+        {% endfor %}
+    </div>
+</ReForBlock>

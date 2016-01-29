@@ -15,3 +15,16 @@
         {% endblock %}
     </div>
 </TwoBlocks>
+<OptimizeNestedBlockInIf>
+    <div>
+        {% if cond %}
+            {% block "then" %}
+                true
+            {% endblock %}
+        {% else %}
+            {% block "otherwise" %}
+                false
+            {% endblock %}
+        {% endif %}
+    </div>
+</OptimizeNestedBlockInIf>

@@ -4,15 +4,24 @@ import { lookUpOnlyOneChild, map } from '../utils';
 
 export default function (ast) {
   ast.IfStatementNode.prototype.compile = function (figure) {
-    var templateNameForThen = figure.name + '.if' + figure.uniqid('template_name');
-    var templateNameForElse = templateNameForThen + '.else';
-    // TODO: Optimize when child has only one custom node. Replace templateName with that custom tag name.
+    let templateNameForThen, templateNameForOtherwise;
 
-    var childNameForThen = 'child' + figure.uniqid('child_name');
-    var childNameForElse = 'child' + figure.uniqid('child_name');
+    if (this.templateNames && this.templateNames.then) {
+      templateNameForThen = figure.name + '.' + this.templateNames.then;
+    } else {
+      templateNameForThen = figure.name + '.if' + figure.uniqid('template_name');
+    }
 
-    var placeholder;
-    var parentNode = lookUpOnlyOneChild(this);
+    if (this.templateNames && this.templateNames.otherwise) {
+      templateNameForOtherwise = figure.name + '.' + this.templateNames.otherwise;
+    } else {
+      templateNameForOtherwise = templateNameForThen + '.else';
+    }
+
+    let childNameForThen = 'child' + figure.uniqid('child_name');
+    let childNameForOtherwise = 'child' + figure.uniqid('child_name');
+
+    let placeholder, parentNode = lookUpOnlyOneChild(this);
     if (parentNode) {
       placeholder = parentNode.nodeName;
     } else {
@@ -22,18 +31,18 @@ export default function (ast) {
 
     figure.declare(["var ", childNameForThen, " = {};"]);
 
-    if (this._else) {
-      figure.declare(["var ", childNameForElse, " = {};"]);
+    if (this.otherwise) {
+      figure.declare(["var ", childNameForOtherwise, " = {};"]);
     }
 
     // if (
 
-    var variablesOfExpression = collectVariables(this.test);
+    var variablesOfExpression = collectVariables(this.cond);
 
-    compileTest(figure, this.loc, this._else ? "result = " : "", placeholder, templateNameForThen, childNameForThen, this.test.compile(), variablesOfExpression).declareVariable(this._else ? "result" : false);
+    compileCond(figure, this.loc, this.otherwise ? "result = " : "", placeholder, templateNameForThen, childNameForThen, this.cond.compile(), variablesOfExpression).declareVariable(this.otherwise ? "result" : false);
 
-    if (this._else) {
-      compileTest(figure, this.loc, "", placeholder, templateNameForElse, childNameForElse, "!result", variablesOfExpression);
+    if (this.otherwise) {
+      compileCond(figure, this.loc, "", placeholder, templateNameForOtherwise, childNameForOtherwise, "!result", variablesOfExpression);
     }
 
     // ) then {
@@ -42,8 +51,8 @@ export default function (ast) {
 
     // } else {
 
-    if (this._else) {
-      compileBody(figure, this.loc, templateNameForElse, childNameForElse, this._else, variablesOfExpression);
+    if (this.otherwise) {
+      compileBody(figure, this.loc, templateNameForOtherwise, childNameForOtherwise, this.otherwise, variablesOfExpression);
     }
 
     // }
@@ -52,7 +61,7 @@ export default function (ast) {
   };
 }
 
-function compileTest(figure, loc, prepend, placeholder, templateName, childName, result, variablesOfExpression) {
+function compileCond(figure, loc, prepend, placeholder, templateName, childName, result, variablesOfExpression) {
   return figure.addUpdater(loc, variablesOfExpression, () => {
     return sourceNode(loc, ["      ",
       prepend,

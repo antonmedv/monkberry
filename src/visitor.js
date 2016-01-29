@@ -54,15 +54,15 @@ export function visitor(ast) {
   ast.IfStatementNode.prototype.visit = function (callback) {
     callback(this);
 
-    this.test.visit(callback);
+    this.cond.visit(callback);
 
     for (let i = 0; i < this.then.length; i++) {
       this.then[i].visit(callback);
     }
 
-    if (this._else) {
-      for (let i = 0; i < this._else.length; i++) {
-        this._else[i].visit(callback);
+    if (this.otherwise) {
+      for (let i = 0; i < this.otherwise.length; i++) {
+        this.otherwise[i].visit(callback);
       }
     }
   };

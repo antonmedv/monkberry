@@ -6,7 +6,7 @@ export function whitespace(ast) {
       trim(node, 'body');
     } else if (node.type == 'IfStatement') {
       trim(node, 'then');
-      trim(node, '_else');
+      trim(node, 'otherwise');
     } else if (node.type == 'ForStatement') {
       trim(node, 'body');
     } else if (node.type == 'BlockStatement') {

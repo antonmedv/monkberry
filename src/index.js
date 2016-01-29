@@ -19,6 +19,7 @@ import for_ from './compiler/for';
 import block from './compiler/block';
 import unsafe from './compiler/unsafe';
 import { whitespace } from './optimize/whitespace';
+import { nestedBlocks } from './optimize/nestedBlocks';
 import { entity } from './transform/entity';
 import { drawGraph } from './graph';
 
@@ -26,7 +27,7 @@ export class Compiler {
   constructor() {
     this.sources = [];
     this.parsers = {'default': parser};
-    this.transforms = {whitespace, entity};
+    this.transforms = {whitespace, nestedBlocks, entity};
     this.globals = [];
   }
 

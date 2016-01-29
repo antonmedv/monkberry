@@ -39,7 +39,7 @@
 
     for (j = childrenSize, len = arrayLength; j < len; j++) {
       // Render new view.
-      var view = this._render(template);
+      var view = this._render(template, undefined, undefined, true);
 
       // Set view hierarchy.
       view.parent = parent;
@@ -50,6 +50,11 @@
         view.insertBefore(node);
       } else {
         view.appendTo(node);
+      }
+
+      // Call onRender actions.
+      if (view.onRender) {
+        view.onRender();
       }
 
       // Set view data (note what it must be after adding nodes to DOM).
@@ -74,7 +79,7 @@
       }
     } else if (test) {
       // Render new view.
-      var view = this._render(template);
+      var view = this._render(template, undefined, undefined, true);
 
       // Set view hierarchy.
       view.parent = parent;
@@ -85,6 +90,11 @@
         view.insertBefore(node);
       } else {
         view.appendTo(node);
+      }
+
+      // Call onRender actions.
+      if (view.onRender) {
+        view.onRender();
       }
 
       // Set view data (note what it must be after adding nodes to DOM).
@@ -115,8 +125,9 @@
    * This method is used only for private rendering of views.
    * @private
    */
-  Monkberry.prototype._render = function (name, values, noCache) {
+  Monkberry.prototype._render = function (name, values, noCache, noOnRender) {
     noCache = noCache || false;
+    noOnRender = noOnRender || false;
 
     if (this.templates[name]) {
       var view;
@@ -134,7 +145,7 @@
         }
       }
 
-      if (view.onRender) {
+      if (!noOnRender && view.onRender) {
         view.onRender();
       }
 

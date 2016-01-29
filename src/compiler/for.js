@@ -4,13 +4,17 @@ import { lookUpOnlyOneChild, map, esc } from '../utils';
 
 export default function (ast) {
   ast.ForStatementNode.prototype.compile = function (figure) {
-    var templateName = figure.name + '.for' + figure.uniqid('template_name');
-    // TODO: Optimize when child has only one custom node. Replace templateName with that custom tag name.
+    let templateName;
 
-    var childrenName = 'children' + figure.uniqid('child_name');
+    if (this.templateNames && this.templateNames.body) {
+      templateName = figure.name + '.' + this.templateNames.body;
+    } else {
+      templateName = figure.name + '.for' + figure.uniqid('template_name');
+    }
 
-    var placeholder;
-    var parentNode = lookUpOnlyOneChild(this);
+    let childrenName = 'children' + figure.uniqid('child_name');
+
+    let placeholder, parentNode = lookUpOnlyOneChild(this);
     if (parentNode) {
       placeholder = parentNode.nodeName;
     } else {

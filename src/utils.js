@@ -41,6 +41,10 @@ export function lookUpOnlyOneChild(node) {
   return null;
 }
 
+export function getStringLiteralValue(literal) {
+  return literal.value.replace(/^["']/, '').replace(/["']$/, '');
+}
+
 export function arrayToObject(array, value = 1) {
   var obj = {};
   for (var i = 0; i < array.length; i++) {
