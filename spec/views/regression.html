@@ -1,0 +1,32 @@
+<test-parent-values>
+    <p>{{ value }}</p>
+    <p>{% if on %}{{ value }}{% endif %}</p>
+    <p>{% for i of each %}{{ value }}{% endfor %}</p>
+</test-parent-values>
+<test-parent-values-complex>
+    <p>{{ a + b }}</p>
+    <p>{% if on %}{{ a - b }}{% endif %}</p>
+    <p>{% for i of each %}{{ a * b }}{% endfor %}</p>
+</test-parent-values-complex>
+<test-nested-views>
+    <p>
+        {% for i of each %}
+            {% if on %}
+                {{ value }}
+            {% endif %}
+        {% endfor %}
+    </p>
+</test-nested-views>
+<FirstLevelStatements>
+    text
+    {% if cond %}
+        <div class="if">ok</div>
+    {% endif %}
+    {% for loop %}
+        <div class="for">ok</div>
+    {% endfor %}
+    <first-level-tag on="{{ tag }}">
+        <div class="custom">ok</div>
+    </first-level-tag>
+    {% unsafe "<i class='unsafe'>" + xss + "</i>" %}
+</FirstLevelStatements>
