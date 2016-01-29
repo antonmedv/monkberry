@@ -6,27 +6,17 @@
   "main": "lib/index.js",
   "browser": "./monkberry.js",
   "scripts": {
-    "test": "node_modules/.bin/testem ci -l phantomjs",
+    "test": "testem ci -l phantomjs",
     "toc": "doctoc --title '## Table of Contents' README.md",
-    "compile": "node_modules/.bin/babel -d lib/ src/",
-    "build": "node_modules/.bin/babel -w -d lib/ src/",
+    "compile": "babel -d lib/ src/",
+    "build": "babel -w -d lib/ src/",
     "prepublish": "npm run compile"
-  },
-  "babel": {
-    "presets": [
-      "es2015"
-    ]
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/monkberry/monkberry.git"
   },
-  "keywords": [
-    "dom",
-    "template",
-    "view",
-    "ui"
-  ],
+  "keywords": ["dom", "template", "view", "ui"],
   "author": "Anton Medvedev <anton@medv.io>",
   "license": "MIT",
   "bugs": {
