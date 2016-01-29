@@ -9,6 +9,8 @@ export function whitespace(ast) {
       trim(node, '_else');
     } else if (node.type == 'ForStatement') {
       trim(node, 'body');
+    } else if (node.type == 'BlockStatement') {
+      trim(node, 'body');
     }
   });
 }

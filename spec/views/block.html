@@ -1,0 +1,17 @@
+<Block>
+    <div>
+        {% block "block" %}
+            <i>{{ foo }}</i>
+        {% endblock %}
+    </div>
+</Block>
+<TwoBlocks>
+    <div>
+        {% block "one" %}
+            <i>{{ foo }}</i>
+        {% endblock %}
+        {% block "two" %}
+            <i>{{ foo }}</i>
+        {% endblock %}
+    </div>
+</TwoBlocks>

@@ -134,12 +134,12 @@
         }
       }
 
-      if (values !== undefined) {
-        view.update(values);
-      }
-
       if (view.onRender) {
         view.onRender();
+      }
+
+      if (values !== undefined) {
+        view.update(values);
       }
 
       if (this.wrappers[name] && !view.wrapped[name]) {

@@ -77,6 +77,14 @@ export function visitor(ast) {
     }
   };
 
+  ast.BlockStatementNode.prototype.visit = function (callback) {
+    callback(this);
+
+    for (let i = 0; i < this.body.length; i++) {
+      this.body[i].visit(callback);
+    }
+  };
+
   ast.UnsafeStatementNode.prototype.visit = function (callback) {
     callback(this);
   };

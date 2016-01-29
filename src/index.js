@@ -16,6 +16,7 @@ import comment from './compiler/comment';
 import import_ from './compiler/import';
 import if_ from './compiler/if';
 import for_ from './compiler/for';
+import block from './compiler/block';
 import unsafe from './compiler/unsafe';
 import { whitespace } from './optimize/whitespace';
 import { entity } from './transform/entity';
@@ -50,6 +51,7 @@ export class Compiler {
       import_(parser.ast);
       if_(parser.ast);
       for_(parser.ast);
+      block(parser.ast);
       unsafe(parser.ast);
       visitor(parser.ast);
 
@@ -71,7 +73,12 @@ export class Compiler {
       if (parserType in this.parsers) {
         var parser = this.parsers[parserType];
 
-        var ast = parser.parse(code, name);
+        try {
+          var ast = parser.parse(code, name);
+        } catch (error) {
+          console.error(error.toString());
+          throw error;
+        }
 
         // Transforms
         Object.keys(this.transforms).forEach((key) => this.transforms[key](ast, parser));
