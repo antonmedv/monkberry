@@ -47,9 +47,8 @@ export class Figure {
     if (size(this.complexUpdaters) > 0) {
       sn.add('  // Complex update functions\n')
         .add('  var __cache__ = view.__cache__ = {};\n')
-        .add('  var λ = {\n')
-        .add([this.compileComplexUpdaters(), '\n'])
-        .add('  };\n')
+        .add('  var ')
+        .add([this.compileComplexUpdaters(), ';\n'])
         .add('\n');
     }
 
@@ -106,10 +105,10 @@ export class Figure {
     var parts = [];
 
     Object.keys(this.complexUpdaters).forEach((key) => {
-      parts.push(join(['    ', key, ': ', this.complexUpdaters[key].compile()]));
+      parts.push(join(['λ__', key, ' = ', this.complexUpdaters[key].compile()]));
     });
 
-    return sourceNode(null, parts).join(',\n');
+    return sourceNode(null, parts).join(',\n    ');
   }
 
   compileUpdaters() {

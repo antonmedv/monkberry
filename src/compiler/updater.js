@@ -100,7 +100,7 @@ class Complex {
     Object.keys(this.calls).forEach((functionName) => {
       var [loc, params] = this.calls[functionName];
       parts.push(sourceNode(loc, [
-        '        λ.', functionName, '(__data__, ', params.map((param) => '__cache__.' + param).join(', '), ');'
+        '        λ__', functionName, '(__data__, ', params.map((param) => '__cache__.' + param).join(', '), ');'
       ]));
     });
 
