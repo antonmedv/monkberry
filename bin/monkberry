@@ -49,7 +49,12 @@ if (program.drawAst) {
   process.exit(0);
 }
 
-var output, node = compiler.compile(program.asModule);
+try {
+  var output, node = compiler.compile(program.asModule);
+} catch (error) {
+  console.error(error.toString());
+  throw error;
+}
 
 if (program.output) {
   var file = program.output,

@@ -74,12 +74,7 @@ export class Compiler {
       if (parserType in this.parsers) {
         var parser = this.parsers[parserType];
 
-        try {
-          var ast = parser.parse(code, name);
-        } catch (error) {
-          console.error(error.toString());
-          throw error;
-        }
+        var ast = parser.parse(code, name);
 
         // Transforms
         Object.keys(this.transforms).forEach((key) => this.transforms[key](ast, parser));
