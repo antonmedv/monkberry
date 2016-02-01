@@ -22,16 +22,12 @@ const plainAttributes = ['id', 'value', 'checked', 'selected'];
 const booleanAttributes = ['checked', 'selected'];
 
 export default function (ast) {
+  /**
+   * Compile attributes of regular nodes.
+   * @param {Figure} figure
+   * @param {string} nodeName
+   */
   ast.AttributeNode.prototype.compile = function (figure, nodeName) {
-    // Transform attribute with text and expression into single expression.
-    //
-    //    <div class="cat {{ dog }} {{ cow }}">
-    //
-    // Will transformed into:
-    //
-    //    <div class={{ 'cat ' + dog + ' ' + cow }}>
-    //
-    // Also collects default values for attribute: `cat `.
     let [expr, defaults] = this.compileToExpression();
 
     var variables = collectVariables(expr);
@@ -54,8 +50,9 @@ export default function (ast) {
       //
       //    view.update({foo, bar});
       //
-      // On other side, if one of expression contains default value,
-      // Monkberry will set attribute for every variable:
+
+      // TODO: Implement updater, if one of expression contains default value.
+      // Example (now this does not work):
       //
       //    <div class="{{ foo }} {{ bar || 'default' }}">
       //
@@ -63,8 +60,6 @@ export default function (ast) {
       //
       //    view.update({foo});
       //
-
-      // TODO: Implement other side.
 
       figure.addUpdater(this.loc, variables, () => sourceNode(this.loc, [
         '      ', attr(this.loc, nodeName, this.name, expr.compile())
@@ -106,6 +101,14 @@ export default function (ast) {
     );
   };
 
+  /**
+   * Generate source nodes for attribute.
+   * @param {Object} loc
+   * @param {string} nodeName
+   * @param {string} attrName
+   * @param {string} value
+   * @returns {SourceNode}
+   */
   function attr(loc, nodeName, attrName, value) {
     if (plainAttributes.indexOf(attrName) != -1) {
       return sourceNode(loc, [nodeName, '.', attrName, ' = ', value]);
@@ -114,6 +117,11 @@ export default function (ast) {
     }
   }
 
+  /**
+   * Returns default value for attribute name.
+   * @param {string} attrName
+   * @returns {string}
+   */
   function defaultAttrValue(attrName) {
     if (booleanAttributes.indexOf(attrName) != -1) {
       return 'true';
@@ -122,6 +130,19 @@ export default function (ast) {
     }
   }
 
+  /**
+   * Transform attribute with text and expression into single expression.
+   *
+   *    <div class="cat {{ dog }} {{ cow || 'moo' }}">
+   *
+   * Will transformed into:
+   *
+   *    <div class={{ 'cat ' + dog + ' ' + (cow || 'moo') }}>
+   *
+   * Also collects default values for attribute: `cat ` and variables name with default: ['moo'].
+   *
+   * @returns {*[]}
+   */
   ast.AttributeNode.prototype.compileToExpression = function () {
     var expr, defaults = [];
 
@@ -138,8 +159,6 @@ export default function (ast) {
 
         if (collectVariables(node.expression.right) == 0) {
           defaults.push(node.expression.right.compile());
-
-          // TODO: Implement other side.
         }
       }
     };
@@ -167,6 +186,10 @@ export default function (ast) {
     return [expr, defaults];
   };
 
+  /**
+   * @param {Object} node
+   * @returns {Object}
+   */
   function extract(node) {
     if (node.type == 'ExpressionStatement') {
       return node.expression;
