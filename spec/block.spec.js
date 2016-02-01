@@ -26,10 +26,20 @@ describe('Block tags', function () {
     view.update({cond: false});
     expect(view).toBe('<div> false </div>');
 
-    expect(monkberry.templates['OptimizeNestedBlockInIf.then']).toBeDefined();
-    expect(monkberry.templates['OptimizeNestedBlockInIf.otherwise']).toBeDefined();
+    expect(monkberry.templates['then']).toBeDefined();
+    expect(monkberry.templates['otherwise']).toBeDefined();
     expect(monkberry.templates['OptimizeNestedBlockInIf.if0']).not.toBeDefined();
     expect(monkberry.templates['OptimizeNestedBlockInIf.if0.else']).not.toBeDefined();
+  });
+
+  it('should give correct figure names', function () {
+    var view = monkberry.render('BlockWithProperNames', {array: [{cond: true}], cond: false});
+    expect(view).toBeLike('<div> 1 <!--block--> 2  3 <!--if--><!--for--> 5 <!--if--><!--if--></div>');
+    expect(monkberry.templates['BlockWithProperNames.1']).toBeDefined();
+    expect(monkberry.templates['BlockWithProperNames.2']).toBeDefined();
+    expect(monkberry.templates['BlockWithProperNames.3']).toBeDefined();
+    expect(monkberry.templates['BlockWithProperNames.4']).toBeDefined();
+    expect(monkberry.templates['BlockWithProperNames.5']).toBeDefined();
   });
 
 });

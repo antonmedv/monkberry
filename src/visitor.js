@@ -1,4 +1,6 @@
 export function visitor(ast) {
+  // TODO: Refactor all bunch of compilers/visitors on path way.
+
   ast.DocumentNode.prototype.visit = function (callback) {
     callback(this);
 

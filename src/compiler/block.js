@@ -5,7 +5,7 @@ import { lookUpOnlyOneChild, getStringLiteralValue, map, esc } from '../utils';
 export default function (ast) {
   ast.BlockStatementNode.prototype.compile = function (figure) {
     let blockName = getStringLiteralValue(this.name);
-    let template = `${figure.name}.${blockName}`;
+    let template = blockName;
     let child = 'child' + figure.uniqid('child_name');
 
     let placeholder, parentNode = lookUpOnlyOneChild(this);

@@ -7,7 +7,7 @@ export default function (ast) {
     let templateName;
 
     if (this.templateNames && this.templateNames.body) {
-      templateName = figure.name + '.' + this.templateNames.body;
+      templateName = this.templateNames.body;
     } else {
       templateName = figure.name + '.for' + figure.uniqid('template_name');
     }

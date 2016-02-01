@@ -7,13 +7,13 @@ export default function (ast) {
     let templateNameForThen, templateNameForOtherwise;
 
     if (this.templateNames && this.templateNames.then) {
-      templateNameForThen = figure.name + '.' + this.templateNames.then;
+      templateNameForThen = this.templateNames.then;
     } else {
       templateNameForThen = figure.name + '.if' + figure.uniqid('template_name');
     }
 
     if (this.templateNames && this.templateNames.otherwise) {
-      templateNameForOtherwise = figure.name + '.' + this.templateNames.otherwise;
+      templateNameForOtherwise = this.templateNames.otherwise;
     } else {
       templateNameForOtherwise = templateNameForThen + '.else';
     }
