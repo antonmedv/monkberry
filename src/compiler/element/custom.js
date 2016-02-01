@@ -33,7 +33,7 @@ export default function (ast) {
         hasUpdater = true;
 
       } else {
-        // TODO: Add support for default value in attributes attr={{ value || 'default' }}.
+        // TODO: Add support for default value in custom tag attributes attr={{ value || 'default' }}.
         let [expr, ] = attr.compileToExpression();
         let variables = collectVariables(expr);
 

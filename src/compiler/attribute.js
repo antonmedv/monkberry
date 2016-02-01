@@ -2,11 +2,36 @@ import { sourceNode, join } from './sourceNode';
 import { collectVariables } from './expression/variable';
 import { esc, arrayToObject } from '../utils';
 
+/**
+ * For this attributes doesn't work this:
+ *
+ *     node.setAttribute('value', ...);
+ *
+ * To change them, Monkberry generate code like this:
+ *
+ *     node.value = ...;
+ *
+ * @type {string[]}
+ */
 const plainAttributes = ['id', 'value', 'checked', 'selected'];
+
+/**
+ * This attributes take boolean values, not string values.
+ * @type {string[]}
+ */
 const booleanAttributes = ['checked', 'selected'];
 
 export default function (ast) {
   ast.AttributeNode.prototype.compile = function (figure, nodeName) {
+    // Transform attribute with text and expression into single expression.
+    //
+    //    <div class="cat {{ dog }} {{ cow }}">
+    //
+    // Will transformed into:
+    //
+    //    <div class={{ 'cat ' + dog + ' ' + cow }}>
+    //
+    // Also collects default values for attribute: `cat `.
     let [expr, defaults] = this.compileToExpression();
 
     var variables = collectVariables(expr);
@@ -16,6 +41,31 @@ export default function (ast) {
         attr(this.loc, nodeName, this.name, (expr ? expr.compile() : defaultAttrValue(this.name))), ';'
       ]));
     } else {
+      // When rendering attributes with more then one variable,
+      // Monkberry will wait for all data, before setting attribute.
+      //
+      //    <div class="{{ foo }} {{ bar }}">
+      //
+      // Then you pass only one variable, no update will happen:
+      //
+      //    view.update({foo});
+      //
+      // Now attribute will be set:
+      //
+      //    view.update({foo, bar});
+      //
+      // On other side, if one of expression contains default value,
+      // Monkberry will set attribute for every variable:
+      //
+      //    <div class="{{ foo }} {{ bar || 'default' }}">
+      //
+      // This will update attribute:
+      //
+      //    view.update({foo});
+      //
+
+      // TODO: Implement other side.
+
       figure.addUpdater(this.loc, variables, () => sourceNode(this.loc, [
         '      ', attr(this.loc, nodeName, this.name, expr.compile())
       ]));
@@ -29,6 +79,14 @@ export default function (ast) {
 
   };
 
+  /**
+   * Generate code for spread operator.
+   *
+   *    <div {{...attributes}}>
+   *
+   * @param {Figure} figure
+   * @param {string} nodeName
+   */
   ast.SpreadAttributeNode.prototype.compile = function (figure, nodeName) {
     figure.root.addFunction('__spread', sourceNode(null, [
       `function (node, attr) {\n`,
@@ -72,8 +130,16 @@ export default function (ast) {
         defaults.push(node.compile());
       } else if (node.type == 'ExpressionStatement' && node.expression.type == 'LogicalExpression' && node.expression.operator == '||') {
         // Add as default right side of "||" expression if there are no variables.
+        // In this example, when Monkberry will render div,
+        //
+        //    <div class="{{ foo || 'default' }}">
+        //
+        // it set class attribute fo 'default'.
+
         if (collectVariables(node.expression.right) == 0) {
           defaults.push(node.expression.right.compile());
+
+          // TODO: Implement other side.
         }
       }
     };
