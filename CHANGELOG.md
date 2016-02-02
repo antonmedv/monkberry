@@ -82,7 +82,7 @@
 * Added trimming of whitespaces.
 * Refactored compiler to ES6. 
 
-# 2.0.0
+## 2.0.0
 
 * Added SVG support.
 * Added key/value options in loops.
