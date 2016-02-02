@@ -1,3 +1,10 @@
+/**                    _    _
+ *   /\/\   ___  _ __ | | _| |__   ___ _ __ _ __ _   _
+ *  /    \ / _ \| '_ \| |/ / '_ \ / _ \ '__| '__| | | |
+ * / /\/\ \ (_) | | | |   <| |_) |  __/ |  | |  | |_| |
+ * \/    \/\___/|_| |_|_|\_\_.__/ \___|_|  |_|   \__, |
+ *                                               |___/
+ */
 (function (document) {
   /**
    * Monkberry.
@@ -10,9 +17,20 @@
     this.wrappers = {};
   }
 
+  /**
+   * Main loops processor.
+   * @param {Monkberry.View} parent - Parent view, where to place loop elements.
+   * @param {Element} node - Parent element, where to append child. Note what it can be a comment element.
+   * @param {Map} map - Map contains views from previous loop render.
+   * @param {string} template - Template name to render.
+   * @param {*} data - Data object passed into view.update() function.
+   * @param {*} array - Data iterating on.
+   * @param {object} options - Loop options, value and key names.
+   */
   Monkberry.prototype.foreach = function (parent, node, map, template, data, array, options) {
     var i, j, len, keys, transform, arrayLength, childrenSize = map.length;
 
+    // Get array length, and convert object ot array, if needed.
     if (Array.isArray(array)) {
       transform = transformArray;
       arrayLength = array.length;
@@ -22,6 +40,7 @@
       arrayLength = keys.length;
     }
 
+    // In new array contains less items what before, remove surpluses.
     len = childrenSize - arrayLength;
     for (i in map.items) {
       if (len-- > 0) {
@@ -31,12 +50,14 @@
       }
     }
 
+    // If there is already some views, update there data with new.
     j = 0;
     for (i in map.items) {
       map.items[i].update(transform(data, array, keys, j, options));
       j++;
     }
 
+    // If new array contains more items when previous, render new views and append them.
     for (j = childrenSize, len = arrayLength; j < len; j++) {
       // Render new view.
       var view = this._render(template, undefined, undefined, true);
@@ -70,8 +91,18 @@
     }
   };
 
+  /**
+   * Main if/else, custom tags, blocks processor.
+   * @param {Monkberry.View} parent - Parent view, where to place loop elements.
+   * @param {Element} node - Parent element, where to append child. Note what it can be a comment element.
+   * @param {{ref:object}} child - Object which may contains previous rendered view.
+   * @param {string} template - Template name to render.
+   * @param {*} data - Data object passed into view.update() function.
+   * @param {boolean} test - Whenever to insert then view.
+   * @returns {boolean} Returns test value.
+   */
   Monkberry.prototype.insert = function (parent, node, child/*.ref*/, template, data, test) {
-    if (child.ref) {
+    if (child.ref) { // If view was already inserted, update or remove it.
       if (test) {
         child.ref.update(data);
       } else {
