@@ -82,7 +82,7 @@
     // If new array contains more items when previous, render new views and append them.
     for (j = childrenSize, len = arrayLength; j < len; j++) {
       // Render new view.
-      var view = this._render(template, undefined, undefined, true);
+      var view = this.render(template, undefined, undefined, {omit: true});
 
       // Set view hierarchy.
       view.parent = parent;
@@ -132,7 +132,7 @@
       }
     } else if (test) {
       // Render new view.
-      var view = this._render(template, undefined, undefined, true);
+      var view = this.render(template, undefined, undefined, {omit: true});
 
       // Set view hierarchy.
       view.parent = parent;
@@ -168,19 +168,12 @@
    * @param {string} name - Template name.
    * @param {Object} values - Data to update view.
    * @param {boolean} noCache - Do not take views from pool.
+   * @param {Object} options - Optional. Extra render options.
    * @return {Monkberry.View}
    */
-  Monkberry.prototype.render = function (name, values, noCache) {
-    return this._render(name, values, noCache);
-  };
-
-  /**
-   * This method is used only for private rendering of views.
-   * @private
-   */
-  Monkberry.prototype._render = function (name, values, noCache, noOnRender) {
+  Monkberry.prototype.render = function (name, values, noCache, options) {
     noCache = noCache || false;
-    noOnRender = noOnRender || false;
+    var omitCallback = options && options.omit || false;
 
     if (this.templates[name]) {
       var view;
@@ -198,7 +191,7 @@
         }
       }
 
-      if (!noOnRender && view.onRender) {
+      if (!omitCallback && view.onRender) {
         view.onRender();
       }
 
