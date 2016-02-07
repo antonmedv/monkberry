@@ -30,7 +30,7 @@
   "homepage": "https://github.com/monkberry/monkberry#readme",
   "dependencies": {
     "commander": "^2.9.0",
-    "monkberry-parser": "^3.7.0",
+    "monkberry-parser": "3.7.*",
     "source-map": "^0.5.3",
     "asciitree": "^1.0.2"
   },
