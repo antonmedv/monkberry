@@ -1,13 +1,21 @@
 # CHANGELOG
 
-## master
+## 3.8.0
+
+* Refactor monkberry-loader hot replacement. 
+* Fix monkberry-parser dependency version.
+
+### 3.7.3
 
 * Optimized code generation function. 30% less generate code.
 
-## 3.7.1
+### 3.7.2
+
+* Improved error messages.
+
+### 3.7.1
 
 * Fixed block naming and nested block naming.
-* Improved error messages.
 
 ## 3.7.0
 
@@ -32,7 +40,7 @@
 * Added <!-- comment --> support.
 * Added spread attributes feature.
 
-## 3.2.1
+### 3.2.1
 
 * Fixed code generation for empty expressions.
 
@@ -40,28 +48,28 @@
 
 * Added global variables feature.
 
-## 3.1.6
+### 3.1.6
 
 * Fixed SVG creation.
 
-## 3.1.5
+### 3.1.5
 
 * Fixed `getElementById()` algorithm.
 
-## 3.1.4
+### 3.1.4
 
 * Fixed bug in Opera 12.16 in `querySelector()`.
 
-## 3.1.3
+### 3.1.3
 
 * Fixed typo in error message.
 * Updated parser version to match synchronized versioning.
 
-## 3.1.2
+### 3.1.2
 
 * Fixed very sophisticated bug with local variables.
 
-## 3.1.1
+### 3.1.1
 
 * Added `createDocument()`, and `dom()` is deprecated.
 
@@ -69,7 +77,7 @@
 
 * Synchronized versioning begun.
 
-## 3.0.8
+### 3.0.8
 
 * Various bug fixes. 
 
