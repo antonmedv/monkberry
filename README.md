@@ -42,6 +42,7 @@ npm install monkberry --save
     - [Parsers](#parsers)
     - [Unsafe](#unsafe)
     - [Comments](#comments)
+    - [Blocks](#blocks)
   - [API Reference](#api-reference)
     - [Monkberry](#monkberry)
       - [monkberry.render(name, [values, [noCache]])](#monkberryrendername-values-nocache)
@@ -453,8 +454,11 @@ monkberry.render('template', {...}); // Will use already created DOM nodes.
 
 This is very usefull to do then browser waiting some xhr request.
 
-To get info about prerendered template in runtime, use `monkberry.pool.store`.
+To get info about prerendered template in runtime, use `monkberry.getPoolInfo()`.
 
+> Note what prerender works only with first level DOM nodes. 
+> This means you need to manually prerender templates used in if/for tags.
+> Look at [block](#blocks) statement for example.
 
 ### Pool
 
@@ -544,6 +548,33 @@ You can use standard html comments.
 ```
 
 Comments will be cut out from template. 
+
+
+### Blocks
+
+Allows to define part of template as separate block:
+ 
+```twig
+{% block "partial" %}
+  ...
+{% endblock %}
+```
+
+This is very usefull then prerendering parts of templates, especially in loops.
+
+```twig
+{% for key, value of items %}
+  {% block "item" %}
+    ...   
+  {% endblock %}
+{% endfor %}
+```
+
+When to prerender loop block:
+
+```js
+monkberry.prerender('item', 10); // Prerender item template 10 times.
+```
 
 ## API Reference
 
