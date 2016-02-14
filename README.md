@@ -703,7 +703,8 @@ testem ci
 
 ## Plugins
 
-* Atom Text Editor: [language-monkberry](https://atom.io/packages/language-monkberry)
+* [Atom Package](https://atom.io/packages/language-monkberry)
+* [Sublime Text Package](https://atom.io/packages/language-monkberry)
 
 ## Benchmarks
 
