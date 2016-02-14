@@ -704,7 +704,7 @@ testem ci
 ## Plugins
 
 * [Atom Package](https://atom.io/packages/language-monkberry)
-* [Sublime Text Package](https://atom.io/packages/language-monkberry)
+* [Sublime Text Package](https://github.com/monkberry/language-monkberry)
 
 ## Benchmarks
 
