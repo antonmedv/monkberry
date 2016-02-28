@@ -4,22 +4,22 @@ import { lookUpOnlyOneChild, map, unique } from '../../utils';
 
 export default function (ast) {
   ast.ElementNode.prototype.compileCustom = function (figure) {
-    var customNodeName = this.name;
-    var templateName = customNodeName;
-    var childName = 'child' + figure.uniqid('child_name');
+    const customNodeName = this.name;
+    const templateName = customNodeName;
+    const childName = 'child' + figure.uniqid('child_name');
 
-    var placeholder;
-    var parentNode = lookUpOnlyOneChild(this);
+    let placeholder;
+    let parentNode = lookUpOnlyOneChild(this);
     if (parentNode) {
       placeholder = parentNode.nodeName;
     } else {
       placeholder = 'custom' + figure.uniqid('placeholder');
-      figure.declare(["var ", placeholder, " = document.createComment('" + customNodeName + "');"]);
+      figure.declare([`var ${placeholder} = document.createComment('${customNodeName}');`]);
     }
-    figure.declare(["var ", childName, " = {};"]);
+    figure.declare([`var ${childName} = {};`]);
 
-    var defaultData = [];
-    var hasUpdater = false;
+    let data = [];
+    let variables = [];
 
     // Collect info about variables and attributes.
     for (let attr of this.attributes) {
@@ -30,40 +30,36 @@ export default function (ast) {
             `      monkberry.insert(view, ${placeholder}, ${childName}, '${templateName}', ${attr.identifier.name}, true)`
           ]);
         });
-        hasUpdater = true;
 
       } else {
-        // TODO: Add support for default value in custom tag attributes attr={{ value || 'default' }}.
-        let [expr, ] = attr.compileToExpression();
-        let variables = collectVariables(expr);
 
-        let data = sourceNode(this.loc, [`'${attr.name}': ${ expr.compile()}`]);
+        let [expr, ] = attr.compileToExpression(); // TODO: Add support for default value in custom tag attributes attr={{ value || 'default' }}.
+        variables = variables.concat(collectVariables(expr));
 
-        if (variables.length == 0) {
-          defaultData.push(data);
-        } else {
+        let property = sourceNode(this.loc, [`'${attr.name}': ${ expr.compile()}`]);
+        data.push(property);
 
-          figure.addUpdater(this.loc, variables, () => {
-            return sourceNode(this.loc, [
-              `      monkberry.insert(view, ${placeholder}, ${childName}, '${templateName}', {${data}}, true)`
-            ]);
-          });
-          hasUpdater = true;
-
-        }
       }
     }
 
-    if (!hasUpdater || defaultData.length > 0) {
-      let data = '{}';
+    variables = unique(variables);
+    data = `{${data.join(', ')}}`;
 
-      if(defaultData.length > 0) {
-        data = `{${defaultData.join(', ')}}`;
-      }
+    // Add complex/caching updater for custom attribute or insert on render if no variables in attributes.
+    if (variables.length > 0) {
+
+      figure.addUpdater(this.loc, variables, () => {
+        return sourceNode(this.loc, [
+          `      monkberry.insert(view, ${placeholder}, ${childName}, '${templateName}', ${data}, true)`
+        ]);
+      });
+
+    } else {
 
       figure.renderActions.push(sourceNode(this.loc, [
         `      monkberry.insert(view, ${placeholder}, ${childName}, '${templateName}', ${data}, true);`
       ]));
+
     }
 
     if (this.body.length > 0) {
