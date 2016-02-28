@@ -1,6 +1,11 @@
 # CHANGELOG
 
-## 3.8.0
+### 3.8.1
+
+* Fix bug with updating local variable from outer scope.
+* Fix bug with updating custom tags with many attributes. 
+
+### 3.8.0
 
 * Refactor monkberry-loader hot replacement. 
 * Fix monkberry-parser dependency version.
@@ -17,24 +22,24 @@
 
 * Fixed block naming and nested block naming.
 
-## 3.7.0
+### 3.7.0
 
 * Added optimization for nested blocks.
 * Added block statement.
 
-## 3.6.0
+### 3.6.0
 
 * Added `createPool()` and `getPoolInfo()` feature.
 
-## 3.5.0
+### 3.5.0
 
 * Added support for HTML entities.
 
-## 3.4.0
+### 3.4.0
 
 * Added unsafe feature.
 
-## 3.3.0
+### 3.3.0
 
 * Added import feature.
 * Added <!-- comment --> support.
@@ -44,7 +49,7 @@
 
 * Fixed code generation for empty expressions.
 
-## 3.2.0
+### 3.2.0
 
 * Added global variables feature.
 
@@ -73,7 +78,7 @@
 
 * Added `createDocument()`, and `dom()` is deprecated.
 
-## 3.1.0
+### 3.1.0
 
 * Synchronized versioning begun.
 
@@ -81,7 +86,7 @@
 
 * Various bug fixes. 
 
-## 3.0.0
+### 3.0.0
 
 * Improved performance of attributes rendering.
 * New API and new template syntax.
@@ -90,12 +95,12 @@
 * Added trimming of whitespaces.
 * Refactored compiler to ES6. 
 
-## 2.0.0
+### 2.0.0
 
 * Added SVG support.
 * Added key/value options in loops.
 * Added filters.
 
-## 1.0.0
+### 1.0.0
 * First working prototype. 
  
