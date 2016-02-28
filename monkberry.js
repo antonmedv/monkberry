@@ -281,6 +281,8 @@
     this.wrapped = {}; // List of already applied wrappers.
     this.onRender = null; // Function to call on render.
     this.onRemove = null; // Function to call on remove.
+    this.__update__ = null;
+    this.__cache__ = null;
   };
 
   /**
@@ -294,7 +296,7 @@
     var keys = typeof data === 'object' ? Object.keys(data) : [];
 
     // Clear cache to prevent double updating.
-    if (_this.__cache__) {
+    if (this.__cache__) {
       keys.forEach(function (key) {
         if (key in _this.__cache__) {
           delete _this.__cache__[key];
@@ -303,7 +305,7 @@
     }
 
     // Update view.
-    if (_this.__update__) {
+    if (this.__update__) {
       keys.forEach(function (key) {
         if (_this.__update__.hasOwnProperty(key)) {
           _this.__update__[key](data, data[key]);
