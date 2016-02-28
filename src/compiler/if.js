@@ -63,15 +63,9 @@ export default function (ast) {
 
 function compileCond(figure, loc, prepend, placeholder, templateName, childName, result, variablesOfExpression) {
   return figure.addUpdater(loc, variablesOfExpression, () => {
-    return sourceNode(loc, ["      ",
-      prepend,
-      "monkberry.insert(view, ",
-      placeholder, ", ",
-      childName, ", ",
-      `'${templateName}', `,
-      "__data__, ",
-      result,
-      ")"
+    return sourceNode(loc, [
+      `      `,
+      `${prepend}monkberry.insert(view, ${placeholder}, ${childName}, '${templateName}', __data__, ${result})`
     ]);
   });
 }
@@ -86,9 +80,9 @@ function compileBody(figure, loc, templateName, childName, body, variablesOfExpr
 
   variablesOfBody.forEach((variable) => {
     figure.onUpdater(variable).add(sourceNode(loc, [
-      "      ",
-      childName, ".ref && ",
-      childName, ".ref.__update__.", variable, "(__data__, ", variable, ")"
+      `      `,
+      // TODO: Properly collect local variables in templates and delete `hasOwnProperty` check in `if` refs.
+      `${childName}.ref && ${childName}.ref.__update__.hasOwnProperty('${variable}') && ${childName}.ref.__update__.${variable}(__data__, ${variable})`
     ]));
   });
 }
