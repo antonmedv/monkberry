@@ -69,3 +69,26 @@
         {% endfor %}
     </div>
 </ReForBlock>
+<UpdateLoopsInCustomTags>
+    <i>
+        <custom-tag-with-loop list={{ list }} foo={{ foo }} bar={{ bar }}/>
+    </i>
+</UpdateLoopsInCustomTags>
+<custom-tag-with-loop>
+    <em>
+        {% for item of list %}
+            <b class="{{ foo }}{{ bar }}">{{ item }}</b>
+        {% endfor %}
+    </em>
+</custom-tag-with-loop>
+<UpdateLocalVars>
+    <p>
+        {% if list %}
+            {% for t1 of list %}
+                {% for value of t1 %}
+                    <i>{{ value }}</i>
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+    </p>
+</UpdateLocalVars>

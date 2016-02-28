@@ -131,4 +131,26 @@ describe('Regression', function () {
     expect(view).toBe('<div><i>1</i><!--block--><i>2</i><!--block--><i>1</i><!--block--><i>2</i><!--block--></div>');
   });
 
+  it('update loops in custom tags', function () {
+    var view = monkberry.render('UpdateLoopsInCustomTags');
+    view.update({
+      foo: 'foo',
+      bar: 'bar',
+      list: [1, 2, 3]
+    });
+    expect(view).toBe('<i><em><b class="foobar">1</b><b class="foobar">2</b><b class="foobar">3</b></em></i>');
+  });
+
+  it('should not update variables what exists only in inner scope', function () {
+    var view = monkberry.render('UpdateLocalVars');
+
+    var data = {
+      list: [[1], [2], [3]],
+      t1: 'bug?'
+    };
+    view.update(data);
+
+    expect(view).toBe('<p><i>1</i><!--for--><i>2</i><!--for--><i>3</i><!--for--><!--for--></p>');
+  });
+
 });
