@@ -10,6 +10,9 @@ export var HTMLElements = (
 ).split(' ');
 
 export var SVGElements = (
-  'circle clipPath defs ellipse g line linearGradient mask path pattern polygon polyline ' +
-  'radialGradient rect stop svg text tspan'
+  'circle clipPath defs ellipse feBlend feColorMatrix feComponentTransfer feComposite ' +
+  'feConvolveMatrix feDiffuseLighting feDisplacementMap feDistantLight feFlood feFuncA ' +
+  'feFuncB feFuncG feFuncR feGaussianBlur feImage feMerge feMergeNode feMorphology feOffset ' +
+  'fePointLight feSpecularLighting feSpotLight feTile feTurbulence g line linearGradient mask ' +
+  'path pattern polygon polyline radialGradient rect stop svg text tspan'
 ).split(' ');
