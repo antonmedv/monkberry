@@ -1,6 +1,8 @@
+import {visit} from '../visitor';
+
 export function entity(ast) {
-  ast.visit((node) => {
-    if (node.type == 'Text') {
+  visit(ast, {
+    Text: (node) => {
       replaceEntities(node);
     }
   });

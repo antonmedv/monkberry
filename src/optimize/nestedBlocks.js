@@ -1,11 +1,13 @@
-import { getStringLiteralValue } from '../utils';
+import {visit} from '../visitor';
+import {getStringLiteralValue} from '../utils';
 
 export function nestedBlocks(ast) {
-  ast.visit((node) => {
-    if (node.type == 'IfStatement') {
+  visit(ast, {
+    IfStatement: (node) => {
       doNested(node, 'then');
       doNested(node, 'otherwise');
-    } else if (node.type == 'ForStatement') {
+    },
+    ForStatement: (node) => {
       doNested(node, 'body');
     }
   });

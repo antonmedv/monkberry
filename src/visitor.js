@@ -1,121 +1,119 @@
-export function visitor(ast) {
-  // TODO: Refactor all bunch of compilers/visitors on path way.
+export function visit(node, visitor) {
+  if (node.type in visitors) {
+    visitors[node.type](node, visitor);
+  } else {
+    throw `Unknown node type "${node.type}".`;
+  }
+}
 
-  ast.DocumentNode.prototype.visit = function (callback) {
-    callback(this);
+function handle(node, visitor) {
+  if (node.type in visitor) {
+    visitor[node.type](node);
+  }
+}
 
-    for (var i = 0; i < this.body.length; i++) {
-      this.body[i].visit(callback);
+const visitors = {
+  Document: (node, visitor) => {
+    handle(node, visitor);
+
+    for (var i = 0; i < node.body.length; i++) {
+      visit(node.body[i], visitor);
     }
-  };
+  },
+  Text: (node, visitor) => {
+    handle(node, visitor);
+  },
+  Comment: (node, visitor) => {
+    handle(node, visitor);
+  },
+  Element: (node, visitor) => {
+    handle(node, visitor);
 
-  ast.TextNode.prototype.visit = function (callback) {
-    callback(this);
-  };
-
-  ast.CommentNode.prototype.visit = function (callback) {
-    callback(this);
-  };
-
-  ast.ElementNode.prototype.visit = function (callback) {
-    callback(this);
-
-    for (let i = 0; i < this.attributes.length; i++) {
-      this.attributes[i].visit(callback);
+    for (let i = 0; i < node.attributes.length; i++) {
+      visit(node.attributes[i], visitor);
     }
 
-    for (let i = 0; i < this.body.length; i++) {
-      this.body[i].visit(callback);
+    for (let i = 0; i < node.body.length; i++) {
+      visit(node.body[i], visitor);
     }
-  };
+  },
+  Attribute: (node, visitor) => {
+    handle(node, visitor);
 
-  ast.AttributeNode.prototype.visit = function (callback) {
-    callback(this);
-
-    if (this.body) {
-      for (let i = 0; i < this.body.length; i++) {
-        this.body[i].visit(callback);
+    if (node.body) {
+      for (let i = 0; i < node.body.length; i++) {
+        visit(node.body[i], visitor);
       }
     }
-  };
+  },
+  SpreadAttribute: (node, visitor) => {
+    handle(node, visitor);
+    visit(node.identifier, visitor);
+  },
+  ExpressionStatement: (node, visitor) => {
+    handle(node, visitor);
+    visit(node.expression, visitor);
+  },
+  ImportStatement: (node, visitor) => {
+    handle(node, visitor);
+  },
+  IfStatement: (node, visitor) => {
+    handle(node, visitor);
 
-  ast.SpreadAttributeNode.prototype.visit = function (callback) {
-    callback(this);
-    this.identifier.visit(callback);
-  };
+    visit(node.cond, visitor);
 
-  ast.ExpressionStatementNode.prototype.visit = function (callback) {
-    callback(this);
-    this.expression.visit(callback);
-  };
-
-  ast.ImportStatementNode.prototype.visit = function (callback) {
-    callback(this);
-  };
-
-  ast.IfStatementNode.prototype.visit = function (callback) {
-    callback(this);
-
-    this.cond.visit(callback);
-
-    for (let i = 0; i < this.then.length; i++) {
-      this.then[i].visit(callback);
+    for (let i = 0; i < node.then.length; i++) {
+      visit(node.then[i], visitor);
     }
 
-    if (this.otherwise) {
-      for (let i = 0; i < this.otherwise.length; i++) {
-        this.otherwise[i].visit(callback);
+    if (node.otherwise) {
+      for (let i = 0; i < node.otherwise.length; i++) {
+        visit(node.otherwise[i], visitor);
       }
     }
-  };
+  },
+  ForStatement: (node, visitor) => {
+    handle(node, visitor);
 
-  ast.ForStatementNode.prototype.visit = function (callback) {
-    callback(this);
+    visit(node.expr, visitor);
 
-    this.expr.visit(callback);
-
-    for (let i = 0; i < this.body.length; i++) {
-      this.body[i].visit(callback);
+    for (let i = 0; i < node.body.length; i++) {
+      visit(node.body[i], visitor);
     }
-  };
+  },
+  BlockStatement: (node, visitor) => {
+    handle(node, visitor);
 
-  ast.BlockStatementNode.prototype.visit = function (callback) {
-    callback(this);
-
-    for (let i = 0; i < this.body.length; i++) {
-      this.body[i].visit(callback);
+    for (let i = 0; i < node.body.length; i++) {
+      visit(node.body[i], visitor);
     }
-  };
+  },
+  UnsafeStatement: (node, visitor) => {
+    handle(node, visitor);
+  },
+  FilterExpression: (node, visitor) => {
+    handle(node, visitor);
 
-  ast.UnsafeStatementNode.prototype.visit = function (callback) {
-    callback(this);
-  };
-
-  ast.FilterExpressionNode.prototype.visit = function (callback) {
-    callback(this);
-
-    this.callee.visit(callback);
-    var args = this.arguments;
+    visit(node.callee, visitor);
+    var args = node.arguments;
 
     for (var i = 0, len = args.length; i < len; i++) {
-      args[i].visit(callback);
+      visit(args[i], visitor);
     }
-  };
+  },
+  ArrayExpression: (node, visitor) => {
+    handle(node, visitor);
 
-  ast.ArrayExpressionNode.prototype.visit = function (callback) {
-    callback(this);
-
-    var elements = this.elements;
+    var elements = node.elements;
 
     for (var i = 0, len = elements.length; i < len; i++) {
-      elements[i].visit(callback);
+      visit(elements[i], visitor);
     }
-  };
+  },
+  ObjectExpression: (node, visitor) => {
+    handle(node, visitor);
 
-  ast.ObjectExpressionNode.prototype.visit = function (callback) {
-    callback(this);
-
-    var i, j, properties = this.properties;
+    var i, j, properties = node.properties;
 
     for (i = 0, len = properties.length; i < len; i++) {
       var prop = properties[i];
@@ -124,116 +122,103 @@ export function visitor(ast) {
       var value = prop.value;
 
       if (kind === "init") {
-        key.visit(callback);
-        value.visit(callback);
+        visit(key, visitor);
+        visit(value, visitor);
       } else {
         var params = value.params;
         var body = value.body;
 
-        key.visit(callback);
+        visit(key, visitor);
 
         for (j = 0, plen = params.length; j < plen; j++) {
-          params[j].visit(callback);
+          visit(params[j], visitor);
         }
 
         for (j = 0, blen = body.length; j < blen; j++) {
-          body[j].visit(callback);
+          visit(body[j], visitor);
         }
       }
     }
-  };
+  },
+  SequenceExpression: (node, visitor) => {
+    handle(node, visitor);
 
-  ast.SequenceExpressionNode.prototype.visit = function (callback) {
-    callback(this);
-
-    var expressions = this.expressions;
+    var expressions = node.expressions;
 
     for (var i = 0, len = expressions.length; i < len; i++) {
-      expressions[i].visit(callback);
+      visit(expressions[i], visitor);
     }
-  };
+  },
+  UnaryExpression: (node, visitor) => {
+    handle(node, visitor);
 
-  ast.UnaryExpressionNode.prototype.visit = function (callback) {
-    callback(this);
+    visit(node.argument, visitor);
+  },
+  BinaryExpression: (node, visitor) => {
+    handle(node, visitor);
 
-    this.argument.visit(callback);
-  };
+    visit(node.left, visitor);
+    visit(node.right, visitor);
+  },
+  AssignmentExpression: (node, visitor) => {
+    handle(node, visitor);
 
-  ast.BinaryExpressionNode.prototype.visit = function (callback) {
-    callback(this);
+    visit(node.left, visitor);
+    visit(node.right, visitor);
+  },
+  UpdateExpression: (node, visitor) => {
+    handle(node, visitor);
 
-    this.left.visit(callback);
-    this.right.visit(callback);
-  };
+    visit(node.argument, visitor);
+    visit(node.argument, visitor);
+  },
+  LogicalExpression: (node, visitor) => {
+    handle(node, visitor);
 
-  ast.AssignmentExpressionNode.prototype.visit = function (callback) {
-    callback(this);
+    visit(node.left, visitor);
+    visit(node.right, visitor);
+  },
+  ConditionalExpression: (node, visitor) => {
+    handle(node, visitor);
 
-    this.left.visit(callback);
-    this.right.visit(callback);
-  };
+    visit(node.test, visitor);
+    visit(node.consequent, visitor);
+    visit(node.alternate, visitor);
+  },
+  NewExpression: (node, visitor) => {
+    handle(node, visitor);
 
-  ast.UpdateExpressionNode.prototype.visit = function (callback) {
-    callback(this);
-
-    this.argument.visit(callback);
-    this.argument.visit(callback);
-  };
-
-  ast.LogicalExpressionNode.prototype.visit = function (callback) {
-    callback(this);
-
-    this.left.visit(callback);
-    this.right.visit(callback);
-  };
-
-  ast.ConditionalExpressionNode.prototype.visit = function (callback) {
-    callback(this);
-
-    this.test.visit(callback);
-    this.consequent.visit(callback);
-    this.alternate.visit(callback);
-  };
-
-  ast.NewExpressionNode.prototype.visit = function (callback) {
-    callback(this);
-
-    this.callee.visit(callback);
-    var args = this.arguments;
+    visit(node.callee, visitor);
+    var args = node.arguments;
 
     if (args !== null) {
       for (var i = 0, len = args.length; i < len; i++) {
-        args[i].visit(callback);
+        visit(args[i], visitor);
       }
     }
-  };
+  },
+  CallExpression: (node, visitor) => {
+    handle(node, visitor);
 
-  ast.CallExpressionNode.prototype.visit = function (callback) {
-    callback(this);
-
-    this.callee.visit(callback);
-    var args = this.arguments;
+    visit(node.callee, visitor);
+    var args = node.arguments;
 
     for (var i = 0, len = args.length; i < len; i++) {
-      args[i].visit(callback);
+      visit(args[i], visitor);
     }
-  };
-
-  ast.MemberExpressionNode.prototype.visit = function (callback) {
-    callback(this);
-    this.object.visit(callback);
-    this.property.visit(callback);
-  };
-
-  ast.IdentifierNode.prototype.visit = function (callback) {
-    callback(this);
-  };
-
-  ast.AccessorNode.prototype.visit = function (callback) {
-    callback(this);
-  };
-
-  ast.LiteralNode.prototype.visit = function (callback) {
-    callback(this);
-  };
-}
+  },
+  MemberExpression: (node, visitor) => {
+    handle(node, visitor);
+    visit(node.object, visitor);
+    visit(node.property, visitor);
+  },
+  Identifier: (node, visitor) => {
+    handle(node, visitor);
+  },
+  Accessor: (node, visitor) => {
+    handle(node, visitor);
+  },
+  Literal: (node, visitor) => {
+    handle(node, visitor);
+  }
+};
