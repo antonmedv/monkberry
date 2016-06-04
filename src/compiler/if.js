@@ -2,8 +2,8 @@ import { sourceNode } from './sourceNode';
 import { collectVariables } from './expression/variable';
 import { lookUpOnlyOneChild, map } from '../utils';
 
-export default function (ast) {
-  ast.IfStatementNode.prototype.compile = function (figure) {
+export default {
+  IfStatement: ({parent, node, figure, compile}) => {
     let templateNameForThen, templateNameForOtherwise;
 
     if (this.templateNames && this.templateNames.then) {
@@ -58,8 +58,8 @@ export default function (ast) {
     // }
 
     return parentNode ? null : placeholder;
-  };
-}
+  }
+};
 
 function compileCond(figure, loc, prepend, placeholder, templateName, childName, result, variablesOfExpression) {
   return figure.addUpdater(loc, variablesOfExpression, () => {

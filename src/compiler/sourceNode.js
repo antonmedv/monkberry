@@ -13,7 +13,3 @@ export function sourceNode(loc, chunk) {
     return new SourceNode(loc.start.line, loc.start.column, loc.source, chunk);
   }
 }
-
-export function join(parts, separator = '') {
-  return sourceNode(null, parts).join(separator);
-}

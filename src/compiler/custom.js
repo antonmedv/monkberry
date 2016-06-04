@@ -1,9 +1,9 @@
-import { sourceNode } from '../sourceNode';
-import { collectVariables } from '../expression/variable';
-import { lookUpOnlyOneChild, map, unique } from '../../utils';
+import { sourceNode } from './sourceNode';
+import { collectVariables } from './expression/variable';
+import { lookUpOnlyOneChild, map, unique } from '../utils';
 
-export default function (ast) {
-  ast.ElementNode.prototype.compileCustom = function (figure) {
+export default {
+  Element: (figure) => {
     const customNodeName = this.name;
     const templateName = customNodeName;
     const childName = 'child' + figure.uniqid('child_name');
@@ -67,5 +67,5 @@ export default function (ast) {
     }
 
     return parentNode ? null : placeholder;
-  };
-}
+  }
+};

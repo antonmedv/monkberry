@@ -1,16 +1,13 @@
 import { config } from '../../config';
+import { visit } from '../../visitor';
 
 export function collectVariables(node) {
   var variables = [];
   if (node) {
     var nodes = [].concat(node);
     nodes.forEach((node) => {
-      if (!node.visit) {
-        throw new Error('Can not collect variables for node "' + node.type + '" type.');
-      }
-
-      node.visit(function (node) {
-        if (node.type == 'Identifier') {
+      visit(node, {
+        Identifier: (node) => {
           if (variables.indexOf(node.name) == -1 && config.globals.indexOf(node.name) == -1) {
             variables.push(node.name);
           }

@@ -39,9 +39,10 @@ if (program.globals) {
   compiler.globals = program.globals.split(',').map(v => v.trim());
 }
 
-program.args.forEach(function (file) {
+
+var sources = program.args.map(function (file) {
   var code = fs.readFileSync(file, utf8);
-  compiler.addSource(path.basename(file), code, program.parser, program.asLibrary);
+  return [path.basename(file), code];
 });
 
 if (program.drawAst) {
@@ -50,10 +51,10 @@ if (program.drawAst) {
 }
 
 try {
-  var output, node = compiler.compile(program.asModule);
+  var output, node = compiler.compile(sources[0][0], sources[0][1]);
 } catch (error) {
-  console.error(error.toString());
-  throw error;
+  console.error(error.stack);
+  return;
 }
 
 if (program.output) {

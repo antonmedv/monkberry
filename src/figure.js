@@ -1,168 +1,100 @@
-import { sourceNode, join } from './compiler/sourceNode';
-import { Updater } from './compiler/updater';
-import { size, uniqueName, map } from './utils';
+import { sourceNode } from './compiler/sourceNode';
+import { size } from './utils';
+import { Spot } from './spot';
 
 export class Figure {
-  constructor(name, root) {
+  constructor(name, parent = null) {
     this.name = name;
-    this.root = root;
+    this.parent = parent;
     this.uniqCounters = {};
     this.children = [];
     this.functions = {};
     this.declarations = [];
-    this.construct = [];
-    this.complexUpdaters = {};
-    this.updaters = {};
-    this.variables = {};
+    this.constructions = [];
     this.renderActions = [];
     this.subFigures = [];
-    this.perceivedAsLibrary = false;
+    this.spots = {};
   }
 
-  createFigure(name, nodes) {
-    var figure = new Figure(name, this.root);
-    figure.children = map(nodes, (node) => node.compile(figure));
-    return figure;
-  }
-
-  compile() {
-    var sn = sourceNode(null, 'function () {\n');
+  generate() {
+    var sn = sourceNode(`function () {\n`);
 
     if (this.declarations.length > 0) {
-      sn.add('  // Create elements\n')
-        .add(['  ', this.compileDeclarations(), '\n'])
-        .add('\n');
+      sn.add([
+        `  // Create elements\n`,
+        `  `, sourceNode(this.declarations).join(`\n  `),
+        `\n\n`
+      ]);
     }
 
-    if (this.construct.length > 0) {
-      sn.add('  // Construct dom\n')
-        .add(['  ', this.compileDomConstruction(), '\n'])
-        .add('\n');
+    if (this.constructions.length > 0) {
+      sn.add([
+        `  // Construct dom\n`,
+        `  `, sourceNode(null, this.constructions).join(`\n  `),
+        `\n\n`
+      ]);
     }
 
-    sn.add('  // Create view\n')
-      .add('  var view = monkberry.view();\n')
-      .add('\n');
-
-    if (size(this.complexUpdaters) > 0) {
-      sn.add('  // Complex update functions\n')
-        .add('  var __cache__ = view.__cache__ = {};\n')
-        .add('  var ')
-        .add([this.compileComplexUpdaters(), ';\n'])
-        .add('\n');
-    }
-
-    if (size(this.updaters) > 0) {
-      sn.add('  // Update functions\n')
-        .add('  view.__update__ = {\n')
-        .add([this.compileUpdaters(), '\n'])
-        .add('  };\n')
-        .add('\n');
+    if (size(this.spots) > 0) {
+      sn.add([
+        `  // Update functions\n`,
+        `  this.__update__ = {\n`,
+        this.generateSpots(), `\n`,
+        `  };\n`,
+        `\n`
+      ]);
     }
 
     if (this.renderActions.length > 0) {
-      sn.add('  // Extra render actions\n')
-        .add('  view.onRender = function () {\n')
-        .add([this.compileRenderActions(), '\n'])
-        .add('  };\n')
-        .add('\n');
+      sn.add([
+        `  // Extra render actions\n`,
+        `  view.onRender = function () {\n`,
+        this.generateRenderActions(), `\n`,
+        `  };\n`,
+        `\n`
+      ]);
     }
 
-    sn.add('  // Set root nodes\n');
-    sn.add(['  view.nodes = [', join(this.children, ', '), '];\n']);
-    sn.add('  return view;\n');
+    sn.add([
+      `  // Set root nodes\n`,
+      `  view.nodes = [`, sourceNode(this.children).join(`, `), `];\n`,
+      `  return view;\n`
+    ]);
 
-    sn.add('}');
+    sn.add(`}`);
 
     return sn;
   }
 
-  declare(nodes) {
-    this.declarations.push(sourceNode(null, nodes));
-  }
-
-  compileFunctions() {
+  generateFunctions() {
     if (Object.keys(this.functions).length > 0) {
       var defn = [];
       Object.keys(this.functions).forEach((key) => {
         defn.push(sourceNode(null, `${key} = ${this.functions[key]}`));
       });
-      return sourceNode(null, 'var ').add(join(defn, ',\n')).add(';\n');
+      return sourceNode(null, `var `).add(join(defn, `,\n`)).add(`;\n`);
     } else {
-      return sourceNode(null, '');
+      return sourceNode(null, ``);
     }
   }
 
-  compileDeclarations() {
-    return sourceNode(null, this.declarations).join('\n  ');
-  }
-
-  compileDomConstruction() {
-    return sourceNode(null, this.construct).join('\n  ');
-  }
-
-  compileComplexUpdaters() {
+  generateSpots() {
     var parts = [];
 
-    Object.keys(this.complexUpdaters).forEach((key) => {
-      parts.push(join(['λ__', key, ' = ', this.complexUpdaters[key].compile()]));
+    Object.keys(this.spots).forEach((reference) => {
+      let spot = this.spots[reference];
+      parts.push(sourceNode([`    `, spot.reference, `: `, spot.generate()]).join(`, `));
     });
 
-    return sourceNode(null, parts).join(',\n    ');
+    return sourceNode(null, parts).join(`,\n`);
   }
 
-  compileUpdaters() {
-    var parts = [];
-
-    Object.keys(this.updaters).forEach((key) => {
-      parts.push(join(['    ', key, ': ', this.updaters[key].compile()]));
-    });
-
-    return sourceNode(null, parts).join(',\n');
-  }
-
-  compileRenderActions() {
+  generateRenderActions() {
     var parts = [];
     for (var control of this.renderActions) {
       parts.push(control);
     }
-    return join(parts, '\n');
-  }
-
-  addFunction(name, source) {
-    if (!(name in this.functions)) {
-      this.functions[name] = source;
-    }
-  }
-
-  addUpdater(loc, variables, callback) {
-    if (variables.length == 0) {
-      throw new Error('Updaters must have at least one variable.');
-    } else if (variables.length == 1) {
-
-      return this.onUpdater(variables[0]).add(callback());
-
-    } else if (variables.length > 1) {
-
-      var complexUpdater = this.onComplexUpdater(variables);
-      complexUpdater.add(callback());
-
-      for (let variable of variables) {
-        this.onUpdater(variable).cache();
-        this.onUpdater(variable).addComplex(loc, variables, complexUpdater.name);
-      }
-
-      return complexUpdater;
-    }
-  }
-
-  onUpdater(variableName) {
-    return variableName in this.updaters ? this.updaters[variableName] : this.updaters[variableName] = new Updater([variableName]);
-  }
-
-  onComplexUpdater(variables) {
-    var name = uniqueName(variables);
-    return name in this.complexUpdaters ? this.complexUpdaters[name] : this.complexUpdaters[name] = new Updater(variables);
+    return join(parts, `\n`);
   }
 
   uniqid(name = 'default') {
@@ -170,5 +102,31 @@ export class Figure {
       this.uniqCounters[name] = 0
     }
     return this.uniqCounters[name]++;
+  }
+
+  spot(variables) {
+    let s = new Spot(variables);
+    if (!this.spots.hasOwnProperty(s.reference)) {
+      this.spots[s.reference] = s;
+    }
+    return this.spots[s.reference];
+  }
+
+  declare(node) {
+    this.declarations.push(node);
+  }
+
+  construct(node) {
+    this.constructions.push(node);
+  }
+
+  addFunction(name, source) {
+    if (!this.functions.hasOwnProperty(name)) {
+      this.functions[name] = source;
+    }
+  }
+
+  addFigure(figure) {
+    this.subFigures.push(figure);
   }
 }

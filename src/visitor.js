@@ -2,7 +2,7 @@ export function visit(node, visitor) {
   if (node.type in visitors) {
     visitors[node.type](node, visitor);
   } else {
-    throw `Unknown node type "${node.type}".`;
+    throw new Error(`Unknown node type "${node.type}".`);
   }
 }
 

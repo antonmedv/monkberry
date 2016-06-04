@@ -2,10 +2,6 @@ export function esc(str) {
   return JSON.stringify(str);
 }
 
-export function map(array, fn) {
-  return array.map(fn).filter((item) => item !== null);
-}
-
 export function size(obj) {
   var size = 0, key;
   for (key in obj) {
@@ -14,6 +10,10 @@ export function size(obj) {
     }
   }
   return size;
+}
+
+export function notNull(item) {
+  return item !== null;
 }
 
 export function unique(a) {
@@ -29,16 +29,15 @@ export function uniqueName(params) {
   return unique(params).sort().join('_');
 }
 
-export function lookUpOnlyOneChild(node) {
-  var parent = node.parent;
+export function isSingleChild(parent, node) {
   if (parent) {
     if (parent.type == 'Element') {
       if (parent.body.length == 1 && parent.body[0] == node) {
-        return parent;
+        return true;
       }
     }
   }
-  return null;
+  return false;
 }
 
 export function getStringLiteralValue(literal) {
