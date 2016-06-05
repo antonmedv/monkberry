@@ -17,11 +17,11 @@ export class Compiler {
   }
 
   compile(filename, code) {
-    let ast = parser.parse(code);
+    let ast = parser.parse(filename, code);
 
     // Transform.
     Object.keys(this.transforms).forEach((key) => this.transforms[key](ast));
-    
+
     return compile(getTemplateName(filename), ast);
   }
 }

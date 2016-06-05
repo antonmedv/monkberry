@@ -86,7 +86,7 @@ export default {
    * @param {Figure} figure
    */
   SpreadAttribute: ({parent, node, figure}) => {
-    figure.root.addFunction('__spread', sourceNode([
+    figure.root().addFunction('__spread', sourceNode([
       `function (node, attr) {\n`,
       `  for (var property in attr) if (attr.hasOwnProperty(property)) {\n`,
       `    if (property in ${esc(arrayToObject(plainAttributes))}) {\n`,
@@ -99,8 +99,8 @@ export default {
     ]));
 
     let attr = node.identifier.name;
-    figure.addUpdater(node.loc, [attr], () =>
-      sourceNode(node.loc, [`      __spread(${parent.reference}, ${attr})`])
+    figure.spot(attr).add(
+      sourceNode(node.loc, `      __spread(${parent.reference}, ${attr})`)
     );
   }
 }
@@ -120,7 +120,7 @@ export default {
  * @param {Function} compile
  * @returns {*[]}
  */
-function compileToExpression(node, compile) {
+export function compileToExpression(node, compile) {
   let expr, defaults = [];
 
   let pushDefaults = (node) => {

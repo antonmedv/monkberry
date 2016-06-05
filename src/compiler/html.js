@@ -1,4 +1,5 @@
 import { sourceNode } from './sourceNode';
+import { notNull } from '../utils';
 
 export default {
   Element: ({node, figure, compile}) => {
@@ -8,7 +9,7 @@ export default {
       sourceNode(node.loc, `var ${node.reference} = document.createElement('${node.name}');`)
     );
 
-    let children = node.body.map((child) => compile(child));
+    let children = node.body.map((child) => compile(child)).filter(notNull);
 
     for (let child of children) {
       figure.construct(

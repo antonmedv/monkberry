@@ -9,6 +9,7 @@ export class Figure {
     this.uniqCounters = {};
     this.children = [];
     this.functions = {};
+    this.imports = [];
     this.declarations = [];
     this.constructions = [];
     this.renderActions = [];
@@ -17,7 +18,19 @@ export class Figure {
   }
 
   generate() {
-    var sn = sourceNode([
+    let sn = sourceNode(``);
+
+    if (this.imports.length > 0) {
+      sn.add(sourceNode(this.imports).join(`\n`));
+      sn.add(`\n`);
+    }
+
+    if (size(this.functions) > 0) {
+      sn.add(`\n`);
+      sn.add(this.generateFunctions());
+    }
+
+    sn.add([
       `\n`,
       `function ${this.name}() {\n`,
       `  Monkberry.call(this);\n`,
@@ -54,7 +67,7 @@ export class Figure {
     if (this.renderActions.length > 0) {
       sn.add([
         `  // Extra render actions\n`,
-        `  view.onRender = function () {\n`,
+        `  this.onRender = function () {\n`,
         this.generateRenderActions(), `\n`,
         `  };\n`,
         `\n`
@@ -83,15 +96,11 @@ export class Figure {
   }
 
   generateFunctions() {
-    if (Object.keys(this.functions).length > 0) {
-      var defn = [];
-      Object.keys(this.functions).forEach((key) => {
-        defn.push(sourceNode(null, `${key} = ${this.functions[key]}`));
-      });
-      return sourceNode(null, `var `).add(join(defn, `,\n`)).add(`;\n`);
-    } else {
-      return sourceNode(null, ``);
-    }
+    var defn = [];
+    Object.keys(this.functions).forEach((key) => {
+      defn.push(sourceNode(`${key} = ${this.functions[key]}`));
+    });
+    return sourceNode(`var `).add(sourceNode(defn).join(`,\n`)).add(`;\n`);
   }
 
   generateSpots() {
@@ -110,11 +119,7 @@ export class Figure {
   }
 
   generateRenderActions() {
-    var parts = [];
-    for (var control of this.renderActions) {
-      parts.push(control);
-    }
-    return join(parts, `\n`);
+    return sourceNode(this.renderActions).join(`\n`);
   }
 
   generateUpdateFunction() {
@@ -177,6 +182,14 @@ export class Figure {
     return this.spots[s.reference];
   }
 
+  root() {
+    if (this.parent) {
+      return this.parent.root();
+    } else {
+      return this;
+    }
+  }
+
   declare(node) {
     this.declarations.push(node);
   }
@@ -193,5 +206,13 @@ export class Figure {
 
   addFigure(figure) {
     this.subFigures.push(figure);
+  }
+
+  addRenderActions(action) {
+    this.renderActions.push(action);
+  }
+
+  addImport(source) {
+    this.imports.push(source);
   }
 }

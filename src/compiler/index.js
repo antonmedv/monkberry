@@ -1,5 +1,4 @@
 import { Figure } from '../figure';
-import { Root } from '../figure/root';
 import document from './document';
 import element from './element';
 import attribute from './attribute';
@@ -9,7 +8,6 @@ import comment from './comment';
 import import_ from './import';
 import if_ from './if';
 import for_ from './for';
-import block from './block';
 import unsafe from './unsafe';
 
 const compilers = Object.assign({},
@@ -22,7 +20,6 @@ const compilers = Object.assign({},
   import_,
   if_,
   for_,
-  block,
   unsafe
 );
 
@@ -42,5 +39,5 @@ function next(parent, node, figure) {
 }
 
 export function compile(name, ast) {
-  return next(null, ast, new Figure(name, new Root()));
+  return next(null, ast, new Figure(name));
 }

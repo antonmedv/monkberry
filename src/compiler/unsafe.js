@@ -1,42 +1,48 @@
 import { sourceNode } from './sourceNode';
 import { collectVariables } from './expression/variable';
-import { lookUpOnlyOneChild, esc } from '../utils';
+import { isSingleChild } from '../utils';
 
-export default function (ast) {
-  ast.UnsafeStatementNode.prototype.compile = function (figure) {
+export default {
+  UnsafeStatement: ({parent, node, figure, compile}) => {
+    node.reference = null;
+
     let unsafeNumber = figure.uniqid('unsafe');
-
+    let unsafeNodes = 'unsafeNodes' + unsafeNumber;
     let placeholder;
-    let parentNode = lookUpOnlyOneChild(this);
-    if (parentNode) {
-      placeholder = parentNode.nodeName;
+
+    if (isSingleChild(parent, node)) {
+      placeholder = parent.reference;
     } else {
-      placeholder = 'unsafe' + unsafeNumber;
-      figure.declare([`var ${placeholder} = document.createComment('unsafe');`]);
+      node.reference = placeholder = 'unsafe' + unsafeNumber;
+      figure.declare(sourceNode(`var ${placeholder} = document.createComment('unsafe');`));
     }
 
-    let unsafeNodes = 'unsafeNodes' + unsafeNumber;
-    figure.declare([`var ${unsafeNodes} = [];`]);
+
+    figure.declare(sourceNode(`var ${unsafeNodes} = [];`));
 
     // Add unsafe function.
     let code = unsafe.toString().replace(/(\s{2,}|\n)/g, '');
-    figure.root.addFunction('__unsafe', sourceNode(null, code));
+    figure.root().addFunction('__unsafe', sourceNode(null, code));
 
-    let variables = collectVariables(this.html);
+    let variables = collectVariables(node.html);
 
     if (variables.length == 0) {
-      figure.renderActions.push(sourceNode(this.loc, [
-        `      __unsafe(${placeholder}, ${unsafeNodes}, `, this.html.compile(), `);`
-      ]));
+      figure.addRenderActions(
+        sourceNode(node.loc, [
+          `      __unsafe(${placeholder}, ${unsafeNodes}, `, compile(node.html), `);`
+        ])
+      );
     } else {
-      figure.addUpdater(this.loc, variables, () => sourceNode(this.loc, [
-        `      __unsafe(${placeholder}, ${unsafeNodes}, `, this.html.compile(), `)`
-      ]));
+      figure.spot(variables).add(
+        sourceNode(node.loc, [
+          `      __unsafe(${placeholder}, ${unsafeNodes}, `, compile(node.html), `)`
+        ])
+      );
     }
 
-    return parentNode ? null : placeholder;
-  };
-}
+    return node.reference;
+  }
+};
 
 /**
  * This function is being used for unsafe `innerHTML` insertion of HTML into DOM.
