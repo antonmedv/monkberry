@@ -7,7 +7,13 @@ export default {
 
     return sourceNode(node.loc, [
       `var Monkberry = require('monkberry');\n`,
-      figure.generate()
+      figure.generate(),
+      `\n`,
+      `if (typeof module !== 'undefined') {\n`,
+      `  module.exports = ${figure.name};\n`,
+      `} else {\n`,
+      `  window.${figure.name} = ${figure.name};\n`,
+      `}`
     ]);
   }
 };

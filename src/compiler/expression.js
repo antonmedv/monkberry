@@ -15,7 +15,7 @@ export default {
     }
 
     figure.declare(
-      sourceNode(`var ${node.nodeName} = document.createTextNode(${defaultValue})`)
+      sourceNode(`var ${node.reference} = document.createTextNode(${defaultValue})`)
     );
 
     let variables = collectVariables(node.expression);
@@ -26,11 +26,11 @@ export default {
       );
     } else {
       figure.spot(variables).add(
-        sourceNode(node.loc, [node.reference, '.textContent = ', compile(node.expression)])
+        sourceNode(node.loc, [`      `, node.reference, '.textContent = ', compile(node.expression)])
       );
     }
 
-    return node.references;
+    return node.reference;
   },
 
   FilterExpression: ({node, compile}) => {

@@ -1,5 +1,5 @@
 import { ast } from 'monkberry-parser';
-import { sourceNode, join } from './sourceNode';
+import { sourceNode } from './sourceNode';
 import { collectVariables } from './expression/variable';
 import { esc, arrayToObject } from '../utils';
 
@@ -69,7 +69,7 @@ export default {
 
       if (defaults.length > 0) {
         figure.construct(sourceNode(node.loc, [
-          attr(node.loc, parent.reference, node.name, join(defaults, ' + '))
+          attr(node.loc, parent.reference, node.name, sourceNode(defaults).join(' + '))
         ]));
       }
     }

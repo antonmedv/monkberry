@@ -7,7 +7,7 @@ export default {
   ForStatement: ({parent, node, figure, compile}) => {
     node.reference = null;
 
-    let templateName = figure.name + '.for' + figure.uniqid('template_name');
+    let templateName = figure.name + '_for' + figure.uniqid('template_name');
     let childrenName = 'children' + figure.uniqid('child_name');
     let placeholder;
 
@@ -26,7 +26,7 @@ export default {
 
     figure.spot(variablesOfExpression).add(
       sourceNode(node.loc, [
-        `Monkberry.loop(this, ${placeholder}, ${childrenName}, ${templateName}, __data__`,
+        `      Monkberry.loop(_this, ${placeholder}, ${childrenName}, ${templateName}, __data__, `,
         compile(node.expr),
         (node.options === null ? `` : [`, `, esc(node.options)]),
         `)`
@@ -37,10 +37,10 @@ export default {
     // ) {
 
     if (node.body.length > 0) {
-      let subFigure = new Figure(templateName, figure);
-      subFigure.children = node.body.map((node) => compile(node, figure)).filter(notNull);
+      let subfigure = new Figure(templateName, figure);
+      subfigure.children = node.body.map((node) => compile(node, subfigure)).filter(notNull);
 
-      figure.addFigure(subFigure);
+      figure.addFigure(subfigure);
     }
 
     if (node.options !== null) {

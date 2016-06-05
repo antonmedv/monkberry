@@ -25,10 +25,6 @@ export function unique(a) {
   }, []);
 }
 
-export function uniqueName(params) {
-  return unique(params).sort().join('_');
-}
-
 export function isSingleChild(parent, node) {
   if (parent) {
     if (parent.type == 'Element') {

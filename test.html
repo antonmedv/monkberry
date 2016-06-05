@@ -1,13 +1,9 @@
 <div class="container">
-    <p>
-        Hello {{ world + name }}
-    </p>
-    <input type="text" value="{{ value }}">
-    {% for [world, name] %}
-        <section>
-            {% for loop %}
-                <h1>Hi</h1>
-            {% endfor %}
-        </section>
-    {% endfor %}
+    {{ name + foo + bar }}
+    <!-- This is comment -->
+    {% if cond.indexOf(foo) != index %}
+        {{ name }}
+    {% else %}
+        ew!
+    {% endif %}
 </div>
