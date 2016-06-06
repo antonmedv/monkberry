@@ -31,6 +31,7 @@ export default {
 
     var variablesOfExpression = collectVariables(node.cond);
 
+    figure.thisRef = true;
     figure.spot(variablesOfExpression).add(
       sourceNode(node.loc, [
         `      `,

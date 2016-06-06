@@ -15,6 +15,8 @@ export class Figure {
     this.renderActions = [];
     this.subFigures = [];
     this.spots = {};
+    this.thisRef = false;
+    this.spotMaxLength = 0;
   }
 
   generate() {
@@ -37,9 +39,17 @@ export class Figure {
       ` */\n`,
       `function ${this.name}() {\n`,
       `  Monkberry.call(this);\n`,
-      `  var _this = this;\n`,
-      `\n`
     ]);
+
+    if (this.spotMaxLength > 1) {
+      sn.add(`  this.__cache__ = {};\n`);
+    }
+
+    if (this.thisRef) {
+      sn.add(`  var _this = this;\n`);
+    }
+
+    sn.add(`\n`);
 
     if (this.declarations.length > 0) {
       sn.add([
@@ -181,6 +191,8 @@ export class Figure {
         for (let variable of s.variables) {
           this.spot(variable).cache = true;
         }
+
+        this.spotMaxLength = s.variables.length;
       }
     }
 

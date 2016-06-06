@@ -48,6 +48,8 @@ export default {
     variables = unique(variables);
     data = `{${data.join(', ')}}`;
 
+    figure.thisRef = true;
+
     // Add spot for custom attribute or insert on render if no variables in attributes.
     if (variables.length > 0) {
 

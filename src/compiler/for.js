@@ -24,6 +24,7 @@ export default {
 
     let variablesOfExpression = collectVariables(node.expr);
 
+    figure.thisRef = true;
     figure.spot(variablesOfExpression).add(
       sourceNode(node.loc, [
         `      Monkberry.loop(_this, ${placeholder}, ${childrenName}, ${templateName}, __data__, `,

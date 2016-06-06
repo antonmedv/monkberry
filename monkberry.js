@@ -38,8 +38,6 @@
     this.nodes = []; // Root DOM nodes.
     this.onRender = null; // Function to call on render.
     this.onRemove = null; // Function to call on remove.
-    this.__update__ = null; // Spot updaters.
-    this.__cache__ = null; // Cache spot data.
   }
 
   /**
