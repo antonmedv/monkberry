@@ -36,6 +36,10 @@ export function isSingleChild(parent, node) {
   return false;
 }
 
+export function getTemplateName(name) {
+  return name.replace(/\W+/g, '_');
+}
+
 export function getStringLiteralValue(literal) {
   return literal.value.replace(/^["']/, '').replace(/["']$/, '');
 }

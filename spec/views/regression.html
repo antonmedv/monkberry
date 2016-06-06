@@ -37,14 +37,6 @@
         {% endif %}
     </div>
 </ReIfCustom>
-<ReIfBlock>
-    <div>
-        {% if test %}
-            {% block "1" %}<i>1</i>{% endblock %}
-            {% block "2" %}<i>2</i>{% endblock %}
-        {% endif %}
-    </div>
-</ReIfBlock>
 <ReIfUnsafe>
     <div>
         {% if test %}
@@ -61,14 +53,6 @@
         {% endfor %}
     </div>
 </ReForCustom>
-<ReForBlock>
-    <div>
-        {% for array %}
-            {% block "1" %}<i>1</i>{% endblock %}
-            {% block "2" %}<i>2</i>{% endblock %}
-        {% endfor %}
-    </div>
-</ReForBlock>
 <UpdateLoopsInCustomTags>
     <i>
         <custom-tag-with-loop list={{ list }} foo={{ foo }} bar={{ bar }}/>

@@ -2,19 +2,21 @@ import { sourceNode } from './sourceNode';
 import { notNull } from '../utils';
 
 export default {
-  Document: ({node, figure, compile}) => {
+  Document: ({node, figure, compile, options}) => {
     figure.children = node.body.map((child) => compile(child)).filter(notNull);
 
-    return sourceNode(node.loc, [
-      `var Monkberry = typeof require !== 'undefined' ? require('monkberry') : Monkberry;\n`,
-      figure.generate(),
-      `\n`,
-      `if (typeof module !== 'undefined') {\n`,
-      `  module.exports = ${figure.name};\n`,
-      `} else {\n`,
-      `  window.${figure.name} = ${figure.name};\n`,
-      `}`
-    ]);
+    if (options.asModule) {
+      return sourceNode(node.loc, [
+        `var Monkberry = require('monkberry');\n`,
+        figure.generate(), `\n`,
+        `module.exports = ${figure.name};\n`
+      ]);
+    } else {
+      return sourceNode(node.loc, [
+        figure.generate(), `\n`,
+        `window.${figure.name} = ${figure.name};\n`
+      ]);
+    }
   }
 };
 

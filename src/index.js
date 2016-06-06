@@ -1,18 +1,17 @@
 import { parser } from 'monkberry-parser';
 import { compile } from './compiler';
-import { Figure } from './figure';
-import { Root } from './figure/root';
-import { config } from './config';
-import { sourceNode } from './compiler/sourceNode';
-import { whitespace } from './optimize/whitespace';
-import { nestedBlocks } from './optimize/nestedBlocks';
 import { entity } from './transform/entity';
+import { whitespace } from './optimize/whitespace';
+import { sourceNode } from './compiler/sourceNode';
+import { getTemplateName } from './utils';
 import { drawGraph } from './graph';
 
-
 export class Compiler {
-  constructor() {
-    this.transforms = {whitespace, nestedBlocks, entity};
+  constructor(options = {}) {
+    this.options = Object.assign({
+      asModule: true
+    }, options);
+    this.transforms = {whitespace, entity};
     this.globals = ['window', 'Math'];
   }
 
@@ -22,14 +21,14 @@ export class Compiler {
     // Transform.
     Object.keys(this.transforms).forEach((key) => this.transforms[key](ast));
 
-    return compile(getTemplateName(filename), ast);
+    return compile(getTemplateName(getBaseName(filename)), ast, this.options);
   }
 }
 
 export class Compiler_v1 {
   constructor() {
     this.sources = [];
-    this.transforms = {whitespace, nestedBlocks, entity};
+    this.transforms = {whitespace, entity};
     this.globals = [];
   }
 
@@ -97,12 +96,8 @@ export class Compiler_v1 {
       throw new Error('No sources.');
     }
   }
-
-  getTemplateName(name) {
-    return name.split('/').pop().replace(/\.\w+$/, '');
-  }
 }
 
-function getTemplateName(name) {
+function getBaseName(name) {
   return name.split('/').pop().replace(/\.\w+$/, '');
 }

@@ -1,6 +1,6 @@
 import { sourceNode } from './sourceNode';
 import { collectVariables } from './expression/variable';
-import { isSingleChild, unique, notNull } from '../utils';
+import { isSingleChild, unique, notNull, getTemplateName } from '../utils';
 import { compileToExpression } from './attribute';
 import { Figure } from '../figure';
 
@@ -8,7 +8,7 @@ export default {
   Element: ({parent, node, figure, compile}) => {
     node.reference = null;
 
-    let templateName = node.name;
+    let templateName = getTemplateName(node.name);
     let childName = 'child' + figure.uniqid('child_name');
     let placeholder;
 

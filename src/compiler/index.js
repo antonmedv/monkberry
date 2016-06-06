@@ -23,12 +23,13 @@ const compilers = Object.assign({},
   unsafe
 );
 
-function next(parent, node, figure) {
+function next(parent, node, figure, options) {
   let path = {
     parent,
     node,
     figure,
-    compile: (child, subfigure = figure) => next(node, child, subfigure)
+    options,
+    compile: (child, subfigure = figure) => next(node, child, subfigure, options)
   };
 
   if (node.type in compilers) {
@@ -38,6 +39,6 @@ function next(parent, node, figure) {
   }
 }
 
-export function compile(name, ast) {
-  return next(null, ast, new Figure(name));
+export function compile(name, ast, options) {
+  return next(null, ast, new Figure(name), options);
 }
