@@ -32,6 +32,9 @@ export class Figure {
 
     sn.add([
       `\n`,
+      `/**\n`,
+      ` * @class\n`,
+      ` */\n`,
       `function ${this.name}() {\n`,
       `  Monkberry.call(this);\n`,
       `  var _this = this;\n`,
@@ -83,7 +86,8 @@ export class Figure {
 
     sn.add([
       `${this.name}.prototype = Object.create(Monkberry.prototype);\n`,
-      `${this.name}.prototype.constructor = ${this.name};\n`
+      `${this.name}.prototype.constructor = ${this.name};\n`,
+      `${this.name}.pool = [];\n`
     ]);
 
     sn.add(this.generateUpdateFunction());
@@ -132,7 +136,7 @@ export class Figure {
     for (let spot of spots) {
       if (spot.length == 1) {
         let name = spot.variables[0];
-        sn.add(`  if (__data__.${name}) {\n`);
+        sn.add(`  if (__data__.${name} !== undefined) {\n`);
 
         if (spot.cache) {
           sn.add(`    this.__cache__.${name} = __data__.${name};\n`);
@@ -145,17 +149,18 @@ export class Figure {
         sn.add(`  }\n`);
       } else {
 
-        let variables = spot.variables.map(name => `this.__cache__.${name}`);
+        let cond = sourceNode(spot.variables.map(name => `this.__cache__.${name} !== undefined`)).join(` && `);
+        let params = sourceNode(spot.variables.map(name => `this.__cache__.${name}`)).join(`, `);
 
         sn.add([
-          `  if (`, sourceNode(variables).join(` && `), `) {\n`,
-          `    this.__update__.${spot.reference}(__data__, `, sourceNode(variables).join(`, `), `);\n`,
+          `  if (`, cond, `) {\n`,
+          `    this.__update__.${spot.reference}(__data__, `, params, `);\n`,
           `  }\n`
         ]);
       }
     }
 
-    sn.add(`}\n`);
+    sn.add(`};\n`);
     return sn;
   }
 

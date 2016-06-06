@@ -18,7 +18,7 @@ export default {
       figure.declare(sourceNode(`var ${placeholder} = document.createComment('for');`));
     }
 
-    figure.declare(sourceNode(`var ${childrenName} = monkberry.map();`));
+    figure.declare(sourceNode(`var ${childrenName} = new Monkberry.Map();`));
 
     // for (
 

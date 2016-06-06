@@ -6,7 +6,7 @@ export default {
     figure.children = node.body.map((child) => compile(child)).filter(notNull);
 
     return sourceNode(node.loc, [
-      `var Monkberry = require('monkberry');\n`,
+      `var Monkberry = typeof require !== 'undefined' ? require('monkberry') : Monkberry;\n`,
       figure.generate(),
       `\n`,
       `if (typeof module !== 'undefined') {\n`,

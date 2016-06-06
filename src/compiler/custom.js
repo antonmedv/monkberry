@@ -15,7 +15,7 @@ export default {
     if (isSingleChild(parent, node)) {
       placeholder = parent.reference;
     } else {
-      node.reference = placeholder = 'for' + figure.uniqid('placeholder');
+      node.reference = placeholder = 'custom' + figure.uniqid('placeholder');
       figure.declare(sourceNode(`var ${placeholder} = document.createComment('${node.name}');`));
     }
 
