@@ -1,11 +1,13 @@
 describe('For tags', function () {
+  var root;
+
   beforeEach(function () {
     jasmine.addMatchers(customMatchers);
+    root = document.createElement('div');
   });
 
   it('should render arrays', function () {
-    var view = monkberry.render('For');
-
+    var view = Monkberry.render(Loop, root);
     view.update({list: [1, 2, 3]});
     expect(view).toBeLike('<ul><li>0:1</li><li>1:2</li><li>2:3</li></ul>');
 
@@ -17,14 +19,13 @@ describe('For tags', function () {
   });
 
   it('should render arrays with externals', function () {
-    var view = monkberry.render('ForA');
-
+    var view = Monkberry.render(LoopA, root);
     view.update({list: [1, 2, 3], ext: '.js'});
     expect(view).toBeLike('<div><p>1.js</p><p>2.js</p><p>3.js</p></div>');
   });
 
   it('should iterate over objects', function () {
-    var view = monkberry.render('ForObject');
+    var view = Monkberry.render(LoopObject, root);
 
     view.update({
       obj: {
@@ -46,7 +47,7 @@ describe('For tags', function () {
   });
 
   it('should iterate over arrays without options', function () {
-    var view = monkberry.render('ForObjectWithoutOptions');
+    var view = Monkberry.render(LoopObjectWithoutOptions, root);
 
     view.update({
       obj: [
@@ -60,7 +61,7 @@ describe('For tags', function () {
 
 
   it('should iterate over objects without options', function () {
-    var view = monkberry.render('ForObjectWithoutOptions');
+    var view = Monkberry.render(LoopObjectWithoutOptions, root);
 
     view.update({
       obj: {
@@ -73,7 +74,7 @@ describe('For tags', function () {
   });
 
   it('should delete old items from childred map with custom tag', function () {
-    var view = monkberry.render('ForWithCustomTag');
+    var view = Monkberry.render(LoopWithCustomTag, root);
 
     view.update({
       list: [
@@ -109,7 +110,7 @@ describe('For tags', function () {
   });
 
   it('should not expose local variables', function () {
-    var view = monkberry.render('ForLocaleVariableExpose');
+    var view = Monkberry.render(LoopLocaleVariableExpose, root);
 
     view.update({
       as: ['a', 'b'],

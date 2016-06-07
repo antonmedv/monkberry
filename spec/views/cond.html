@@ -1,9 +1,9 @@
-<If>
+<CondIf>
     <div>
         {% if test %}true: {{ context }}{% endif %}
     </div>
-</If>
-<IfElse>
+</CondIf>
+<CondElse>
     <div>
         {% if test %}
             then
@@ -11,8 +11,8 @@
             else
         {% endif %}
     </div>
-</IfElse>
-<IfExpr>
+</CondElse>
+<CondExpr>
     <div>
         {% if array.indexOf(1) != -1 %}
             (one)
@@ -22,11 +22,11 @@
             <p>{{ indep }}</p>
         {% endif %}
     </div>
-</IfExpr>
-<IfUpdate>
+</CondExpr>
+<CondUpdate>
     <div>
         {% if test %}
             {{ value }}
         {% endif %}
     </div>
-</IfUpdate>
+</CondUpdate>

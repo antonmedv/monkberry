@@ -1,10 +1,14 @@
 describe('Regression', function () {
+  var root;
+
   beforeEach(function () {
     jasmine.addMatchers(customMatchers);
+    root = document.createElement('div');
   });
 
   it('should update all values', function () {
-    var view = monkberry.render('test-parent-values', {
+    var view = Monkberry.render(RegressionParentValues, root);
+    view.update({
       value: 1,
       on: true,
       each: [1, 2, 3]
@@ -16,7 +20,8 @@ describe('Regression', function () {
 
     // Complex:
 
-    view = monkberry.render('test-parent-values-complex', {
+    view = Monkberry.render(RegressionParentValuesComplex, root);
+    view.update({
       a: 2,
       b: 3,
       on: true,
@@ -35,7 +40,8 @@ describe('Regression', function () {
   });
 
   it('should update variables in nested views', function () {
-    var view = monkberry.render('test-nested-views', {
+    var view = Monkberry.render(RegressionNestedViews, root);
+    view.update({
       value: 1,
       on: true,
       each: [1, 2, 3]
@@ -47,22 +53,18 @@ describe('Regression', function () {
   });
 
   it('should work with first level non-elements', function () {
-    var view = monkberry.render('FirstLevelStatements');
-    var node = document.createElement('div');
-    view.appendTo(node);
+    var view = Monkberry.render(FirstLevelStatements, root);
     view.update({
       cond: true,
       loop: [1, 2, 3],
       tag: true,
       xss: 'ok'
     });
-    expect(node).toDOM(' text <div class="if">ok</div><!--if--><div class="for">ok</div><div class="for">ok</div><div class="for">ok</div><!--for--><div class="custom">ok</div><!--first-level-tag--><i class="unsafe">ok</i><!--unsafe-->');
+    expect(root).toDOM(' text <div class="if">ok</div><!--if--><div class="for">ok</div><div class="for">ok</div><div class="for">ok</div><!--for--><div class="custom">ok</div><!--first-level-tag--><i class="unsafe">ok</i><!--unsafe-->');
   });
 
   it('should throw exception if user try to use querySelector on first level non-elements', function () {
-    var view = monkberry.render('FirstLevelStatements');
-    var node = document.createElement('div');
-    view.appendTo(node);
+    var view = Monkberry.render(FirstLevelStatements, root);
     view.update({
       cond: true,
       loop: [1, 2, 3],
@@ -77,7 +79,8 @@ describe('Regression', function () {
 
 
   it('if with custom tag', function () {
-    var view = monkberry.render('ReIfCustom', {test: true});
+    var view = Monkberry.render(ReIfCustom, root);
+    view.update({test: true});
     expect(view).toBe('<div><div> Custom tag </div><!--Tag--></div>');
 
     view.update({test: false});
@@ -88,7 +91,8 @@ describe('Regression', function () {
   });
 
   it('if with unsafe tag', function () {
-    var view = monkberry.render('ReIfUnsafe', {test: true});
+    var view = Monkberry.render(ReIfUnsafe, root);
+    view.update({test: true});
     expect(view).toBe('<div><div><i>unsafe</i></div></div>');
 
     view.update({test: false});
@@ -99,7 +103,8 @@ describe('Regression', function () {
   });
 
   it('if with custom tag', function () {
-    var view = monkberry.render('ReForCustom', {array: [1,2,3]});
+    var view = Monkberry.render(ReForCustom, root);
+    view.update({array: [1,2,3]});
     expect(view).toBe('<div><div> Custom tag </div><!--Tag--><div> Custom tag </div><!--Tag--><div> Custom tag </div><!--Tag--></div>');
 
     view.update({array: []});
@@ -110,7 +115,7 @@ describe('Regression', function () {
   });
 
   it('update loops in custom tags', function () {
-    var view = monkberry.render('UpdateLoopsInCustomTags');
+    var view = Monkberry.render(UpdateLoopsInCustomTags, root);
     view.update({
       foo: 'foo',
       bar: 'bar',
@@ -120,7 +125,7 @@ describe('Regression', function () {
   });
 
   it('should not update variables what exists only in inner scope', function () {
-    var view = monkberry.render('UpdateLocalVars');
+    var view = Monkberry.render(UpdateLocalVars, root);
 
     var data = {
       list: [[1], [2], [3]],

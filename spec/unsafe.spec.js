@@ -1,15 +1,18 @@
 describe('Unsafe', function () {
+  var root;
+
   beforeEach(function () {
     jasmine.addMatchers(customMatchers);
+    root = document.createElement('div');
   });
 
   it('should insert constants as HTML', function () {
-    var view = monkberry.render('UnsafeWithConstant');
+    var view = Monkberry.render(UnsafeWithConstant, root);
     expect(view).toBe('<div><br></div>');
   });
 
   it('should insert variables as HTML', function () {
-    var view = monkberry.render('UnsafeWithVariables');
+    var view = Monkberry.render(UnsafeWithVariables, root);
     expect(view).toBe('<div></div>');
 
     view.update({html: '<a href="javascript:XSS;">Link</a>'});
@@ -17,7 +20,8 @@ describe('Unsafe', function () {
   });
 
   it('should remove old DOM nodes and insert new', function () {
-    var view = monkberry.render('UnsafeWithVariables', {html: '<div>foo</div><br>'});
+    var view = Monkberry.render(UnsafeWithVariables, root);
+    view.update({html: '<div>foo</div><br>'});
     expect(view).toBe('<div><div>foo</div><br></div>');
 
     view.update({html: '<input type="datetime"><hr><div>baz</div>'});
@@ -31,7 +35,8 @@ describe('Unsafe', function () {
   });
 
   it('should insert unsafe with placeholders', function () {
-    var view = monkberry.render('UnsafeWithPlaceholder', {html: '<hr>'});
+    var view = Monkberry.render(UnsafeWithPlaceholder, root);
+    view.update({html: '<hr>'});
     expect(view).toBe('<div><br><!--unsafe--><hr><!--unsafe--></div>');
 
     view.update({html: '<br><!-- comment --><link href="http://monkberry.js.org">'});

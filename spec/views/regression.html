@@ -1,14 +1,14 @@
-<test-parent-values>
+<RegressionParentValues>
     <p>{{ value }}</p>
     <p>{% if on %}{{ value }}{% endif %}</p>
     <p>{% for i of each %}{{ value }}{% endfor %}</p>
-</test-parent-values>
-<test-parent-values-complex>
+</RegressionParentValues>
+<RegressionParentValuesComplex>
     <p>{{ a + b }}</p>
     <p>{% if on %}{{ a - b }}{% endif %}</p>
     <p>{% for i of each %}{{ a * b }}{% endfor %}</p>
-</test-parent-values-complex>
-<test-nested-views>
+</RegressionParentValuesComplex>
+<RegressionNestedViews>
     <p>
         {% for i of each %}
             {% if on %}
@@ -16,7 +16,7 @@
             {% endif %}
         {% endfor %}
     </p>
-</test-nested-views>
+</RegressionNestedViews>
 <FirstLevelStatements>
     text
     {% if cond %}
