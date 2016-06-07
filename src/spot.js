@@ -9,11 +9,12 @@ export class Spot {
     this.operators = [];
     this.length = this.variables.length;
     this.cache = false;
+    this.onlyFromLoop = false;
   }
 
   generate() {
     let sn = sourceNode(
-      `function (__data__, ${this.variables.join(`, `)}) {\n`
+      `function (${this.variables.join(`, `)}) {\n`
     );
 
     Object.keys(this.declaredVariables).forEach(name => {

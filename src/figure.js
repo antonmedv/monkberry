@@ -15,6 +15,7 @@ export class Figure {
     this.renderActions = [];
     this.subFigures = [];
     this.spots = {};
+    this.onUpdate = [];
     this.thisRef = false;
     this.spotMaxLength = 0;
   }
@@ -38,7 +39,7 @@ export class Figure {
       ` * @class\n`,
       ` */\n`,
       `function ${this.name}() {\n`,
-      `  Monkberry.call(this);\n`,
+      `  Monkberry.call(this);\n`
     ]);
 
     if (this.spotMaxLength > 1) {
@@ -82,6 +83,16 @@ export class Figure {
         `  // Extra render actions\n`,
         `  this.onRender = function () {\n`,
         this.generateRenderActions(), `\n`,
+        `  };\n`,
+        `\n`
+      ]);
+    }
+
+    if (this.onUpdate.length > 0) {
+      sn.add([
+        `  // On update actions\n`,
+        `  this.onUpdate = function (__data__) {\n`,
+        this.generateOnUpdate(), `\n`,
         `  };\n`,
         `\n`
       ]);
@@ -141,6 +152,10 @@ export class Figure {
     return sourceNode(this.renderActions).join(`\n`);
   }
 
+  generateOnUpdate() {
+    return sourceNode(this.onUpdate).join(`\n`);
+  }
+
   generateUpdateFunction() {
     let sn = sourceNode(
       `${this.name}.prototype.update = function (__data__) {\n`
@@ -151,14 +166,19 @@ export class Figure {
     for (let spot of spots) {
       if (spot.length == 1) {
         let name = spot.variables[0];
-        sn.add(`  if (__data__.${name} !== undefined) {\n`);
+
+        sn.add(`  if (__data__.${name} !== undefined`);
+        if (spot.onlyFromLoop) {
+          sn.add(` && __data__.__index__ !== undefined`);
+        }
+        sn.add(`) {\n`);
 
         if (spot.cache) {
           sn.add(`    this.__cache__.${name} = __data__.${name};\n`);
         }
 
         if (spot.operators.length > 0) {
-          sn.add(`    this.__update__.${spot.reference}(__data__, __data__.${name});\n`);
+          sn.add(`    this.__update__.${spot.reference}(__data__.${name});\n`);
         }
 
         sn.add(`  }\n`);
@@ -169,10 +189,14 @@ export class Figure {
 
         sn.add([
           `  if (`, cond, `) {\n`,
-          `    this.__update__.${spot.reference}(__data__, `, params, `);\n`,
+          `    this.__update__.${spot.reference}(`, params, `);\n`,
           `  }\n`
         ]);
       }
+    }
+
+    if (this.onUpdate.length > 0) {
+      sn.add(`  this.onUpdate(__data__);\n`);
     }
 
     sn.add(`};\n`);
@@ -184,6 +208,12 @@ export class Figure {
       this.uniqCounters[name] = 0
     }
     return this.uniqCounters[name]++;
+  }
+
+  hasSpot(variables) {
+    return this.spots.hasOwnProperty(
+      new Spot([].concat(variables)).reference
+    );
   }
 
   spot(variables) {
@@ -236,5 +266,9 @@ export class Figure {
 
   addImport(source) {
     this.imports.push(source);
+  }
+
+  addOnUpdate(node) {
+    this.onUpdate.push(node);
   }
 }

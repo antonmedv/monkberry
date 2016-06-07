@@ -27,7 +27,7 @@ export default {
     figure.thisRef = true;
     figure.spot(variablesOfExpression).add(
       sourceNode(node.loc, [
-        `      Monkberry.loop(_this, ${placeholder}, ${childrenName}, ${templateName}, __data__, `,
+        `      Monkberry.loop(_this, ${placeholder}, ${childrenName}, ${templateName}, `,
         compile(node.expr),
         (node.options === null ? `` : [`, `, esc(node.options)]),
         `)`
@@ -37,38 +37,28 @@ export default {
 
     // ) {
 
-    if (node.body.length > 0) {
-      let subfigure = new Figure(templateName, figure);
-      subfigure.children = node.body.map((node) => compile(node, subfigure)).filter(notNull);
+    let subfigure = new Figure(templateName, figure);
 
+    if (node.body.length > 0) {
+      subfigure.children = node.body.map((node) => compile(node, subfigure)).filter(notNull);
       figure.addFigure(subfigure);
     }
 
     if (node.options !== null) {
-      let variablesOfBody = collectVariables(node.body);
+      figure.addOnUpdate(
+        sourceNode(node.loc, [
+          `    ${childrenName}.forEach(function (view) {\n`,
+          `      view.update(__data__);\n`,
+          `    });`
+        ])
+      );
 
-      // Remove options variables.
-      for (var i = variablesOfBody.length - 1; i >= 0; i--) {
-        if (variablesOfBody[i] == node.options.value || variablesOfBody[i] == node.options.key) {
-          variablesOfBody.splice(i, 1);
+      [node.options.value, node.options.key].forEach(variable => {
+        if (subfigure.hasSpot(variable)) {
+          subfigure.spot(variable).onlyFromLoop = true;
         }
-      }
-
-      // TODO: Properly collect local variables in templates and delete `hasOwnProperty` check in `forEach`.
-
-      // Delete variables from expression to prevent double updating.
-      variablesOfBody = variablesOfBody.filter((v) => variablesOfExpression.indexOf(v) == -1);
-
-      // Add to updaters.
-      variablesOfBody.forEach((variable) => {
-        figure.spot(variable).add(
-          sourceNode(node.loc, [
-            "      ", childrenName, ".forEach(function (view) {\n",
-            "        if (view.__update__.hasOwnProperty('", variable, "')) view.__update__.", variable, "(__data__, ", variable, ");\n",
-            "      })"
-          ])
-        );
       });
+
     }
 
     // }

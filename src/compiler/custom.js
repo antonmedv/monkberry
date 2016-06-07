@@ -30,7 +30,7 @@ export default {
 
         figure.spot(attr.identifier.name).add(
           sourceNode(node.loc,
-            `      Monkberry.insert(_this, ${placeholder}, ${childName}, ${templateName}, ${attr.identifier.name}, true)`
+            `      Monkberry.insert(_this, ${placeholder}, ${childName}, ${templateName}, ${attr.identifier.name})`
           )
         );
 
@@ -52,10 +52,10 @@ export default {
 
     // Add spot for custom attribute or insert on render if no variables in attributes.
     if (variables.length > 0) {
-
+      
       figure.spot(variables).add(
         sourceNode(node.loc,
-          `      Monkberry.insert(_this, ${placeholder}, ${childName}, ${templateName}, ${data}, true)`
+          `      Monkberry.insert(_this, ${placeholder}, ${childName}, ${templateName}, ${data})`
         )
       );
 
@@ -63,7 +63,7 @@ export default {
 
       figure.addRenderActions(
         sourceNode(node.loc,
-          `    Monkberry.insert(_this, ${placeholder}, ${childName}, ${templateName}, ${data}, true);`
+          `    Monkberry.insert(_this, ${placeholder}, ${childName}, ${templateName}, ${data});`
         ));
 
     }

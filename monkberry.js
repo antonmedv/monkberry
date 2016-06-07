@@ -37,6 +37,7 @@
     this.nested = []; // Nested views.
     this.nodes = []; // Root DOM nodes.
     this.onRender = null; // Function to call on render.
+    this.onUpdate = null; // Function to call on update.
     this.onRemove = null; // Function to call on remove.
   }
 
@@ -71,15 +72,8 @@
 
   /**
    * Main loops processor.
-   * @param {Monkberry.View} parent - Parent view, where to place loop elements.
-   * @param {Element} node - Parent element, where to append child. Note what it can be a comment element.
-   * @param {Map} map - Map contains views from previous loop render.
-   * @param {string} template - Template name to render.
-   * @param {*} data - Data object passed into view.update() function.
-   * @param {*} array - Data iterating on.
-   * @param {object} options - Loop options, value and key names.
    */
-  Monkberry.loop = function (parent, node, map, template, data, array, options) {
+  Monkberry.loop = function (parent, node, map, template, array, options) {
     var i, j, len, keys, transform, arrayLength, childrenSize = map.length;
 
     // Get array length, and convert object to array if needed.
@@ -105,7 +99,7 @@
     // If there is already some views, update there data with new.
     j = 0;
     for (i in map.items) {
-      map.items[i].update(transform(data, array, keys, j, options));
+      map.items[i].update(transform(array, keys, j, options));
       j++;
     }
 
@@ -118,9 +112,6 @@
       view.parent = parent;
       parent.nested.push(view);
 
-      // Set view data (note what it must be after adding nodes to DOM).
-      view.update(transform(data, array, keys, j, options));
-
       // Remember to remove from children map on view remove.
       i = map.push(view);
       view.onRemove = (function (i) {
@@ -128,24 +119,18 @@
           map.remove(i);
         };
       })(i);
+
+      // Set view data (note what it must be after adding nodes to DOM).
+      view.update(transform(array, keys, j, options));
     }
   };
 
   /**
-   * Main if/else, custom tags processor.
-   * @param {Monkberry.View} parent - Parent view, where to place loop elements.
-   * @param {Element} node - Parent element, where to append child. Note what it can be a comment element.
-   * @param {{ref:object}} child - Object which may contains previous rendered view.
-   * @param {string} template - Template name to render.
-   * @param {*} data - Data object passed into view.update() function.
-   * @param {boolean} test - Whenever to insert then view.
-   * @return {boolean} Returns test value.
+   * Main if processor.
    */
-  Monkberry.insert = function (parent, node, child/*.ref*/, template, data, test) {
+  Monkberry.cond = function (parent, node, child/*.ref*/, template, test) {
     if (child.ref) { // If view was already inserted, update or remove it.
-      if (test) {
-        child.ref.update(data);
-      } else {
+      if (!test) {
         child.ref.remove();
       }
     } else if (test) {
@@ -155,9 +140,6 @@
       // Set view hierarchy.
       view.parent = parent;
       parent.nested.push(view);
-
-      // Set view data (note what it must be after adding nodes to DOM).
-      view.update(data);
 
       // Remember to remove child ref on remove of view.
       child.ref = view;
@@ -170,9 +152,34 @@
   };
 
   /**
+   * Main custom tags processor.
+   */
+  Monkberry.insert = function (parent, node, child/*.ref*/, template, data) {
+    if (child.ref) { // If view was already inserted, update or remove it.
+        child.ref.update(data);
+    } else {
+      // Render new view.
+      var view = Monkberry.render(template, node);
+
+      // Set view hierarchy.
+      view.parent = parent;
+      parent.nested.push(view);
+
+      // Remember to remove child ref on remove of view.
+      child.ref = view;
+      view.onRemove = function () {
+        child.ref = null;
+      };
+
+      // Set view data (note what it must be after adding nodes to DOM).
+      view.update(data);
+    }
+  };
+
+  /**
    * Prerepder view for future usage.
-   * @param {string} name - Template name.
-   * @param {number} times - Times of prerender.
+   * @param {String} name - Template name.
+   * @param {Number} times - Times of prerender.
    */
   Monkberry.prototype.prerender = function (name, times) {
     while (times--) {
@@ -316,9 +323,9 @@
   // Will transform data for "key, value of array" constructions.
   //
 
-  function transformArray(data, array, keys, i, options) {
+  function transformArray(array, keys, i, options) {
     if (options) {
-      var t = data;
+      var t = {__index__: i};
       t[options.value] = array[i];
 
       if (options.key) {
@@ -331,9 +338,9 @@
     }
   }
 
-  function transformObject(data, array, keys, i, options) {
+  function transformObject(array, keys, i, options) {
     if (options) {
-      var t = data;
+      var t = {__index__: i};
       t[options.value] = array[keys[i]];
 
       if (options.key) {

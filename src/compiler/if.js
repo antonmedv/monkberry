@@ -32,11 +32,13 @@ export default {
     var variablesOfExpression = collectVariables(node.cond);
 
     figure.thisRef = true;
+    figure.hasNested = true;
+    
     figure.spot(variablesOfExpression).add(
       sourceNode(node.loc, [
         `      `,
         node.otherwise ? `result = ` : ``,
-        `Monkberry.insert(_this, ${placeholder}, ${childNameForThen}, ${templateNameForThen}, __data__, `, compile(node.cond), `)`
+        `Monkberry.cond(_this, ${placeholder}, ${childNameForThen}, ${templateNameForThen}, `, compile(node.cond), `)`
       ])
     );
 
@@ -44,7 +46,7 @@ export default {
       figure.spot(variablesOfExpression).add(
         sourceNode(node.loc, [
           `      `,
-          `Monkberry.insert(_this, ${placeholder}, ${childNameForOtherwise}, ${templateNameForOtherwise}, __data__, !result)`
+          `Monkberry.cond(_this, ${placeholder}, ${childNameForOtherwise}, ${templateNameForOtherwise}, !result)`
         ])
       ).declareVariable('result');
     }
@@ -56,19 +58,13 @@ export default {
       subfigure.children = body.map(node => compile(node, subfigure)).filter(notNull);
       figure.addFigure(subfigure);
 
-      let variablesOfBody = collectVariables(body);
-
-      // Delete variables from expression to prevent double updating.
-      variablesOfBody = variablesOfBody.filter((v) => variablesOfExpression.indexOf(v) == -1);
-
-      variablesOfBody.forEach((variable) => {
-        figure.spot(variable).add(
-          sourceNode(loc, [
-          `      `,
-          // TODO: Properly collect local variables in templates and delete `hasOwnProperty` check in `if` refs.
-          `${childName}.ref && ${childName}.ref.__update__.hasOwnProperty('${variable}') && ${childName}.ref.__update__.${variable}(__data__, ${variable})`
-        ]));
-      });
+      figure.addOnUpdate(
+        sourceNode(loc, [
+          `    if (${childName}.ref) {\n`,
+          `      ${childName}.ref.update(__data__);\n`,
+          `    }`
+        ])
+      );
     };
 
     compileBody(node.loc, node.then, templateNameForThen, childNameForThen);
@@ -84,21 +80,3 @@ export default {
     return node.reference;
   }
 };
-
-
-function compileBody(figure, loc, templateName, childName, body, variablesOfExpression) {
-  figure.subFigures.push(figure.createFigure(templateName, body));
-
-  var variablesOfBody = collectVariables(body);
-
-  // Delete variables from expression to prevent double updating.
-  variablesOfBody = variablesOfBody.filter((v) => variablesOfExpression.indexOf(v) == -1);
-
-  variablesOfBody.forEach((variable) => {
-    figure.onUpdater(variable).add(sourceNode(loc, [
-      `      `,
-      // TODO: Properly collect local variables in templates and delete `hasOwnProperty` check in `if` refs.
-      `${childName}.ref && ${childName}.ref.__update__.hasOwnProperty('${variable}') && ${childName}.ref.__update__.${variable}(__data__, ${variable})`
-    ]));
-  });
-}
