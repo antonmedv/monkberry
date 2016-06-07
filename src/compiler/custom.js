@@ -1,5 +1,5 @@
 import { sourceNode } from './sourceNode';
-import { collectVariables } from './expression/variable';
+import { collectVariables } from './variable';
 import { isSingleChild, unique, notNull, getTemplateName } from '../utils';
 import { compileToExpression } from './attribute';
 import { Figure } from '../figure';
@@ -36,8 +36,8 @@ export default {
 
       } else {
 
-        let [expr, ] = compileToExpression(attr, compile); // TODO: Add support for default value in custom tag attributes attr={{ value || 'default' }}.
-        variables = variables.concat(collectVariables(expr));
+        let [expr, ] = compileToExpression(figure, attr, compile); // TODO: Add support for default value in custom tag attributes attr={{ value || 'default' }}.
+        variables = variables.concat(collectVariables(figure.getScope(), expr));
 
         let property = sourceNode(node.loc, [`'${attr.name}': ${compile(expr)}`]);
         data.push(property);

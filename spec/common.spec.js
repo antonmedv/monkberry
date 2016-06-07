@@ -140,7 +140,7 @@ describe('Monkberry', function () {
     var view = Monkberry.render(Globals, root);
     view.update({host: window.location.host});
 
-    expect(view).toBeLike('<i>expr, if<!--if-->, for<!--for-->, <i class="attr"></i>, custom<!--custom--></i>');
+    expect(view).toBeLike('<i>expr, if<!--if-->, for<!--for-->, <i class="attr"></i>, custom<!--GlobalsCustom--></i>');
   });
 
   it('should support expressions without variables', function () {

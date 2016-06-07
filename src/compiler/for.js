@@ -1,5 +1,5 @@
 import { sourceNode } from './sourceNode';
-import { collectVariables } from './expression/variable';
+import { collectVariables } from './variable';
 import { isSingleChild, esc, notNull } from '../utils';
 import { Figure } from '../figure';
 
@@ -22,7 +22,7 @@ export default {
 
     // for (
 
-    let variablesOfExpression = collectVariables(node.expr);
+    let variablesOfExpression = collectVariables(figure.getScope(), node.expr);
 
     figure.thisRef = true;
     figure.spot(variablesOfExpression).add(

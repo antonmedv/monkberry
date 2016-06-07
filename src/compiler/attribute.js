@@ -1,6 +1,6 @@
 import { ast } from 'monkberry-parser';
 import { sourceNode } from './sourceNode';
-import { collectVariables } from './expression/variable';
+import { collectVariables } from './variable';
 import { esc, arrayToObject } from '../utils';
 
 /**
@@ -30,9 +30,9 @@ export default {
    * @param {Function} compile
    */
   Attribute: ({parent, node, figure, compile}) => {
-    let [expr, defaults] = compileToExpression(node, compile);
+    let [expr, defaults] = compileToExpression(figure, node, compile);
 
-    var variables = collectVariables(expr);
+    var variables = collectVariables(figure.getScope(), expr);
 
     if (variables.length == 0) {
       figure.construct(sourceNode(node.loc, [
@@ -116,11 +116,12 @@ export default {
  *
  * Also collects default values for attribute: `cat ` and variables name with default: ['moo'].
  *
+ * @param {Figure} figure
  * @param {Object} node
  * @param {Function} compile
  * @returns {*[]}
  */
-export function compileToExpression(node, compile) {
+export function compileToExpression(figure, node, compile) {
   let expr, defaults = [];
 
   let pushDefaults = (node) => {
@@ -134,7 +135,7 @@ export function compileToExpression(node, compile) {
       //
       // it set class attribute fo 'default'.
 
-      if (collectVariables(node.expression.right) == 0) {
+      if (collectVariables(figure.getScope(), node.expression.right) == 0) {
         defaults.push(compile(node.expression.right));
       }
     }

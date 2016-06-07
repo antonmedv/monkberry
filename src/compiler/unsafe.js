@@ -1,5 +1,5 @@
 import { sourceNode } from './sourceNode';
-import { collectVariables } from './expression/variable';
+import { collectVariables } from './variable';
 import { isSingleChild } from '../utils';
 
 export default {
@@ -24,7 +24,7 @@ export default {
     let code = unsafe.toString().replace(/(\s{2,}|\n)/g, '');
     figure.root().addFunction('__unsafe', sourceNode(null, code));
 
-    let variables = collectVariables(node.html);
+    let variables = collectVariables(figure.getScope(), node.html);
 
     if (variables.length == 0) {
       figure.addRenderActions(

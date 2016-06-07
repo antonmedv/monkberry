@@ -1,14 +1,13 @@
-import { config } from '../../config';
-import { visit } from '../../visitor';
+import { visit } from '../visitor';
 
-export function collectVariables(node) {
+export function collectVariables(scope, node) {
   var variables = [];
   if (node) {
     var nodes = [].concat(node);
     nodes.forEach((node) => {
       visit(node, {
         Identifier: (node) => {
-          if (variables.indexOf(node.name) == -1 && config.globals.indexOf(node.name) == -1) {
+          if (variables.indexOf(node.name) == -1 && scope.indexOf(node.name) == -1) {
             variables.push(node.name);
           }
         }

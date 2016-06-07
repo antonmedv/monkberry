@@ -70,9 +70,9 @@
         {% if host == window.location.host %}if{% endif %},
         {% for i of [host == window.location.host] %}{{ i ? 'for' : '' }}{% endfor %},
         <i class="{{ host == window.location.host ? 'attr' : '' }}"></i>,
-        <custom host={{ host == window.location.host }}>
+        <GlobalsCustom host={{ host == window.location.host }}>
             {{ host ? 'custom' : '' }}
-        </custom>
+        </GlobalsCustom>
     </i>
 </Globals>
 <EmptyExpression>

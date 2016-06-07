@@ -1,5 +1,5 @@
 import { sourceNode } from './sourceNode';
-import { collectVariables } from './expression/variable';
+import { collectVariables } from './variable';
 
 export default {
   ExpressionStatement: ({node, compile, figure}) => {
@@ -9,7 +9,7 @@ export default {
 
     if (node.expression.type == 'LogicalExpression' && node.expression.operator == '||') {
       // Add as default right side of "||" expression if there are no variables.
-      if (collectVariables(node.expression.right) == 0) {
+      if (collectVariables(figure.getScope(), node.expression.right) == 0) {
         defaultValue = compile(node.expression.right);
       }
     }
@@ -18,7 +18,7 @@ export default {
       sourceNode(`var ${node.reference} = document.createTextNode(${defaultValue});`)
     );
 
-    let variables = collectVariables(node.expression);
+    let variables = collectVariables(figure.getScope(), node.expression);
 
     if (variables.length == 0) {
       figure.construct(

@@ -15,6 +15,7 @@ export class Figure {
     this.renderActions = [];
     this.subFigures = [];
     this.spots = {};
+    this.scope = [];
     this.onUpdate = [];
     this.thisRef = false;
     this.spotMaxLength = 0;
@@ -239,6 +240,14 @@ export class Figure {
       return this.parent.root();
     } else {
       return this;
+    }
+  }
+
+  getScope() {
+    if (this.parent) {
+      return [].concat(this.scope).concat(this.parent.getScope());
+    } else {
+      return this.scope;
     }
   }
 

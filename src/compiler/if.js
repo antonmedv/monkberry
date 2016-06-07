@@ -1,6 +1,6 @@
 import { sourceNode } from './sourceNode';
 import { Figure } from '../figure';
-import { collectVariables } from './expression/variable';
+import { collectVariables } from './variable';
 import { isSingleChild, notNull } from '../utils';
 
 export default {
@@ -29,7 +29,7 @@ export default {
 
     // if (
 
-    var variablesOfExpression = collectVariables(node.cond);
+    var variablesOfExpression = collectVariables(figure.getScope(), node.cond);
 
     figure.thisRef = true;
     figure.hasNested = true;

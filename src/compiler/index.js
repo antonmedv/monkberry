@@ -39,6 +39,8 @@ function next(parent, node, figure, options) {
   }
 }
 
-export function compile(name, ast, options) {
-  return next(null, ast, new Figure(name), options);
+export function compile(name, ast, options, globals) {
+  let figure = new Figure(name);
+  figure.scope = globals;
+  return next(null, ast, figure, options);
 }

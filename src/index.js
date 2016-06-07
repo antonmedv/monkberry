@@ -21,7 +21,7 @@ export class Compiler {
     // Transform.
     Object.keys(this.transforms).forEach((key) => this.transforms[key](ast));
 
-    return compile(getTemplateName(getBaseName(filename)), ast, this.options);
+    return compile(getTemplateName(getBaseName(filename)), ast, this.options, this.globals);
   }
 }
 
