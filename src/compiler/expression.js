@@ -33,8 +33,8 @@ export default {
     return node.reference;
   },
 
-  FilterExpression: ({node, compile}) => {
-    var sn = sourceNode(node.loc, ['__filters.', compile(node.callee), '(']);
+  FilterExpression: ({node, figure, compile}) => {
+    var sn = sourceNode(node.loc, [figure.root().name, '.filters.', compile(node.callee), '(']);
 
     for (let i = 0; i < node.arguments.length; i++) {
       if (i !== 0) {

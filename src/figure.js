@@ -100,6 +100,11 @@ export class Figure {
       `${this.name}.pool = [];\n`
     ]);
 
+    // If this figure is root figure.
+    if (this.parent == null) {
+      sn.add(`${this.name}.filters = {};\n`);
+    }
+
     sn.add(this.generateUpdateFunction());
 
     for (let subfigure of this.subFigures) {

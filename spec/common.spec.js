@@ -83,12 +83,12 @@ describe('Monkberry', function () {
   });
 
   it('should properly for with filters', function () {
-    // monkberry.filters.append = function (value, text) {
-    //   return value + text;
-    // };
-    // monkberry.filters.upperCase = function (value) {
-    //   return value.toUpperCase();
-    // };
+    common.filters.append = function (value, text) {
+      return value + text;
+    };
+    common.filters.upperCase = function (value) {
+      return value.toUpperCase();
+    };
 
     var view = Monkberry.render(CommonFilters, root);
     view.update({text: 'upper_'});
