@@ -1,96 +1,106 @@
 import { sourceNode } from './sourceNode';
-import { collectVariables } from './expression/variable';
+import { collectVariables } from './variable';
 
-export default function (ast) {
-  ast.ExpressionStatementNode.prototype.compile = function (figure) {
-    this.nodeName = 'text' + figure.uniqid();
+export default {
+  ExpressionStatement: ({node, compile, figure}) => {
+    node.reference = 'text' + figure.uniqid();
 
     let defaultValue = `''`;
 
-    if (this.expression.type == 'LogicalExpression' && this.expression.operator == '||') {
+    if (node.expression.type == 'LogicalExpression' && node.expression.operator == '||') {
       // Add as default right side of "||" expression if there are no variables.
-      if (collectVariables(this.expression.right) == 0) {
-        defaultValue = this.expression.right.compile();
+      if (collectVariables(figure.getScope(), node.expression.right) == 0) {
+        defaultValue = compile(node.expression.right);
       }
     }
 
-    figure.declarations.push(
-      sourceNode(null, `var ${this.nodeName} = document.createTextNode(${defaultValue});`)
+    figure.declare(
+      sourceNode(`var ${node.reference} = document.createTextNode(${defaultValue});`)
     );
 
-    var variables = collectVariables(this.expression);
+    let variables = collectVariables(figure.getScope(), node.expression);
 
     if (variables.length == 0) {
-      figure.construct.push(sourceNode(this.loc, [this.nodeName, '.textContent = ', this.expression.compile(), ';']));
+      figure.construct(
+        sourceNode(node.loc, [node.reference, '.textContent = ', compile(node.expression)])
+      );
     } else {
-      figure.addUpdater(this.loc, variables, () => sourceNode(this.loc, ['      ', this.nodeName, '.textContent = ', this.expression.compile()]));
+      figure.spot(variables).add(
+        sourceNode(node.loc, [`      `, node.reference, '.textContent = ', compile(node.expression)])
+      );
     }
 
-    return this.nodeName;
-  };
+    return node.reference;
+  },
 
-  ast.FilterExpressionNode.prototype.compile = function () {
-    var sn = sourceNode(this.loc, ['__filters.', this.callee.compile(), '(']);
+  FilterExpression: ({node, figure, compile}) => { 
+    let prefix = ``;
 
-    for (let i = 0; i < this.arguments.length; i++) {
+    if (!figure.isInScope(node.callee.name)) {
+      prefix = `${figure.root().name}.filters.`;
+    }
+    
+    let sn = sourceNode(node.loc, [prefix, compile(node.callee), '(']);
+
+    for (let i = 0; i < node.arguments.length; i++) {
       if (i !== 0) {
         sn.add(', ');
       }
 
-      sn.add(this.arguments[i].compile());
+      sn.add(compile(node.arguments[i]));
     }
 
     return sn.add(')');
-  };
+  },
 
-  ast.ArrayExpressionNode.prototype.compile = function () {
-    var sn = sourceNode(this.loc, '[');
-    var elements = this.elements;
+  ArrayExpression: ({node, compile}) => {
+    let sn = sourceNode(node.loc, '[');
+    let elements = node.elements;
 
-    for (var i = 0; i < this.elements.length; i++) {
+    for (let i = 0; i < node.elements.length; i++) {
       if (i !== 0) {
         sn.add(', ');
       }
 
-      sn.add(elements[i].compile());
+      sn.add(compile(elements[i]));
     }
 
     return sn.add(']');
-  };
+  },
 
-  ast.ObjectExpressionNode.prototype.compile = function () {
-    var sn = sourceNode(this.loc, '({');
+  ObjectExpression: ({node, compile}) => {
+    let sn = sourceNode(node.loc, '({');
 
-    for (let i = 0; i < this.properties.length; i++) {
-      var prop = this.properties[i];
-      var kind = prop.kind;
-      var key = prop.key;
-      var value = prop.value;
+    for (let i = 0; i < node.properties.length; i++) {
+      let prop = node.properties[i];
+      let kind = prop.kind;
+      let key = prop.key;
+      let value = prop.value;
 
       if (i !== 0) {
         sn.add(', ');
       }
 
       if (kind === 'init') {
-        sn.add([key.compile(), ': ', value.compile()]);
+        sn.add([compile(key), ': ', compile(value)]);
       } else {
-        var params = value.params;
-        var body = value.body;
+        let params = value.params;
+        let body = value.body;
 
-        sn.add([kind, ' ', key.compile(), '(']);
+        sn.add([kind, ' ', compile(key), '(']);
 
         for (let j = 0; j < params.length; j++) {
           if (j !== 0) {
             sn.add(', ');
           }
 
-          sn.add(params[j].compile());
+          sn.add(compile(params[j]));
         }
 
         sn.add(') { ');
 
         for (let j = 0; j < body.length; j++) {
-          sn.add([body[j].compile(), ' ']);
+          sn.add([compile(body[j]), ' ']);
         }
 
         sn.add('}');
@@ -98,105 +108,105 @@ export default function (ast) {
     }
 
     return sn.add('})');
-  };
+  },
 
-  ast.SequenceExpressionNode.prototype.compile = function () {
-    var sn = sourceNode(this.loc, '');
+  SequenceExpression: ({node, compile}) => {
+    let sn = sourceNode(node.loc, '');
 
-    for (var i = 0; i < this.expressions.length; i++) {
+    for (let i = 0; i < node.expressions.length; i++) {
       if (i !== 0) {
         sn.add(', ');
       }
 
-      sn.add(this.expressions[i].compile());
+      sn.add(compile(node.expressions[i]));
     }
 
     return sn;
-  };
+  },
 
-  ast.UnaryExpressionNode.prototype.compile = function () {
-    if (this.operator == 'delete' || this.operator == 'void' || this.operator == 'typeof') {
-      return sourceNode(this.loc, [this.operator, ' (', this.argument.compile(), ')']);
+  UnaryExpression: ({node, compile}) => {
+    if (node.operator == 'delete' || node.operator == 'void' || node.operator == 'typeof') {
+      return sourceNode(node.loc, [node.operator, ' (', compile(node.argument), ')']);
     } else {
-      return sourceNode(this.loc, [this.operator, '(', this.argument.compile(), ')']);
+      return sourceNode(node.loc, [node.operator, '(', compile(node.argument), ')']);
     }
-  };
+  },
 
-  ast.BinaryExpressionNode.prototype.compile = function () {
-    return sourceNode(this.loc, ['(', this.left.compile(), ') ', this.operator, ' (', this.right.compile(), ')']);
-  };
+  BinaryExpression: ({node, compile}) => {
+    return sourceNode(node.loc, ['(', compile(node.left), ') ', node.operator, ' (', compile(node.right), ')']);
+  },
 
-  ast.AssignmentExpressionNode.prototype.compile = function () {
-    return sourceNode(this.loc, ['(', this.left.compile(), ') ', this.operator, ' (', this.right.compile(), ')']);
-  };
+  AssignmentExpression: ({node, compile}) => {
+    return sourceNode(node.loc, ['(', compile(node.left), ') ', node.operator, ' (', compile(node.right), ')']);
+  },
 
-  ast.UpdateExpressionNode.prototype.compile = function () {
-    if (this.prefix) {
-      return sourceNode(this.loc, ['(', this.operator, this.argument.compile(), ')']);
+  UpdateExpression: ({node, compile}) => {
+    if (node.prefix) {
+      return sourceNode(node.loc, ['(', node.operator, compile(node.argument), ')']);
     } else {
-      return sourceNode(this.loc, ['(', this.argument.compile(), this.operator, ')']);
+      return sourceNode(node.loc, ['(', compile(node.argument), node.operator, ')']);
     }
-  };
+  },
 
-  ast.LogicalExpressionNode.prototype.compile = function () {
-    return sourceNode(this.loc, ['(', this.left.compile(), ') ', this.operator, ' (' + this.right.compile(), ')']);
-  };
+  LogicalExpression: ({node, compile}) => {
+    return sourceNode(node.loc, ['(', compile(node.left), ') ', node.operator, ' (' + compile(node.right), ')']);
+  },
 
-  ast.ConditionalExpressionNode.prototype.compile = function () {
-    return sourceNode(this.loc, ['(', this.test.compile(), ') ? ', this.consequent.compile(), ' : ', this.alternate.compile()]);
-  };
+  ConditionalExpression: ({node, compile}) => {
+    return sourceNode(node.loc, ['(', compile(node.test), ') ? ', compile(node.consequent), ' : ', compile(node.alternate)]);
+  },
 
-  ast.NewExpressionNode.prototype.compile = function () {
-    var sn = sourceNode(this.loc, ['new ', this.callee.compile()]);
+  NewExpression: ({node, compile}) => {
+    let sn = sourceNode(node.loc, ['new ', compile(node.callee)]);
 
-    if (this.arguments !== null) {
+    if (node.arguments !== null) {
       sn.add('(');
 
-      for (var i = 0; i < this.arguments.length; i++) {
+      for (let i = 0; i < node.arguments.length; i++) {
         if (i !== 0) {
           sn.add(', ');
         }
 
-        sn.add(this.arguments[i].compile());
+        sn.add(compile(node.arguments[i]));
       }
 
       sn.add(')');
     }
 
     return sn;
-  };
+  },
 
-  ast.CallExpressionNode.prototype.compile = function () {
-    var sn = sourceNode(this.loc, [this.callee.compile(), '(']);
+  CallExpression: ({node, compile}) => {
+    let sn = sourceNode(node.loc, [compile(node.callee), '(']);
 
-    for (let i = 0; i < this.arguments.length; i++) {
+    for (let i = 0; i < node.arguments.length; i++) {
       if (i !== 0) {
         sn.add(', ');
       }
 
-      sn.add(this.arguments[i].compile());
+      sn.add(compile(node.arguments[i]));
     }
 
     return sn.add(')');
-  };
+  },
 
-  ast.MemberExpressionNode.prototype.compile = function () {
-    if (this.computed) {
-      return sourceNode(this.loc, [this.object.compile(), '[', this.property.compile(), ']']);
+  MemberExpression: ({node, compile}) => {
+    if (node.computed) {
+      return sourceNode(node.loc, [compile(node.object), '[', compile(node.property), ']']);
     } else {
-      return sourceNode(this.loc, [this.object.compile(), '.', this.property.compile()]);
+      return sourceNode(node.loc, [compile(node.object), '.', compile(node.property)]);
     }
-  };
+  },
 
-  ast.IdentifierNode.prototype.compile = function () {
-    return sourceNode(this.loc, this.name);
-  };
+  Identifier: ({node}) => {
+    return sourceNode(node.loc, node.name);
+  },
 
-  ast.AccessorNode.prototype.compile = function () {
-    return sourceNode(this.loc, this.name);
-  };
+  Accessor: ({node}) => {
+    return sourceNode(node.loc, node.name);
+  },
 
-  ast.LiteralNode.prototype.compile = function () {
-    return sourceNode(this.loc, this.value.toString());
-  };
-}
+  Literal: ({node}) => {
+    return sourceNode(node.loc, node.value.toString());
+  }
+};

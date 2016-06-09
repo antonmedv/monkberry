@@ -1,10 +1,14 @@
 describe('If tags', function () {
+  var root;
+
   beforeEach(function () {
     jasmine.addMatchers(customMatchers);
+    root = document.createElement('div');
   });
 
   it('should properly work', function () {
-    var view = monkberry.render('If', {test: true, context: 'parent data'});
+    var view = Monkberry.render(CondIf, root);
+    view.update({test: true, context: 'parent data'});
     expect(view).toBeLike('<div>true: parent data</div>');
 
     view.update({test: false});
@@ -13,7 +17,8 @@ describe('If tags', function () {
     view.update({test: true});
     expect(view).toBeLike('<div>true: parent data</div>');
 
-    view = monkberry.render('IfElse', {test: true});
+    view = Monkberry.render(CondElse, root);
+    view.update({test: true});
     expect(view).toBeLike('<div> then </div>');
 
     view.update({test: false});
@@ -21,7 +26,8 @@ describe('If tags', function () {
   });
 
   it('should work with expression', function () {
-    var view = monkberry.render('IfExpr', {
+    var view = Monkberry.render(CondExpr, root);
+    view.update({
       array: [1, 2, 3, 4, 5],
       look: 3,
       indep: 'independent'
@@ -33,7 +39,8 @@ describe('If tags', function () {
   });
 
   it('should update only one view', function () {
-    var view = monkberry.render('IfUpdate', {
+    var view = Monkberry.render(CondUpdate, root);
+    view.update({
       test: true,
       value: 'old'
     });

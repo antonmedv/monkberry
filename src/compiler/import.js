@@ -1,9 +1,17 @@
 import { sourceNode } from './sourceNode';
-import { esc } from '../utils';
 
-export default function (ast) {
-  ast.ImportStatementNode.prototype.compile = function (figure) {
-    figure.root.addImport(this.loc, this.path.value);
+export default {
+  /**
+   * @return {null}
+   */
+  ImportStatement: ({node, figure}) => {
+    // TODO: Add support for ES2015 imports.
+    figure.root().addImport(
+      sourceNode(node.loc, `var ${node.identifier.name} = require(${node.path.value});`)
+    );
+
+    figure.addToScope(node.identifier.name);
+
     return null;
-  };
-}
+  }
+};

@@ -1,168 +1,207 @@
-import { sourceNode, join } from './compiler/sourceNode';
-import { Updater } from './compiler/updater';
-import { size, uniqueName, map } from './utils';
+import { sourceNode } from './compiler/sourceNode';
+import { size } from './utils';
+import { Spot } from './spot';
 
 export class Figure {
-  constructor(name, root) {
+  constructor(name, parent = null) {
     this.name = name;
-    this.root = root;
+    this.parent = parent;
     this.uniqCounters = {};
     this.children = [];
     this.functions = {};
+    this.imports = [];
     this.declarations = [];
-    this.construct = [];
-    this.complexUpdaters = {};
-    this.updaters = {};
-    this.variables = {};
+    this.constructions = [];
     this.renderActions = [];
     this.subFigures = [];
-    this.perceivedAsLibrary = false;
+    this.spots = {};
+    this.scope = [];
+    this.onUpdate = [];
+    this.thisRef = false;
+    this.spotMaxLength = 0;
   }
 
-  createFigure(name, nodes) {
-    var figure = new Figure(name, this.root);
-    figure.children = map(nodes, (node) => node.compile(figure));
-    return figure;
-  }
+  generate() {
+    let sn = sourceNode(``);
 
-  compile() {
-    var sn = sourceNode(null, 'function () {\n');
+    if (this.imports.length > 0) {
+      sn.add(sourceNode(this.imports).join(`\n`));
+      sn.add(`\n`);
+    }
+
+    if (size(this.functions) > 0) {
+      sn.add(`\n`);
+      sn.add(this.generateFunctions());
+    }
+
+    sn.add([
+      `\n`,
+      `/**\n`,
+      ` * @class\n`,
+      ` */\n`,
+      `function ${this.name}() {\n`,
+      `  Monkberry.call(this);\n`
+    ]);
+
+    if (this.spotMaxLength > 1) {
+      sn.add(`  this.__cache__ = {};\n`);
+    }
+
+    if (this.thisRef) {
+      sn.add(`  var _this = this;\n`);
+    }
+
+    sn.add(`\n`);
 
     if (this.declarations.length > 0) {
-      sn.add('  // Create elements\n')
-        .add(['  ', this.compileDeclarations(), '\n'])
-        .add('\n');
+      sn.add([
+        `  // Create elements\n`,
+        `  `, sourceNode(this.declarations).join(`\n  `),
+        `\n\n`
+      ]);
     }
 
-    if (this.construct.length > 0) {
-      sn.add('  // Construct dom\n')
-        .add(['  ', this.compileDomConstruction(), '\n'])
-        .add('\n');
+    if (this.constructions.length > 0) {
+      sn.add([
+        `  // Construct dom\n`,
+        `  `, sourceNode(null, this.constructions).join(`\n  `),
+        `\n\n`
+      ]);
     }
 
-    sn.add('  // Create view\n')
-      .add('  var view = monkberry.view();\n')
-      .add('\n');
-
-    if (size(this.complexUpdaters) > 0) {
-      sn.add('  // Complex update functions\n')
-        .add('  var __cache__ = view.__cache__ = {};\n')
-        .add('  var ')
-        .add([this.compileComplexUpdaters(), ';\n'])
-        .add('\n');
-    }
-
-    if (size(this.updaters) > 0) {
-      sn.add('  // Update functions\n')
-        .add('  view.__update__ = {\n')
-        .add([this.compileUpdaters(), '\n'])
-        .add('  };\n')
-        .add('\n');
+    if (size(this.spots) > 0) {
+      sn.add([
+        `  // Update functions\n`,
+        `  this.__update__ = {\n`,
+        this.generateSpots(), `\n`,
+        `  };\n`,
+        `\n`
+      ]);
     }
 
     if (this.renderActions.length > 0) {
-      sn.add('  // Extra render actions\n')
-        .add('  view.onRender = function () {\n')
-        .add([this.compileRenderActions(), '\n'])
-        .add('  };\n')
-        .add('\n');
+      sn.add([
+        `  // Extra render actions\n`,
+        `  this.onRender = function () {\n`,
+        this.generateRenderActions(), `\n`,
+        `  };\n`,
+        `\n`
+      ]);
     }
 
-    sn.add('  // Set root nodes\n');
-    sn.add(['  view.nodes = [', join(this.children, ', '), '];\n']);
-    sn.add('  return view;\n');
+    if (this.onUpdate.length > 0) {
+      sn.add([
+        `  // On update actions\n`,
+        `  this.onUpdate = function (__data__) {\n`,
+        this.generateOnUpdate(), `\n`,
+        `  };\n`,
+        `\n`
+      ]);
+    }
 
-    sn.add('}');
+    sn.add([
+      `  // Set root nodes\n`,
+      `  this.nodes = [`, sourceNode(this.children).join(`, `), `];\n`
+    ]);
+
+    sn.add(`}\n`);
+
+    sn.add([
+      `${this.name}.prototype = Object.create(Monkberry.prototype);\n`,
+      `${this.name}.prototype.constructor = ${this.name};\n`,
+      `${this.name}.pool = [];\n`
+    ]);
+
+    // If this figure is root figure.
+    if (this.parent == null) {
+      sn.add(`${this.name}.filters = {};\n`);
+    }
+
+    sn.add(this.generateUpdateFunction());
+
+    for (let subfigure of this.subFigures) {
+      sn.add(subfigure.generate());
+    }
 
     return sn;
   }
 
-  declare(nodes) {
-    this.declarations.push(sourceNode(null, nodes));
+  generateFunctions() {
+    var defn = [];
+    Object.keys(this.functions).forEach((key) => {
+      defn.push(sourceNode(`${key} = ${this.functions[key]}`));
+    });
+    return sourceNode(`var `).add(sourceNode(defn).join(`,\n`)).add(`;\n`);
   }
 
-  compileFunctions() {
-    if (Object.keys(this.functions).length > 0) {
-      var defn = [];
-      Object.keys(this.functions).forEach((key) => {
-        defn.push(sourceNode(null, `${key} = ${this.functions[key]}`));
+  generateSpots() {
+    var parts = [];
+
+    Object.keys(this.spots)
+      .map(x => this.spots[x])
+      .filter(spot => spot.operators.length > 0)
+      .map(spot => {
+        parts.push(
+          sourceNode([`    `, spot.reference, `: `, spot.generate()])
+        );
       });
-      return sourceNode(null, 'var ').add(join(defn, ',\n')).add(';\n');
-    } else {
-      return sourceNode(null, '');
-    }
+
+    return sourceNode(null, parts).join(`,\n`);
   }
 
-  compileDeclarations() {
-    return sourceNode(null, this.declarations).join('\n  ');
+  generateRenderActions() {
+    return sourceNode(this.renderActions).join(`\n`);
   }
 
-  compileDomConstruction() {
-    return sourceNode(null, this.construct).join('\n  ');
+  generateOnUpdate() {
+    return sourceNode(this.onUpdate).join(`\n`);
   }
 
-  compileComplexUpdaters() {
-    var parts = [];
+  generateUpdateFunction() {
+    let sn = sourceNode(
+      `${this.name}.prototype.update = function (__data__) {\n`
+    );
 
-    Object.keys(this.complexUpdaters).forEach((key) => {
-      parts.push(join(['λ__', key, ' = ', this.complexUpdaters[key].compile()]));
-    });
+    let spots = Object.keys(this.spots).map(key => this.spots[key]).sort((a, b) => a.length - b.length);
 
-    return sourceNode(null, parts).join(',\n    ');
-  }
+    for (let spot of spots) {
+      if (spot.length == 1) {
+        let name = spot.variables[0];
 
-  compileUpdaters() {
-    var parts = [];
+        sn.add(`  if (__data__.${name} !== undefined`);
+        if (spot.onlyFromLoop) {
+          sn.add(` && __data__.__index__ !== undefined`);
+        }
+        sn.add(`) {\n`);
 
-    Object.keys(this.updaters).forEach((key) => {
-      parts.push(join(['    ', key, ': ', this.updaters[key].compile()]));
-    });
+        if (spot.cache) {
+          sn.add(`    this.__cache__.${name} = __data__.${name};\n`);
+        }
 
-    return sourceNode(null, parts).join(',\n');
-  }
+        if (spot.operators.length > 0) {
+          sn.add(`    this.__update__.${spot.reference}(__data__.${name});\n`);
+        }
 
-  compileRenderActions() {
-    var parts = [];
-    for (var control of this.renderActions) {
-      parts.push(control);
-    }
-    return join(parts, '\n');
-  }
+        sn.add(`  }\n`);
+      } else {
 
-  addFunction(name, source) {
-    if (!(name in this.functions)) {
-      this.functions[name] = source;
-    }
-  }
+        let cond = sourceNode(spot.variables.map(name => `this.__cache__.${name} !== undefined`)).join(` && `);
+        let params = sourceNode(spot.variables.map(name => `this.__cache__.${name}`)).join(`, `);
 
-  addUpdater(loc, variables, callback) {
-    if (variables.length == 0) {
-      throw new Error('Updaters must have at least one variable.');
-    } else if (variables.length == 1) {
-
-      return this.onUpdater(variables[0]).add(callback());
-
-    } else if (variables.length > 1) {
-
-      var complexUpdater = this.onComplexUpdater(variables);
-      complexUpdater.add(callback());
-
-      for (let variable of variables) {
-        this.onUpdater(variable).cache();
-        this.onUpdater(variable).addComplex(loc, variables, complexUpdater.name);
+        sn.add([
+          `  if (`, cond, `) {\n`,
+          `    this.__update__.${spot.reference}(`, params, `);\n`,
+          `  }\n`
+        ]);
       }
-
-      return complexUpdater;
     }
-  }
 
-  onUpdater(variableName) {
-    return variableName in this.updaters ? this.updaters[variableName] : this.updaters[variableName] = new Updater([variableName]);
-  }
+    if (this.onUpdate.length > 0) {
+      sn.add(`  this.onUpdate(__data__);\n`);
+    }
 
-  onComplexUpdater(variables) {
-    var name = uniqueName(variables);
-    return name in this.complexUpdaters ? this.complexUpdaters[name] : this.complexUpdaters[name] = new Updater(variables);
+    sn.add(`};\n`);
+    return sn;
   }
 
   uniqid(name = 'default') {
@@ -170,5 +209,83 @@ export class Figure {
       this.uniqCounters[name] = 0
     }
     return this.uniqCounters[name]++;
+  }
+
+  hasSpot(variables) {
+    return this.spots.hasOwnProperty(
+      new Spot([].concat(variables)).reference
+    );
+  }
+
+  spot(variables) {
+    let s = new Spot([].concat(variables));
+
+    if (!this.spots.hasOwnProperty(s.reference)) {
+      this.spots[s.reference] = s;
+
+      if (s.variables.length > 1) {
+        for (let variable of s.variables) {
+          this.spot(variable).cache = true;
+        }
+
+        this.spotMaxLength = s.variables.length;
+      }
+    }
+
+    return this.spots[s.reference];
+  }
+
+  root() {
+    if (this.parent) {
+      return this.parent.root();
+    } else {
+      return this;
+    }
+  }
+
+  getScope() {
+    if (this.parent) {
+      return [].concat(this.scope).concat(this.parent.getScope());
+    } else {
+      return this.scope;
+    }
+  }
+
+  addToScope(variable) {
+    this.scope.push(variable);
+  }
+
+  isInScope(variable) {
+    return this.getScope().indexOf(variable) != -1;
+  }
+
+  declare(node) {
+    this.declarations.push(node);
+  }
+
+  construct(node) {
+    this.constructions.push(node);
+  }
+
+  addFunction(name, source) {
+    if (!this.functions.hasOwnProperty(name)) {
+      this.functions[name] = source;
+    }
+  }
+
+  addFigure(figure) {
+    this.subFigures.push(figure);
+  }
+
+  addRenderActions(action) {
+    this.renderActions.push(action);
+  }
+
+  addImport(source) {
+    this.imports.push(source);
+  }
+
+  addOnUpdate(node) {
+    this.onUpdate.push(node);
   }
 }

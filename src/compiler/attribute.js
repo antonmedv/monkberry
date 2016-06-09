@@ -1,5 +1,6 @@
-import { sourceNode, join } from './sourceNode';
-import { collectVariables } from './expression/variable';
+import { ast } from 'monkberry-parser';
+import { sourceNode } from './sourceNode';
+import { collectVariables } from './variable';
 import { esc, arrayToObject } from '../utils';
 
 /**
@@ -11,30 +12,31 @@ import { esc, arrayToObject } from '../utils';
  *
  *     node.value = ...;
  *
- * @type {string[]}
  */
 const plainAttributes = ['id', 'value', 'checked', 'selected'];
 
 /**
  * This attributes take boolean values, not string values.
- * @type {string[]}
  */
 const booleanAttributes = ['checked', 'selected'];
 
-export default function (ast) {
+export default {
   /**
    * Compile attributes of regular nodes.
+   *
+   * @param {ElementNode} parent
+   * @param {AttributeNode} node
    * @param {Figure} figure
-   * @param {string} nodeName
+   * @param {Function} compile
    */
-  ast.AttributeNode.prototype.compile = function (figure, nodeName) {
-    let [expr, defaults] = this.compileToExpression();
+  Attribute: ({parent, node, figure, compile}) => {
+    let [expr, defaults] = compileToExpression(figure, node, compile);
 
-    var variables = collectVariables(expr);
+    var variables = collectVariables(figure.getScope(), expr);
 
     if (variables.length == 0) {
-      figure.construct.push(sourceNode(this.loc, [
-        attr(this.loc, nodeName, this.name, (expr ? expr.compile() : defaultAttrValue(this.name))), ';'
+      figure.construct(sourceNode(node.loc, [
+        attr(node.loc, parent.reference, node.name, (expr ? compile(expr) : defaultAttrValue(node.name)))
       ]));
     } else {
       // When rendering attributes with more then one variable,
@@ -61,29 +63,30 @@ export default function (ast) {
       //    view.update({foo});
       //
 
-      figure.addUpdater(this.loc, variables, () => sourceNode(this.loc, [
-        '      ', attr(this.loc, nodeName, this.name, expr.compile())
-      ]));
+      figure.spot(variables).add(
+        sourceNode(node.loc, ['      ', attr(node.loc, parent.reference, node.name, compile(expr))])
+      );
 
       if (defaults.length > 0) {
-        figure.construct.push(sourceNode(this.loc, [
-          attr(this.loc, nodeName, this.name, join(defaults, ' + ')), ';'
+        figure.construct(sourceNode(node.loc, [
+          attr(node.loc, parent.reference, node.name, sourceNode(defaults).join(' + '))
         ]));
       }
     }
 
-  };
+  },
 
   /**
    * Generate code for spread operator.
    *
    *    <div {{...attributes}}>
    *
+   * @param {ElementNode} parent
+   * @param {AttributeNode} node
    * @param {Figure} figure
-   * @param {string} nodeName
    */
-  ast.SpreadAttributeNode.prototype.compile = function (figure, nodeName) {
-    figure.root.addFunction('__spread', sourceNode(null, [
+  SpreadAttribute: ({parent, node, figure}) => {
+    figure.root().addFunction('__spread', sourceNode([
       `function (node, attr) {\n`,
       `  for (var property in attr) if (attr.hasOwnProperty(property)) {\n`,
       `    if (property in ${esc(arrayToObject(plainAttributes))}) {\n`,
@@ -95,106 +98,112 @@ export default function (ast) {
       `}`
     ]));
 
-    let attr = this.identifier.name;
-    figure.addUpdater(this.loc, [attr], () =>
-      sourceNode(this.loc, [`      __spread(${nodeName}, ${attr})`])
+    let attr = node.identifier.name;
+    figure.spot(attr).add(
+      sourceNode(node.loc, `      __spread(${parent.reference}, ${attr})`)
     );
+  }
+}
+
+/**
+ * Transform attribute with text and expression into single expression.
+ *
+ *    <div class="cat {{ dog }} {{ cow || 'moo' }}">
+ *
+ * Will transformed into:
+ *
+ *    <div class={{ 'cat ' + dog + ' ' + (cow || 'moo') }}>
+ *
+ * Also collects default values for attribute: `cat ` and variables name with default: ['moo'].
+ *
+ * @param {Figure} figure
+ * @param {Object} node
+ * @param {Function} compile
+ * @returns {*[]}
+ */
+export function compileToExpression(figure, node, compile) {
+  let expr, defaults = [];
+
+  let pushDefaults = (node) => {
+    if (node.type == 'Literal') {
+      defaults.push(compile(node));
+    } else if (node.type == 'ExpressionStatement' && node.expression.type == 'LogicalExpression' && node.expression.operator == '||') {
+      // Add as default right side of "||" expression if there are no variables.
+      // In this example, when Monkberry will render div,
+      //
+      //    <div class="{{ foo || 'default' }}">
+      //
+      // it set class attribute fo 'default'.
+
+      if (collectVariables(figure.getScope(), node.expression.right) == 0) {
+        defaults.push(compile(node.expression.right));
+      }
+    }
   };
 
-  /**
-   * Generate source nodes for attribute.
-   * @param {Object} loc
-   * @param {string} nodeName
-   * @param {string} attrName
-   * @param {string} value
-   * @returns {SourceNode}
-   */
-  function attr(loc, nodeName, attrName, value) {
-    if (plainAttributes.indexOf(attrName) != -1) {
-      return sourceNode(loc, [nodeName, '.', attrName, ' = ', value]);
-    } else {
-      return sourceNode(loc, [nodeName, '.setAttribute(', esc(attrName), ', ', value, ')']);
+  if (!node.body) {
+    expr = null;
+  } else if (node.body.length == 1) {
+
+    expr = extract(node.body[0]);
+    pushDefaults(node.body[0]);
+
+  } else if (node.body.length >= 2) {
+
+    expr = new ast.BinaryExpressionNode('+', extract(node.body[0]), extract(node.body[1]), node.loc);
+    pushDefaults(node.body[0]);
+    pushDefaults(node.body[1]);
+
+    let at = expr;
+    for (var i = 2; i < node.body.length; i++) {
+      at = at.right = new ast.BinaryExpressionNode('+', at.right, extract(node.body[i]), null);
+      pushDefaults(node.body[i]);
     }
   }
 
-  /**
-   * Returns default value for attribute name.
-   * @param {string} attrName
-   * @returns {string}
-   */
-  function defaultAttrValue(attrName) {
-    if (booleanAttributes.indexOf(attrName) != -1) {
-      return 'true';
-    } else {
-      return '""';
-    }
+  return [expr, defaults];
+}
+
+
+/**
+ * Generate source nodes for attribute.
+ * @param {Object} loc
+ * @param {string} reference
+ * @param {string} attrName
+ * @param {string} value
+ * @returns {SourceNode}
+ */
+function attr(loc, reference, attrName, value) {
+  if (plainAttributes.indexOf(attrName) != -1) {
+    return sourceNode(loc, [reference, '.', attrName, ' = ', value]);
+  } else {
+    return sourceNode(loc, [reference, '.setAttribute(', esc(attrName), ', ', value, ')']);
   }
+}
 
-  /**
-   * Transform attribute with text and expression into single expression.
-   *
-   *    <div class="cat {{ dog }} {{ cow || 'moo' }}">
-   *
-   * Will transformed into:
-   *
-   *    <div class={{ 'cat ' + dog + ' ' + (cow || 'moo') }}>
-   *
-   * Also collects default values for attribute: `cat ` and variables name with default: ['moo'].
-   *
-   * @returns {*[]}
-   */
-  ast.AttributeNode.prototype.compileToExpression = function () {
-    var expr, defaults = [];
 
-    var pushDefaults = (node) => {
-      if (node.type == 'Literal') {
-        defaults.push(node.compile());
-      } else if (node.type == 'ExpressionStatement' && node.expression.type == 'LogicalExpression' && node.expression.operator == '||') {
-        // Add as default right side of "||" expression if there are no variables.
-        // In this example, when Monkberry will render div,
-        //
-        //    <div class="{{ foo || 'default' }}">
-        //
-        // it set class attribute fo 'default'.
+/**
+ * Returns default value for attribute name.
+ * @param {string} attrName
+ * @returns {string}
+ */
+function defaultAttrValue(attrName) {
+  if (booleanAttributes.indexOf(attrName) != -1) {
+    return 'true';
+  } else {
+    return '""';
+  }
+}
 
-        if (collectVariables(node.expression.right) == 0) {
-          defaults.push(node.expression.right.compile());
-        }
-      }
-    };
 
-    if (!this.body) {
-      expr = null;
-    } else if (this.body.length == 1) {
-
-      expr = extract(this.body[0]);
-      pushDefaults(this.body[0]);
-
-    } else if (this.body.length >= 2) {
-
-      expr = new ast.BinaryExpressionNode('+', extract(this.body[0]), extract(this.body[1]), this.loc);
-      pushDefaults(this.body[0]);
-      pushDefaults(this.body[1]);
-
-      var at = expr;
-      for (var i = 2; i < this.body.length; i++) {
-        at = at.right = new ast.BinaryExpressionNode('+', at.right, extract(this.body[i]), null);
-        pushDefaults(this.body[i]);
-      }
-    }
-
-    return [expr, defaults];
-  };
-
-  /**
-   * @param {Object} node
-   * @returns {Object}
-   */
-  function extract(node) {
-    if (node.type == 'ExpressionStatement') {
-      return node.expression;
-    } else {
-      return node;
-    }
+/**
+ * @param {Object} node
+ * @returns {Object}
+ */
+function extract(node) {
+  if (node.type == 'ExpressionStatement') {
+    return node.expression;
+  } else {
+    return node;
   }
 }

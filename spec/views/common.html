@@ -1,29 +1,34 @@
-<monkberry>
+<SimpleDom>
     <div>
         Monkberry Moon Delight
     </div>
-</monkberry>
-<test1>
+</SimpleDom>
+<Tag>
+    <div>
+        Custom tag
+    </div>
+</Tag>
+<TextNode>
     <p>{{ text }}</p>
-</test1>
-<test2>
+</TextNode>
+<AttributeVariable>
     <input type="text" value="{{ value }}">
-</test2>
-<test3>
+</AttributeVariable>
+<TextNodeAround>
     <p>foo {{ bar }} baz</p>
-</test3>
-<test4>
+</TextNodeAround>
+<AttributeVariableAround>
     <div class="foo {{ bar }} baz"></div>
-</test4>
-<test5>
+</AttributeVariableAround>
+<ComplexSpotWithTwoVariables>
     <div class="{{ foo }} {{ bar }}"></div>
-</test5>
-<test7>
+</ComplexSpotWithTwoVariables>
+<TwoTopLevelNodes>
     <p>first</p>
 
     <p>second</p>
-</test7>
-<test10>
+</TwoTopLevelNodes>
+<CommonIf>
     <div>
         <p>
             {% if a %}a{% endif %}
@@ -33,25 +38,25 @@
             {% for b %}b{% endfor %}
         </p>
     </div>
-</test10>
-<test11>
+</CommonIf>
+<CommonIfWithPlaceholders>
     <div>
         {% if a %}a{% endif %}
         {% if b %}b{% endif %}
     </div>
-</test11>
-<test12>
+</CommonIfWithPlaceholders>
+<CommonInFor>
     <div>
         {% if a %}a{% endif %}
         {% for b %}i{% endfor %}
     </div>
-</test12>
-<test-filters>
+</CommonInFor>
+<CommonFilters>
     <p>{{ text | append('case') | upperCase }}</p>
-</test-filters>
-<test-expressions>
+</CommonFilters>
+<CommonExpressions>
     <a title="{{ (a + b) * c / d }}">{{ more.amazing + features[0] + features[1] }}</a>
-</test-expressions>
+</CommonExpressions>
 <EmptyAttr>
     <input type="checkbox" value="" checked>
 </EmptyAttr>
@@ -70,9 +75,9 @@
         {% if host == window.location.host %}if{% endif %},
         {% for i of [host == window.location.host] %}{{ i ? 'for' : '' }}{% endfor %},
         <i class="{{ host == window.location.host ? 'attr' : '' }}"></i>,
-        <custom host={{ host == window.location.host }}>
+        <GlobalsCustom host={{ host == window.location.host }}>
             {{ host ? 'custom' : '' }}
-        </custom>
+        </GlobalsCustom>
     </i>
 </Globals>
 <EmptyExpression>

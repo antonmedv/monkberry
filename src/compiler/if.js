@@ -1,88 +1,82 @@
 import { sourceNode } from './sourceNode';
-import { collectVariables } from './expression/variable';
-import { lookUpOnlyOneChild, map } from '../utils';
+import { Figure } from '../figure';
+import { collectVariables } from './variable';
+import { isSingleChild, notNull } from '../utils';
 
-export default function (ast) {
-  ast.IfStatementNode.prototype.compile = function (figure) {
-    let templateNameForThen, templateNameForOtherwise;
+export default {
+  IfStatement: ({parent, node, figure, compile}) => {
+    node.reference = null;
 
-    if (this.templateNames && this.templateNames.then) {
-      templateNameForThen = this.templateNames.then;
-    } else {
-      templateNameForThen = figure.name + '.if' + figure.uniqid('template_name');
-    }
-
-    if (this.templateNames && this.templateNames.otherwise) {
-      templateNameForOtherwise = this.templateNames.otherwise;
-    } else {
-      templateNameForOtherwise = templateNameForThen + '.else';
-    }
-
+    let templateNameForThen = figure.name + '_if' + figure.uniqid('template_name');
+    let templateNameForOtherwise = figure.name + '_else' + figure.uniqid('template_name');
     let childNameForThen = 'child' + figure.uniqid('child_name');
     let childNameForOtherwise = 'child' + figure.uniqid('child_name');
+    let placeholder;
 
-    let placeholder, parentNode = lookUpOnlyOneChild(this);
-    if (parentNode) {
-      placeholder = parentNode.nodeName;
+    if (isSingleChild(parent, node)) {
+      placeholder = parent.reference;
     } else {
-      placeholder = 'if' + figure.uniqid('placeholder');
-      figure.declare(["var ", placeholder, " = document.createComment('if');"]);
+      node.reference = placeholder = 'for' + figure.uniqid('placeholder');
+      figure.declare(sourceNode(`var ${placeholder} = document.createComment('if');`));
     }
 
-    figure.declare(["var ", childNameForThen, " = {};"]);
 
-    if (this.otherwise) {
-      figure.declare(["var ", childNameForOtherwise, " = {};"]);
+    figure.declare(`var ${childNameForThen} = {};`);
+
+    if (node.otherwise) {
+      figure.declare(`var ${childNameForOtherwise} = {};`);
     }
 
     // if (
 
-    var variablesOfExpression = collectVariables(this.cond);
+    var variablesOfExpression = collectVariables(figure.getScope(), node.cond);
 
-    compileCond(figure, this.loc, this.otherwise ? "result = " : "", placeholder, templateNameForThen, childNameForThen, this.cond.compile(), variablesOfExpression).declareVariable(this.otherwise ? "result" : false);
+    figure.thisRef = true;
+    figure.hasNested = true;
+    
+    figure.spot(variablesOfExpression).add(
+      sourceNode(node.loc, [
+        `      `,
+        node.otherwise ? `result = ` : ``,
+        `Monkberry.cond(_this, ${placeholder}, ${childNameForThen}, ${templateNameForThen}, `, compile(node.cond), `)`
+      ])
+    );
 
-    if (this.otherwise) {
-      compileCond(figure, this.loc, "", placeholder, templateNameForOtherwise, childNameForOtherwise, "!result", variablesOfExpression);
+    if (node.otherwise) {
+      figure.spot(variablesOfExpression).add(
+        sourceNode(node.loc, [
+          `      `,
+          `Monkberry.cond(_this, ${placeholder}, ${childNameForOtherwise}, ${templateNameForOtherwise}, !result)`
+        ])
+      ).declareVariable('result');
     }
 
     // ) then {
 
-    compileBody(figure, this.loc, templateNameForThen, childNameForThen, this.then, variablesOfExpression);
+    let compileBody = (loc, body, templateName, childName) => {
+      let subfigure = new Figure(templateName, figure);
+      subfigure.children = body.map(node => compile(node, subfigure)).filter(notNull);
+      figure.addFigure(subfigure);
+
+      figure.addOnUpdate(
+        sourceNode(loc, [
+          `    if (${childName}.ref) {\n`,
+          `      ${childName}.ref.update(__data__);\n`,
+          `    }`
+        ])
+      );
+    };
+
+    compileBody(node.loc, node.then, templateNameForThen, childNameForThen);
 
     // } else {
 
-    if (this.otherwise) {
-      compileBody(figure, this.loc, templateNameForOtherwise, childNameForOtherwise, this.otherwise, variablesOfExpression);
+    if (node.otherwise) {
+      compileBody(node.loc, node.otherwise, templateNameForOtherwise, childNameForOtherwise);
     }
 
     // }
 
-    return parentNode ? null : placeholder;
-  };
-}
-
-function compileCond(figure, loc, prepend, placeholder, templateName, childName, result, variablesOfExpression) {
-  return figure.addUpdater(loc, variablesOfExpression, () => {
-    return sourceNode(loc, [
-      `      `,
-      `${prepend}monkberry.insert(view, ${placeholder}, ${childName}, '${templateName}', __data__, ${result})`
-    ]);
-  });
-}
-
-function compileBody(figure, loc, templateName, childName, body, variablesOfExpression) {
-  figure.subFigures.push(figure.createFigure(templateName, body));
-
-  var variablesOfBody = collectVariables(body);
-
-  // Delete variables from expression to prevent double updating.
-  variablesOfBody = variablesOfBody.filter((v) => variablesOfExpression.indexOf(v) == -1);
-
-  variablesOfBody.forEach((variable) => {
-    figure.onUpdater(variable).add(sourceNode(loc, [
-      `      `,
-      // TODO: Properly collect local variables in templates and delete `hasOwnProperty` check in `if` refs.
-      `${childName}.ref && ${childName}.ref.__update__.hasOwnProperty('${variable}') && ${childName}.ref.__update__.${variable}(__data__, ${variable})`
-    ]));
-  });
-}
+    return node.reference;
+  }
+};

@@ -1,3 +1,8 @@
 window.require = function (path) {
-  return {};
+  if (path == 'upper-case')
+    return function (text) {
+      return text.toUpperCase();
+    };
+  else
+    return {};
 };

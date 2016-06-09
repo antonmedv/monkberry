@@ -2,17 +2,14 @@
 var fs = require('fs');
 var path = require('path');
 var program = require('commander');
-var Monkberry = require('../lib/index');
+var sourceNode = require('../lib/compiler/sourceNode').sourceNode;
+var Compiler = require('../lib/index').Compiler;
 
 program
   .usage('[options] <file ...>')
   .option('-o, --output [file]', 'output file name, if not specified will write to stdout.')
   .option('-s, --source-map', 'generate source map.')
-  .option('-p, --parser [type]', 'parser to use', 'default')
   .option('--as-module', 'compile as module.')
-  .option('--as-library', 'compile only custom tags.')
-  .option('--transform [require]', 'transform for ast.')
-  .option('--globals [variable, ...]', 'comma separated list of global variables.')
   .option('--draw-ast', 'draw ast tree of file.')
   .parse(process.argv);
 
@@ -21,39 +18,43 @@ if (program.args.length == 0) {
   process.exit(0);
 }
 
-var utf8 = {encoding: 'utf8'};
-var compiler = new Monkberry.Compiler();
+var compiler, i;
 
-try {
-  var transform = program.transform;
-  if (transform) {
-    var name = path.parse(transform).name;
-    compiler.transforms[name] = require(transform);
-  }
-} catch (error) {
-  console.error('Can not require transform `' + transform + '`.');
-  throw error;
-}
+compiler = new Compiler({
+  asModule: program.asModule
+});
 
-if (program.globals) {
-  compiler.globals = program.globals.split(',').map(v => v.trim());
-}
-
-program.args.forEach(function (file) {
-  var code = fs.readFileSync(file, utf8);
-  compiler.addSource(path.basename(file), code, program.parser, program.asLibrary);
+var sources = program.args.map(function (file) {
+  var code = fs.readFileSync(file, {encoding: 'utf8'});
+  return [path.basename(file), code];
 });
 
 if (program.drawAst) {
-  console.log(compiler.drawAstTree());
-  process.exit(0);
+  for (i = 0; i < sources.length; i++) {
+    try {
+      if (sources.length > 1) {
+        console.log('');
+        console.log('#');
+        console.log('#', sources[i][0]);
+        console.log('#');
+      }
+      console.log(compiler.drawAstTree(sources[i][0], sources[i][1]));
+    } catch (e) {
+      console.error(e.toString());
+      return;
+    }
+  }
+  return;
 }
 
-try {
-  var output, node = compiler.compile(program.asModule);
-} catch (error) {
-  console.error(error.toString());
-  throw error;
+var node = sourceNode('');
+for (i = 0; i < sources.length; i++) {
+  try {
+    node.add(compiler.compile(sources[i][0], sources[i][1]));
+  } catch (e) {
+    console.error(e.toString());
+    return;
+  }
 }
 
 if (program.output) {
@@ -63,16 +64,16 @@ if (program.output) {
     sourceMapPath = file + '.map';
 
   if (program.sourceMap) {
-    output = node.toStringWithSourceMap({
+    var output = node.toStringWithSourceMap({
       file: filename
     });
 
     var smu = '//# sourceMappingURL=' + sourceMapFileName + '\n';
 
-    fs.writeFileSync(file, output.code + smu, utf8);
-    fs.writeFileSync(sourceMapPath, output.map, utf8);
+    fs.writeFileSync(file, output.code + smu, {encoding: 'utf8'});
+    fs.writeFileSync(sourceMapPath, output.map, {encoding: 'utf8'});
   } else {
-    fs.writeFileSync(file, node.toString(), utf8);
+    fs.writeFileSync(file, node.toString(), {encoding: 'utf8'});
   }
 } else {
   console.log(node.toString());

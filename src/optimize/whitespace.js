@@ -1,24 +1,29 @@
+import {visit} from '../visitor';
+
 export function whitespace(ast) {
-  ast.visit((node) => {
-    if (node.type == 'Document') {
+  visit(ast, {
+    Document: (node) => {
       trim(node, 'body');
-    } else if (node.type == 'Element') {
+    },
+    Element: (node) => {
       trim(node, 'body');
-    } else if (node.type == 'IfStatement') {
+    },
+    IfStatement: (node) => {
       trim(node, 'then');
       trim(node, 'otherwise');
-    } else if (node.type == 'ForStatement') {
+    },
+    ForStatement: (node) => {
       trim(node, 'body');
-    } else if (node.type == 'BlockStatement') {
+    },
+    BlockStatement: (node) => {
       trim(node, 'body');
     }
   });
 }
 
-
 function trim(node, key) {
-  var skipped = false,
-   nodes = [];
+  let skipped = false,
+    nodes = [];
 
   if (!node[key]) {
     return;
