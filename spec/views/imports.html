@@ -1,6 +1,4 @@
-<Imports>
-    {% import "./tag/tag.html" %}
-    <section>
-        <Tag/>
-    </section>
-</Imports>
+{% import upperCase from 'upper-case' %}
+<section>
+    {{ upperCase(text) | upperCase }}
+</section>

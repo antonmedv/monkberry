@@ -15,7 +15,7 @@ export default {
     }
 
     figure.declare(
-      sourceNode(`var ${node.reference} = document.createTextNode(${defaultValue});`)
+      sourceNode(`let ${node.reference} = document.createTextNode(${defaultValue});`)
     );
 
     let variables = collectVariables(figure.getScope(), node.expression);
@@ -33,8 +33,14 @@ export default {
     return node.reference;
   },
 
-  FilterExpression: ({node, figure, compile}) => {
-    var sn = sourceNode(node.loc, [figure.root().name, '.filters.', compile(node.callee), '(']);
+  FilterExpression: ({node, figure, compile}) => { 
+    let prefix = ``;
+
+    if (!figure.isInScope(node.callee.name)) {
+      prefix = `${figure.root().name}.filters.`;
+    }
+    
+    let sn = sourceNode(node.loc, [prefix, compile(node.callee), '(']);
 
     for (let i = 0; i < node.arguments.length; i++) {
       if (i !== 0) {
@@ -48,10 +54,10 @@ export default {
   },
 
   ArrayExpression: ({node, compile}) => {
-    var sn = sourceNode(node.loc, '[');
-    var elements = node.elements;
+    let sn = sourceNode(node.loc, '[');
+    let elements = node.elements;
 
-    for (var i = 0; i < node.elements.length; i++) {
+    for (let i = 0; i < node.elements.length; i++) {
       if (i !== 0) {
         sn.add(', ');
       }
@@ -63,13 +69,13 @@ export default {
   },
 
   ObjectExpression: ({node, compile}) => {
-    var sn = sourceNode(node.loc, '({');
+    let sn = sourceNode(node.loc, '({');
 
     for (let i = 0; i < node.properties.length; i++) {
-      var prop = node.properties[i];
-      var kind = prop.kind;
-      var key = prop.key;
-      var value = prop.value;
+      let prop = node.properties[i];
+      let kind = prop.kind;
+      let key = prop.key;
+      let value = prop.value;
 
       if (i !== 0) {
         sn.add(', ');
@@ -78,8 +84,8 @@ export default {
       if (kind === 'init') {
         sn.add([compile(key), ': ', compile(value)]);
       } else {
-        var params = value.params;
-        var body = value.body;
+        let params = value.params;
+        let body = value.body;
 
         sn.add([kind, ' ', compile(key), '(']);
 
@@ -105,9 +111,9 @@ export default {
   },
 
   SequenceExpression: ({node, compile}) => {
-    var sn = sourceNode(node.loc, '');
+    let sn = sourceNode(node.loc, '');
 
-    for (var i = 0; i < node.expressions.length; i++) {
+    for (let i = 0; i < node.expressions.length; i++) {
       if (i !== 0) {
         sn.add(', ');
       }
@@ -151,12 +157,12 @@ export default {
   },
 
   NewExpression: ({node, compile}) => {
-    var sn = sourceNode(node.loc, ['new ', compile(node.callee)]);
+    let sn = sourceNode(node.loc, ['new ', compile(node.callee)]);
 
     if (node.arguments !== null) {
       sn.add('(');
 
-      for (var i = 0; i < node.arguments.length; i++) {
+      for (let i = 0; i < node.arguments.length; i++) {
         if (i !== 0) {
           sn.add(', ');
         }
@@ -171,7 +177,7 @@ export default {
   },
 
   CallExpression: ({node, compile}) => {
-    var sn = sourceNode(node.loc, [compile(node.callee), '(']);
+    let sn = sourceNode(node.loc, [compile(node.callee), '(']);
 
     for (let i = 0; i < node.arguments.length; i++) {
       if (i !== 0) {

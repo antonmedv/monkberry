@@ -7,7 +7,10 @@ describe('Import', function () {
   });
 
   it('should require and mount template', function () {
-    var view = Monkberry.render(Imports, root);
-    expect(view).toBe('<section><div> Custom tag </div></section>');
+    var view = Monkberry.render(imports, root);
+    view.update({
+      text: 'upper'
+    });
+    expect(view).toBe('<section>UPPER</section>');
   });
 });

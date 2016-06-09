@@ -251,6 +251,14 @@ export class Figure {
     }
   }
 
+  addToScope(variable) {
+    this.scope.push(variable);
+  }
+
+  isInScope(variable) {
+    return this.getScope().indexOf(variable) != -1;
+  }
+
   declare(node) {
     this.declarations.push(node);
   }
