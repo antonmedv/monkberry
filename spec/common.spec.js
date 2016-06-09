@@ -170,4 +170,12 @@ describe('Monkberry', function () {
     var view = Monkberry.render(HtmlEntity, root);
     expect(view).toBe(' "&amp;\'&lt;&gt;©£±¶ — € ♥&amp;notExists; ');
   });
+
+  it('should be able prerender templates', function () {
+    Monkberry.prerender(TextNode, 10);
+
+    var view = Monkberry.render(TextNode, root);
+    view.update({text: 'text'});
+    expect(view).toBe('<p>text</p>');
+  });
 });

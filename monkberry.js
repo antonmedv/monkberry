@@ -20,7 +20,7 @@
  *        +---+---+---+   +---+   +   +   +   +---+---+---+   +---+   +---+---+   +   +   +
  *        |   |       |           |       |   |       |       |       |               |   |
  *        +   +   +   +---+---+---+   +---+   +   +   +   +---+   +---+---+   +---+---+   +
- *        |   |   |           |           |   | ∆ |   |       |   |       |   |           |
+ *        |   |   |           |           |   |   |   |       |   |       |   |           |
  *        +   +   +---+---+   +---+---+---+   +---+   +---+   +   +   +   +   +   +---+   +
  *        |       |                           |       |   |       |   |       |   |       |
  *        +---+---+   +   +   +---+---+---+---+   +---+   +---+   +   +---+---+   +   +---+
@@ -68,6 +68,17 @@
     }
 
     return view;
+  };
+
+  /**
+   * Prerepder template for future usage.
+   * @param {Monkberry} template - Template name.
+   * @param {Number} times - Times of prerender.
+   */
+  Monkberry.prerender = function (template, times) {
+    while (times--) {
+      template.pool.push(new template());
+    }
   };
 
   /**
@@ -177,14 +188,35 @@
   };
 
   /**
-   * Prerepder view for future usage.
-   * @param {String} name - Template name.
-   * @param {Number} times - Times of prerender.
+   * Remove view from DOM.
    */
-  Monkberry.prototype.prerender = function (name, times) {
-    while (times--) {
-      this.pool.push(name, this.render(name, undefined, true));
+  Monkberry.prototype.remove = function () {
+    // Remove appended nodes.
+    var i = this.nodes.length;
+    while (i--) {
+      this.nodes[i].parentNode.removeChild(this.nodes[i]);
     }
+
+    // Remove self from parent's children map or child ref.
+    if (this.onRemove) {
+      this.onRemove();
+    }
+
+    // Remove all nested views.
+    i = this.nested.length;
+    while (i--) {
+      this.nested[i].remove();
+    }
+
+    // Remove this view from parent's nested views.
+    if (this.parent) {
+      i = this.parent.nested.indexOf(this);
+      this.parent.nested.splice(i, 1);
+      this.parent = null;
+    }
+
+    // Store view in pool for reuse in future.
+    this.constructor.pool.push(this);
   };
 
   /**
@@ -226,38 +258,6 @@
       }
       return fragment;
     }
-  };
-
-  /**
-   * Remove view from DOM.
-   */
-  Monkberry.prototype.remove = function () {
-    // Remove appended nodes.
-    var i = this.nodes.length;
-    while (i--) {
-      this.nodes[i].parentNode.removeChild(this.nodes[i]);
-    }
-
-    // Remove self from parent's children map or child ref.
-    if (this.onRemove) {
-      this.onRemove();
-    }
-
-    // Remove all nested views.
-    i = this.nested.length;
-    while (i--) {
-      this.nested[i].remove();
-    }
-
-    // Remove this view from parent's nested views.
-    if (this.parent) {
-      i = this.parent.nested.indexOf(this);
-      this.parent.nested.splice(i, 1);
-      this.parent = null;
-    }
-
-    // Store view in pool for reuse in future.
-    this.constructor.pool.push(this);
   };
 
   /**
