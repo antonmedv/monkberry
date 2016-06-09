@@ -2,7 +2,6 @@ import { parser } from 'monkberry-parser';
 import { compile } from './compiler';
 import { entity } from './transform/entity';
 import { whitespace } from './optimize/whitespace';
-import { sourceNode } from './compiler/sourceNode';
 import { getTemplateName } from './utils';
 import { drawGraph } from './graph';
 
