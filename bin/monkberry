@@ -18,7 +18,9 @@ if (program.args.length == 0) {
   process.exit(0);
 }
 
-var compiler = new Compiler({
+var compiler, i;
+
+compiler = new Compiler({
   asModule: program.asModule
 });
 
@@ -28,12 +30,25 @@ var sources = program.args.map(function (file) {
 });
 
 if (program.drawAst) {
-  console.log(compiler.drawAstTree());
-  process.exit(0);
+  for (i = 0; i < sources.length; i++) {
+    try {
+      if (sources.length > 1) {
+        console.log('');
+        console.log('#');
+        console.log('#', sources[i][0]);
+        console.log('#');
+      }
+      console.log(compiler.drawAstTree(sources[i][0], sources[i][1]));
+    } catch (e) {
+      console.error(e.toString());
+      return;
+    }
+  }
+  return;
 }
 
 var node = sourceNode('');
-for (var i = 0; i < sources.length; i++) {
+for (i = 0; i < sources.length; i++) {
   try {
     node.add(compiler.compile(sources[i][0], sources[i][1]));
   } catch (e) {
