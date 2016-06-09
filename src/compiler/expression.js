@@ -15,7 +15,7 @@ export default {
     }
 
     figure.declare(
-      sourceNode(`let ${node.reference} = document.createTextNode(${defaultValue});`)
+      sourceNode(`var ${node.reference} = document.createTextNode(${defaultValue});`)
     );
 
     let variables = collectVariables(figure.getScope(), node.expression);
