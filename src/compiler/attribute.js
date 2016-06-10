@@ -103,7 +103,7 @@ export default {
       sourceNode(node.loc, `      __spread(${parent.reference}, ${attr})`)
     );
   }
-}
+};
 
 /**
  * Transform attribute with text and expression into single expression.

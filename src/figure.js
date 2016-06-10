@@ -113,7 +113,7 @@ export class Figure {
     ]);
 
     // If this figure is root figure.
-    if (this.parent == null) {
+    if (this.parent === null) {
       sn.add(`${this.name}.filters = {};\n`);
     }
 
@@ -206,7 +206,7 @@ export class Figure {
 
   uniqid(name = 'default') {
     if (!this.uniqCounters[name]) {
-      this.uniqCounters[name] = 0
+      this.uniqCounters[name] = 0;
     }
     return this.uniqCounters[name]++;
   }
