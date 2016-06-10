@@ -1,4 +1,4 @@
-import { parser } from 'monkberry-parser';
+import { parser } from './parser';
 import { compile } from './compiler';
 import { entity } from './transform/entity';
 import { whitespace } from './optimize/whitespace';

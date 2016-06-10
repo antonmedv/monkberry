@@ -1,4 +1,4 @@
-import { ast } from 'monkberry-parser';
+import { ast } from '../parser';
 import { sourceNode } from './sourceNode';
 import { collectVariables } from './variable';
 import { esc, arrayToObject } from '../utils';
