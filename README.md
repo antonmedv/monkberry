@@ -462,7 +462,7 @@ To get info about prerendered template in runtime, use `monkberry.getPoolInfo()`
 
 ### Pool
 
-If you have big application with a lot of template within, it may be a problem what two templates have same names.
+If you have a big application with a lot of templates within, two templates with the same name can cause a problem.
 
 To solve this problem create a "pool of templates":
 
@@ -470,9 +470,9 @@ To solve this problem create a "pool of templates":
 var pool = monkberry.createPool();
 ```
 
-This allow to have templates with same names. `createPool` method creates new Monkberry instance. 
+This allows to have several templates with the same name. `createPool` method creates new Monkberry instance. 
  
-> Note what filters remain same.
+> Note that all filters remain the same.
 
 
 ### Wrappers
