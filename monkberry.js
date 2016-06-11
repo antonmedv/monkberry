@@ -36,6 +36,7 @@
     this.parent = null; // Parent view.
     this.nested = []; // Nested views.
     this.nodes = []; // Root DOM nodes.
+    this.context = null; // Optional context.
     this.onRender = null; // Function to call on render.
     this.onUpdate = null; // Function to call on update.
     this.onRemove = null; // Function to call on remove.
@@ -45,7 +46,7 @@
    * Render template and attach it to node.
    * @param {Monkberry} template
    * @param {Element} node
-   * @param {{noCache: Boolean}=} options
+   * @param {{noCache: Boolean, context: Object}=} options
    * @return {Monkberry}
    */
   Monkberry.render = function (template, node, options) {
@@ -61,6 +62,10 @@
       view.insertBefore(node);
     } else {
       view.appendTo(node);
+    }
+
+    if (options && options.context) {
+      view.context = options.context;
     }
 
     if (view.onRender) {
@@ -123,6 +128,11 @@
       view.parent = parent;
       parent.nested.push(view);
 
+      // Set context.
+      if (parent.context) {
+        view.context = parent.context;
+      }
+
       // Remember to remove from children map on view remove.
       i = map.push(view);
       view.onRemove = (function (i) {
@@ -152,6 +162,11 @@
       view.parent = parent;
       parent.nested.push(view);
 
+      // Set context.
+      if (parent.context) {
+        view.context = parent.context;
+      }
+
       // Remember to remove child ref on remove of view.
       child.ref = view;
       view.onRemove = function () {
@@ -175,6 +190,11 @@
       // Set view hierarchy.
       view.parent = parent;
       parent.nested.push(view);
+
+      // Set context.
+      if (parent.context) {
+        view.context = parent.context;
+      }
 
       // Remember to remove child ref on remove of view.
       child.ref = view;

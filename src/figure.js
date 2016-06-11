@@ -114,7 +114,9 @@ export class Figure {
 
     // If this figure is root figure.
     if (this.parent === null) {
-      sn.add(`${this.name}.filters = {};\n`);
+      sn.add([
+        `${this.name}.filters = {};\n`
+      ]);
     }
 
     sn.add(this.generateUpdateFunction());
