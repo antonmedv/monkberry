@@ -1,10 +1,15 @@
 {
   "name": "monkberry",
   "version": "4.0.0-beta.5",
-  "description": "JavaScript DOM Template Engine",
+  "description": "Monkberry is a JavaScript library for building web user interfaces",
   "bin": "bin/monkberry",
   "main": "lib/index.js",
   "browser": "./monkberry.js",
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
   "scripts": {
     "test": "testem ci -l phantomjs",
     "build:parser": "preprocess src/parser/grammar.jison ./src/parser > src/parser/grammar.full.jison && jison src/parser/grammar.full.jison -o src/parser/index.js",
