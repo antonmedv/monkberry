@@ -35,7 +35,6 @@
   "homepage": "http://monkberry.js.org",
   "dependencies": {
     "commander": "^2.9.0",
-    "monkberry-parser": "4.0.*",
     "source-map": "^0.5.6",
     "asciitree": "^1.0.2"
   },
