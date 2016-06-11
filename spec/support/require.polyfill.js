@@ -1,8 +1,11 @@
 window.require = function (path) {
   if (path == 'upper-case')
-    return function (text) {
-      return text.toUpperCase();
+    return {
+      default: function (text) {
+        return text.toUpperCase();
+      }
     };
+
   else
     return {};
 };
