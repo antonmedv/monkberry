@@ -96,6 +96,7 @@ AttributeText [^\"{]+
 <expr>"true"                       return "TRUE";
 <expr>"false"                      return "FALSE";
 <expr>"null"                       return "NULL";
+<expr>"this"                       return "THIS";
 <expr>"unsafe"                     return "UNSAFE";
 <expr>{Identifier}                 return "IDENTIFIER";
 <expr>{DecimalLiteral}             return "NUMERIC_LITERAL";

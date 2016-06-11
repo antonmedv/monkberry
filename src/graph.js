@@ -58,7 +58,7 @@ export function drawGraph(ast) {
               })
               .reduce(function (a, b) {
                 return a.concat(b);
-              });
+              }, []);
         }
       } else {
         return [];

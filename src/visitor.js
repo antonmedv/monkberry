@@ -212,6 +212,9 @@ const visitors = {
     visit(node.object, visitor);
     visit(node.property, visitor);
   },
+  ThisExpression: (node, visitor) => {
+    handle(node, visitor);
+  },
   Identifier: (node, visitor) => {
     handle(node, visitor);
   },

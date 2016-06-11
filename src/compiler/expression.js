@@ -198,6 +198,11 @@ export default {
     }
   },
 
+  ThisExpression: ({node, figure}) => {
+    figure.thisRef = true;
+    return sourceNode(node.loc, '_this');
+  },
+
   Identifier: ({node}) => {
     return sourceNode(node.loc, node.name);
   },

@@ -7,7 +7,7 @@ export default {
   ImportStatement: ({node, figure}) => {
     // TODO: Add support for ES2015 imports.
     figure.root().addImport(
-      sourceNode(node.loc, `var ${node.identifier.name} = require(${node.path.value});`)
+      sourceNode(node.loc, `var ${node.identifier.name} = require(${node.path.value}).default;`)
     );
 
     figure.addToScope(node.identifier.name);
