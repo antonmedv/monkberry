@@ -12,14 +12,11 @@ npm install monkberry --save
 * Small, dependency free
 * Simple and minimalistic
 * Fully tested
-* One-way data flow
 * Precompiled templates
 * SourceMaps
 * Custom tags
 * Extremely fast!
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 ## Table of Contents
 
   - [Example](#example)
@@ -36,32 +33,23 @@ npm install monkberry --save
     - [Event Handling](#event-handling)
     - [Globals](#globals)
     - [Prerender](#prerender)
-    - [Pool](#pool)
-    - [Wrappers](#wrappers)
     - [Transforms](#transforms)
-    - [Parsers](#parsers)
     - [Unsafe](#unsafe)
     - [Comments](#comments)
     - [Blocks](#blocks)
   - [API Reference](#api-reference)
     - [Monkberry](#monkberry)
-      - [monkberry.render(name, [values, [noCache]])](#monkberryrendername-values-nocache)
-      - [monkberry.prerender(name, times)](#monkberryprerendername-times)
-      - [monkberry.mount(templates)](#monkberrymounttemplates)
-      - [monkberry.createPool()](#monkberrycreatepool)
-      - [monkberry.getPoolInfo()](#monkberrygetpoolinfo)
-    - [Monkberry.View](#monkberryview)
-      - [view.appendTo(toNode)](#viewappendtotonode)
-      - [view.insertBefore(toNode)](#viewinsertbeforetonode)
-      - [view.createDocument()](#viewcreatedocument)
-      - [view.update(data)](#viewupdatedata)
-      - [view.remove([force])](#viewremoveforce)
-      - [view.querySelector(query)](#viewqueryselectorquery)
+      - [monkberry.render(template, node[, options])](#monkberryrendername-values-nocache)
+      - [monkberry.prerender(template, times)](#monkberryprerendername-times) 
+      - [Monkberry.prototype.appendTo(toNode)](#viewappendtotonode)
+      - [Monkberry.prototype.insertBefore(toNode)](#viewinsertbeforetonode)
+      - [Monkberry.prototype.createDocument()](#viewcreatedocument)
+      - [Monkberry.prototype.update(data)](#viewupdatedata)
+      - [Monkberry.prototype.remove()](#viewremoveforce)
+      - [Monkberry.prototype.querySelector(query)](#viewqueryselectorquery)
   - [Tests](#tests)
   - [Plugins](#plugins)
   - [Benchmarks](#benchmarks)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Example
 
@@ -94,8 +82,7 @@ view.update = function (data) {
 
 Which can be used like that: 
 ```js
-var view = monkberry.render('template');
-view.appendTo(document.body); 
+var view = Monkberry.render(template, document.body);
 
 view.update({
   title: 'Monkberry',
@@ -121,28 +108,15 @@ To compile all templates into single JavaScript file with source map run next co
 monkberry --source-map --output template.js templates/*.html
 ```
 
-Require generated `template.js` and `monkberry.js` files and mount template:
+Require generated `template.js` and `monkberry.js` files and render that view.
 
 ```js
-var monkberry = require('monkberry');
-var template = require('./template.js');
+var Monkberry = require('monkberry');
+var Template = require('./template.js');
 
-monkberry.mount(template);
+var view = Monkberry.render(Template, document.body);
 ```
 
-Render that view.
-
-```js
-var view = monkberry.render('template'); 
-// or
-var view = monkberry.render('template', {...}); 
-```
-
-Attach generated DOM nodes to the page.
-
-```js
-document.getElementById('root').appendChild(view.createDocument());
-```
 
 Now, to update data of view on page:
 
@@ -188,7 +162,8 @@ Any number on variables in `if`:
 > ```
 > Render that template:
 > ```js
-> var view = monkberry.render('example', {
+> var view = Monkberry.render(Example, document.body);
+> view.update({
 >   check: true,
 >   value: 'one'
 > });
@@ -206,7 +181,7 @@ Any number on variables in `if`:
 > ```
 > View will be `Then one!`. 
 >
-> This is happens becouse Monkberry does not stores variables passed to `update` function, it stores only DOM nodes.
+> This is happens because Monkberry does not stores variables passed to `update` function, it stores only DOM nodes.
 > Monkberry will update only one part of `if`/`else`.
 
 ### For
@@ -245,25 +220,13 @@ Also key can be specified.
 
 ### Default values
 
-Render of view contains two phase: node creation and update of node contents with data.
-
-```js
-var view = monkberry.render('template', data);
-// Equals to:
-var view = monkberry.render('template');
-view.update(data);
-```
-
-Some times data for view does not available and it's use full to place come data as default.
-Best way to do it is use logical _OR_ operator `||`.
-
 ```twig
 <div class="foo {{ modify || 'baz' }}">
     {{ content || "No content" }}
 </div>
 ```
 
-In this case on first phase of render view will be filled with default data:
+View rendered without data will be filled with default data:
 
 ```twig
 <div class="foo baz">
@@ -288,14 +251,14 @@ Hello, {{ user.name | upper }}
 
 To define that filter:
 ```js
-monkberry.filters.upper = function (text) {
+Template.filters.upper = function (text) {
   return text.toUpperCase();
 };
 ```
 
 Also Monkberry understand parameters for filters:
 ```js
-monkberry.filters.replace = function (text, from, to) {
+template.filters.replace = function (text, from, to) {
   return text.replace(from, to);
 };
 ```
@@ -318,40 +281,17 @@ Filters can be used in expressions, `if` and `for` statements.
 
 ### Custom tags
 
-Any template mounted to Monkberry can be called as custom tag. 
-
-```js
-monkberry.mount(require('./views/block.html'));
-```
-
-Inside another template possible to insert that `block` templace as custom tag:
-
-```html
+Custom tag template `greet.monk`:
+```twig
 <div>
-  <block/>
+  {{ value }}, {{ name }}!
 </div>
 ```
 
-One file can contains several definitions of custom tags:
-```html
-<my-tag>
-  ...
-</my-tag>
-<my-second-tag>
-  ...
-</my-second-tag>
-```
-
-Custom tags may contains variables:
-```twig
-<greet>
-  {{ value }}, {{ name }}!
-</greet>
-```
-
-To render that custom tag, specify variables as attributes:
+To render that custom tag in another template:
 
 ```twig
+{% import greet from './greet.monk' %}
 <greet value="Hello" name="world">
 <greet value="Hello" name="{{ user.name }}">
 ```
@@ -366,7 +306,7 @@ The properties of the object that you pass in are copied onto the node's attribu
 ```
 
 ```js
-var view = monkberry.render('template', {attr: {
+view.update({attr: {
   id: 'foo', 
   value: 'baz'
 }});
@@ -403,13 +343,19 @@ Spread operator also works well with custom attributes. In fact, this is best wa
 It is possible to require template within another template. 
   
 ```twig
-{% import './path/to/template.html' %}
+{% import Component './Component.monk' %}
 
-    <template/>
+    <Component/>
  
 ```
 
-Import statement will require that template and automatically mount it to monkberry.
+Also it's possible to include any JS file or module:
+
+```twig
+{% import upperCase 'upper-case' %}
+// ...
+{{ upperCase(name) }}
+```
 
 ### Event Handling
 
@@ -422,7 +368,7 @@ view.querySelector('.button').addEventListener('click', function (event) {
 });
 ```
 
-But this is difficult when dealing with conditions and loops (it's is possible to solve if using [wrappers](#wrappers)).
+But this is difficult when dealing with conditions and loops.
 
 Better approach is to use [event delegating](https://github.com/monkberry/events).
 
@@ -444,57 +390,15 @@ To do it, you need to specify globals as array of variables names for compiler t
 To speedup render Monkberry can prerender DOM nodes to use them in future.
 
 ```js
-monkberry.prerender('template', 10); // Preprender template 10 times.
+Monkberry.prerender(Template, 10); // Preprender template 10 times.
 ```
 
 Then next `render` call will use one of these prerendered views:
 ```js
-monkberry.render('template', {...}); // Will use already created DOM nodes.
+Monkberry.render(Template, node); // Will use already created DOM nodes.
 ```
 
 This is very usefull to do then browser waiting some xhr request.
-
-To get info about prerendered template in runtime, use `monkberry.getPoolInfo()`.
-
-> Note what prerender works only with first level DOM nodes. 
-> This means you need to manually prerender templates used in if/for tags.
-> Look at [block](#blocks) statement for example.
-
-### Pool
-
-If you have big application with a lot of template within, it may be a problem what two templates have same names.
-
-To solve this problem create a "pool of templates":
-
-```js
-var pool = monkberry.createPool();
-```
-
-This allow to have templates with same names. `createPool` method creates new Monkberry instance. 
- 
-> Note what filters remain same.
-
-
-### Wrappers
-
-Every template in Monkbeery when rendered can be "wrapped" by function.
-
-For example we have a template `logo.html`:
-```twig
-<div>
-  <i class="svg-icon"></i>
-</div>
-```
-
-And we want to insert SVG nodes inside `i` tag on render. This is can be done via wrappers:
-```js
-monkberry.wrappers.logo = function (view) {
-  view.querySelector('.svg-icon').appendChild(svgIconNodes);
-  return view;
-};
-```
-
-Wrappers usefull to manipulate view's nodes, adding event listeners and a lot of other staff.
 
 ### Transforms
 
@@ -509,23 +413,6 @@ import { myTransform } from './myTransform';
 
 var compiler = new Compiler();
 compiler.transforms.custom = myTransform;
-```
-
-### Parsers
-
-Now Monkberry support only one type of parser, mustage like (`monk` named). But it can be extender with custom parsers. Every parser must return valid [AST](https://github.com/monkberry/parser/blob/master/src/ast.js) tree.
-
-```js
-import { Compiler } from 'monkberry';
-import { myParser } from './parser';
-
-var compiler = new Compiler();
-compiler.parsers.myParser = myTransform;
-
-compiler.addSource('template', code, 'myParser');
-compiler.addSource('another', code, 'monk');
-
-var output = compiler.compile();
 ```
 
 ### Unsafe
@@ -549,98 +436,38 @@ You can use standard html comments.
 
 Comments will be cut out from template. 
 
-
-### Blocks
-
-Allows to define part of template as separate block:
- 
-```twig
-{% block "partial" %}
-  ...
-{% endblock %}
-```
-
-This is very usefull then prerendering parts of templates, especially in loops.
-
-```twig
-{% for key, value of items %}
-  {% block "item" %}
-    ...   
-  {% endblock %}
-{% endfor %}
-```
-
-When to prerender loop block:
-
-```js
-monkberry.prerender('item', 10); // Prerender item template 10 times.
-```
-
 ## API Reference
 
 Monkberry API strictly follows [semantic versioning](http://semver.org).  
 
 ### Monkberry
-
-Then using Monkberry via `require('monkberry')` single instance returned. 
-To create a new Monkberry object or extend prototype use `monkberry.constructor`.
   
-#### monkberry.render(name, [values, [noCache]])
+#### Monkberry.render(template, node, options)
 
-Generates DOM nodes, and returns new `Monkberry.View` instance.
+Render template, and returns new `Monkberry` instance.
 
-* `name`: `string` - name of template.
-* `values`: `Object` - Optional. Data to update view.
-* `noCache`: `boolean` - Optional. Use or not cached view from pool.
-
-#### monkberry.prerender(name, times)
+#### Monkberry.prerender(template, times)
 
 Generates views for future calls of render method.
 
-* `name`: `string` - name of template.
-* `times`: `number` - how many times.
-
-#### monkberry.mount(templates)
-
-Add template to monkberry.
-
-* `templates`: `Object` - monkberry compiled templates.
-
-Example:
-
-```js
-monkberry.mount(require('./template.monk'));
-``` 
- 
-#### monkberry.createPool()
-
-Return new Monkberry instance.
-  
-#### monkberry.getPoolInfo()
- 
-Gets info about prerendered templates in pool/monkberry.
-
- 
-### Monkberry.View
-
-#### view.appendTo(toNode)
+#### Monkberry.prototype.appendTo(toNode)
 
 Append rendered view nodes to specified node.
 
 * `toNode`: `Element` - DOM node.
 
-#### view.insertBefore(toNode)
+#### Monkberry.prototype.insertBefore(toNode)
 
 Insert rendered view nodes before specified node.
 
 * `toNode`: `Element` - DOM node.
 
-#### view.createDocument()
+#### Monkberry.prototype.createDocument()
 
 Return view's nodes. Note what if your template contains more then one root element, `createDocument` function will 
 return `DocumentFragment` what contains all these nodes. If you have only one root node, it will be returned as is.
 
-#### view.update(data)
+#### Monkberry.prototype.update(data)
 
 Update rendered template with new data. You can specify only part of data to update or update entire data.
 
@@ -654,16 +481,12 @@ var data = {
     content: '...'
 };
 
-var view = monkberry.render('...', data);
-
 view.update({title: 'Title #2'});
 ```
 
-#### view.remove([force])
+#### Monkberry.prototype.remove([)
 
 Remove view's nodes from document, and puts it to pool for future reuse.
-
-* `force`: `boolean` - Optional. False be default. If true, removed view will not be putted into pool.
 
 
 #### view.querySelector(query)
@@ -708,8 +531,7 @@ testem ci
 
 ## Benchmarks
 
-Benchmarks covers a few use cases, and compare Monkberry with [React](https://facebook.github.io/react/) and [temple-wat](https://github.com/KosyanMedia/temple).
-Also it's contains real site code for soft/hard update tests.
+Benchmarks covers a few use cases, and compare Monkberry with [React](https://facebook.github.io/react/) and innerHTML.
+Also it's contains real site code for tests.
 
-* [monkberry.github.io/benchmark](http://monkberry.github.io/benchmark/)
-* [github.com/monkberry/benchmark](https://github.com/monkberry/benchmark)
+* [monkberry.js.org/benchmark](http://monkberry.github.io/benchmark/)
