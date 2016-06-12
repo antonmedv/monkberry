@@ -74,13 +74,28 @@ testem
 
 #### [Benchmarks](http://monkberry.github.io/benchmark/)
 
-Why is Monkberry so fast? Even in comparison with React, Monkberry is 10 times faster, sometimes 100 times faster.  
+Why is Monkberry so fast? Even in comparison with React, Monkberry is **10 times faster**, sometimes **100 times faster**.  
 It's because Monkberry will do only necessary dom updates, and does it in a completely different way than React does.  
 Monkberry compiles template to plain JavaScript to gain an advantage by using v8 **hidden classes** and **reduce call stack**.
+There is no virtual dom (in general, an react app have to keep 3 virtual doms), for example next template will be generated to JavaScript code which will do only necessary dom updates on state changes.
 
+```twig
+<div>
+  ...
+    <h1>{{ title }}</h1>
+  ...
+</div>
+```
 
-Benchmarks covers a few use cases, and compare Monkberry with [React](https://facebook.github.io/react/) and innerHTML.
-Also it's contains real site code for tests.
+Will be compiled to code like this:
+
+```js
+function (state) {
+  h1.textContent = state.title;
+}
+```
+
+Benchmarks covers a few use cases, and compare Monkberry with React and innerHTML. Also it's contains real site code and data.
 
 
 ## License
