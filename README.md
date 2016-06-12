@@ -1,21 +1,50 @@
-# Monkberry - JavaScript template engine
+# Monkberry
 [![Build Status](https://travis-ci.org/monkberry/monkberry.svg?branch=master)](https://travis-ci.org/monkberry/monkberry)
 
-Monkberry compile template to JavaScript code for creating nodes with DOM API and helper methods for updating content of these nodes.
+Monkberry is **blazingly fast**, **small `1kb`** and **simple** JavaScript library for building **web user interfaces**.
 
+## Example
+
+Monkberry comes with powerfull templating engine, which is compiled to JavaScript.
+
+```twig
+<ol>
+  {% for todos %}
+    <li>
+      {% if complete %}
+        <del>{{ text }}</del>
+      {% else %}
+        <em>{{ text }}</em>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ol>
 ```
-npm install monkberry --save
+
+and then
+
+```js
+import Monkberry from 'monkberry';
+import Template from 'template.monk';
+
+const view = Monkberry.render(Template, document.body);
+
+view.update({todos: [...]});
 ```
 
 ## Features
 
-* Small, dependency free
-* Simple and minimalistic
+* Small **`1kb`** minified & gzipped
+* Simple, small learning curve
 * Fully tested
 * Precompiled templates
 * SourceMaps
 * Custom tags
-* Extremely fast!
+* Blazingly fast (only necessary dom updates)
+
+## Documentation
+
+Documentation available on [monkberry.js.org](http://monkberry.js.org) site.
 
 ## Table of Contents
 
