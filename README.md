@@ -39,7 +39,7 @@ view.update({todos: [...]});
 * Simple, small learning curve
 * Fully tested
 * Precompiled templates
-* SourceMaps
+* Source maps
 * Custom tags
 * Blazingly fast (only necessary dom updates)
 
