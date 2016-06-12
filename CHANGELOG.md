@@ -1,5 +1,17 @@
 # CHANGELOG
 
+### 4.0.1
+* A lot of refactoring in compiler and runtime.
+* Improved performance in 1.5 times.
+* New feature: extendable templates.
+* New feature: contexts.
+* Added support to import anything.
+* Added this expression support.
+* Fixed scope variable updates.
+* Dropped support for wrappers.
+* Dropped support for parsers.
+* Dropped block statements.
+
 ### 3.8.1
 
 * Fix bug with updating local variable from outer scope.
