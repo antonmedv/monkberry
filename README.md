@@ -1,4 +1,5 @@
 # Monkberry
+[![npm](https://img.shields.io/npm/v/monkberry.svg)](https://www.npmjs.com/package/monkberry)
 [![Build Status](https://travis-ci.org/monkberry/monkberry.svg?branch=master)](https://travis-ci.org/monkberry/monkberry)
 
 Monkberry is **blazingly fast**, **small `1kb`** and **simple** JavaScript library for building **web user interfaces**.
@@ -71,10 +72,16 @@ testem
 
 ## Performance
 
+#### [Benchmarks](http://monkberry.github.io/benchmark/)
+
+Why is Monkberry so fast? Even in comparison with React, Monkberry is 10 times faster, sometimes 100 times faster.  
+It's because Monkberry will do only necessary dom updates, and does it in a completely different way than React does.  
+Monkberry compiles template to plain JavaScript to gain an advantage by using v8 **hidden classes** and **reduce call stack**.
+
+
 Benchmarks covers a few use cases, and compare Monkberry with [React](https://facebook.github.io/react/) and innerHTML.
 Also it's contains real site code for tests.
 
-* [Benchmarks](http://monkberry.github.io/benchmark/)
 
 ## License
 
