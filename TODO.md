@@ -8,5 +8,6 @@
 * [ ] Hot module replacment for monkberry-loader (good starting point is this commit [eb226f](https://github.com/monkberry/monkberry-loader/commit/eb226f23bc425617898d14d5d60ea3823d1bddec)) :star:
 * [ ] Server side rendering :star:
 * [ ] `{% elseif %}` support.
+* [ ] Template inheritance with `{% extends %}` :star:
 
 :star: — _complex, but interesting tasks_
