@@ -37,7 +37,8 @@ export default {
     let prefix = ``;
 
     if (!figure.isInScope(node.callee.name)) {
-      prefix = `${figure.root().name}.filters.`;
+      figure.thisRef = true;
+      prefix = `_this.filters.`;
     }
     
     let sn = sourceNode(node.loc, [prefix, compile(node.callee), '(']);

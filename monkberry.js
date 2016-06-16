@@ -33,20 +33,21 @@
    * @class
    */
   function Monkberry() {
-    this.parent = null; // Parent view.
-    this.nested = []; // Nested views.
-    this.nodes = []; // Root DOM nodes.
-    this.context = null; // Optional context.
-    this.onRender = null; // Function to call on render.
-    this.onUpdate = null; // Function to call on update.
-    this.onRemove = null; // Function to call on remove.
+    this.parent = null;
+    this.nested = [];
+    this.nodes = [];
+    this.filters = null;
+    this.context = null;
+    this.onRender = null;
+    this.onUpdate = null;
+    this.onRemove = null;
   }
 
   /**
    * Render template and attach it to node.
    * @param {Monkberry} template
    * @param {Element} node
-   * @param {{noCache: Boolean, context: Object}=} options
+   * @param {Object=} options
    * @return {Monkberry}
    */
   Monkberry.render = function (template, node, options) {
@@ -66,6 +67,10 @@
 
     if (options && options.context) {
       view.context = options.context;
+    }
+
+    if (options && options.filters) {
+      view.filters = options.filters;
     }
 
     if (view.onRender) {
@@ -133,6 +138,11 @@
         view.context = parent.context;
       }
 
+      // Set filters.
+      if (parent.filters) {
+        view.filters = parent.filters;
+      }
+
       // Remember to remove from children map on view remove.
       i = map.push(view);
       view.onRemove = (function (i) {
@@ -167,6 +177,11 @@
         view.context = parent.context;
       }
 
+      // Set filters.
+      if (parent.filters) {
+        view.filters = parent.filters;
+      }
+
       // Remember to remove child ref on remove of view.
       child.ref = view;
       view.onRemove = function () {
@@ -194,6 +209,11 @@
       // Set context.
       if (parent.context) {
         view.context = parent.context;
+      }
+
+      // Set filters.
+      if (parent.filters) {
+        view.filters = parent.filters;
       }
 
       // Remember to remove child ref on remove of view.
