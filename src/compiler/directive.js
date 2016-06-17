@@ -8,7 +8,7 @@ export default {
    * Compile directive of regular nodes.
    *
    * @param {ElementNode} parent
-   * @param {AttributeNode} node
+   * @param {DirectiveNode} node
    * @param {Figure} figure
    * @param {Function} compile
    */
