@@ -10,7 +10,7 @@ export class Compiler {
     this.options = Object.assign({
       asModule: true
     }, options);
-    this.transforms = {whitespace, entity};
+    this.transforms = [whitespace, entity];
     this.globals = ['window', 'Math'];
   }
 
@@ -18,7 +18,7 @@ export class Compiler {
     let ast = parser.parse(filename, code);
 
     // Transform.
-    Object.keys(this.transforms).forEach((key) => this.transforms[key](ast));
+    this.transforms.forEach(transform => transform(ast));
 
     return compile(getTemplateName(getBaseName(filename)), ast, this.options, this.globals);
   }
@@ -27,7 +27,7 @@ export class Compiler {
     let ast = parser.parse(filename, code);
 
     // Transform.
-    Object.keys(this.transforms).forEach((key) => this.transforms[key](ast));
+    this.transforms.forEach(transform => transform(ast));
 
     return drawGraph(ast);
   }
