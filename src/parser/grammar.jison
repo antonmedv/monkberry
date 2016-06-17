@@ -64,6 +64,7 @@ AttributeText [^\"{]+
 <html>"meta"                       return "META";
 <html>([\w-]+)                     return "IDENTIFIER";
 <html>\s+                          /* skip whitespaces */
+<html>":"                          return ":";
 <html>"="                          return "=";
 <html>"{{"                         this.begin("expr"); return "{{";
 <html>(\")                         this.begin("attr"); return "QUOTE";
@@ -324,6 +325,13 @@ AttributeList
 
 
 Attribute
+    : PlainAttribute
+    | SpreadAttribute
+    | Directive
+    ;
+
+
+PlainAttribute
     : IDENTIFIER
         {
             $$ = new AttributeNode($1, null, createSourceLocation(@1, @1));
@@ -336,9 +344,29 @@ Attribute
         {
             $$ = new AttributeNode($1, $4, createSourceLocation(@1, @5));
         }
-    | "{{" "..." IdentifierName "}}"
+    ;
+
+
+SpreadAttribute
+    : "{{" "..." IdentifierName "}}"
         {
-            $$ = new SpreadAttributeNode($3, createSourceLocation(@1, @4));
+          $$ = new SpreadAttributeNode($3, createSourceLocation(@1, @4));
+        }
+    ;
+
+
+Directive
+    : ":" IDENTIFIER
+        {
+            $$ = new DirectiveNode($2, null, createSourceLocation(@1, @2));
+        }
+    | ":" IDENTIFIER "=" ExpressionStatement
+        {
+            $$ = new DirectiveNode($2, [$4], createSourceLocation(@1, @4));
+        }
+    | ":" IDENTIFIER "=" QUOTE AttributeValue QUOTE
+        {
+            $$ = new DirectiveNode($2, $5, createSourceLocation(@1, @6));
         }
     ;
 

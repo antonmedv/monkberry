@@ -40,7 +40,7 @@ if (program.drawAst) {
       }
       console.log(compiler.drawAstTree(sources[i][0], sources[i][1]));
     } catch (e) {
-      console.error(e.toString());
+      console.error(e.message);
       return;
     }
   }
@@ -52,7 +52,7 @@ for (i = 0; i < sources.length; i++) {
   try {
     node.add(compiler.compile(sources[i][0], sources[i][1]));
   } catch (e) {
-    console.error(e.toString());
+    console.error(e.message);
     return;
   }
 }

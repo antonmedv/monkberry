@@ -2,6 +2,7 @@ import { Figure } from '../figure';
 import document from './document';
 import element from './element';
 import attribute from './attribute';
+import directive from './directive';
 import expression from './expression';
 import text from './text';
 import comment from './comment';
@@ -14,6 +15,7 @@ const compilers = Object.assign({},
   document,
   element,
   attribute,
+  directive,
   expression,
   text,
   comment,

@@ -50,6 +50,15 @@ const visitors = {
     handle(node, visitor);
     visit(node.identifier, visitor);
   },
+  Directive: (node, visitor) => {
+    handle(node, visitor);
+
+    if (node.body) {
+      for (let i = 0; i < node.body.length; i++) {
+        visit(node.body[i], visitor);
+      }
+    }
+  },
   ExpressionStatement: (node, visitor) => {
     handle(node, visitor);
     visit(node.expression, visitor);

@@ -37,7 +37,9 @@
     this.nested = [];
     this.nodes = [];
     this.filters = null;
+    this.directives = null;
     this.context = null;
+    this.unbind = null;
     this.onRender = null;
     this.onUpdate = null;
     this.onRemove = null;
@@ -65,12 +67,22 @@
       view.appendTo(node);
     }
 
-    if (options && options.context) {
-      view.context = options.context;
-    }
+    if (options) {
+      if (options.parent) {
+        view.parent = options.parent;
+      }
 
-    if (options && options.filters) {
-      view.filters = options.filters;
+      if (options.context) {
+        view.context = options.context;
+      }
+
+      if (options.filters) {
+        view.filters = options.filters;
+      }
+
+      if (options.directives) {
+        view.directives = options.directives;
+      }
     }
 
     if (view.onRender) {
@@ -127,25 +139,14 @@
     // If new array contains more items when previous, render new views and append them.
     for (j = childrenSize, len = arrayLength; j < len; j++) {
       // Render new view.
-      var view = Monkberry.render(template, node);
+      var view = Monkberry.render(template, node, {parent: parent, context: parent.context, filters: parent.filters, directives: parent.directives});
 
       // Set view hierarchy.
-      view.parent = parent;
       parent.nested.push(view);
-
-      // Set context.
-      if (parent.context) {
-        view.context = parent.context;
-      }
-
-      // Set filters.
-      if (parent.filters) {
-        view.filters = parent.filters;
-      }
 
       // Remember to remove from children map on view remove.
       i = map.push(view);
-      view.onRemove = (function (i) {
+      view.unbind = (function (i) {
         return function () {
           map.remove(i);
         };
@@ -166,25 +167,14 @@
       }
     } else if (test) {
       // Render new view.
-      var view = Monkberry.render(template, node);
+      var view = Monkberry.render(template, node, {parent: parent, context: parent.context, filters: parent.filters, directives: parent.directives});
 
       // Set view hierarchy.
-      view.parent = parent;
       parent.nested.push(view);
-
-      // Set context.
-      if (parent.context) {
-        view.context = parent.context;
-      }
-
-      // Set filters.
-      if (parent.filters) {
-        view.filters = parent.filters;
-      }
 
       // Remember to remove child ref on remove of view.
       child.ref = view;
-      view.onRemove = function () {
+      view.unbind = function () {
         child.ref = null;
       };
     }
@@ -197,28 +187,17 @@
    */
   Monkberry.insert = function (parent, node, child/*.ref*/, template, data) {
     if (child.ref) { // If view was already inserted, update or remove it.
-        child.ref.update(data);
+      child.ref.update(data);
     } else {
       // Render new view.
-      var view = Monkberry.render(template, node);
+      var view = Monkberry.render(template, node, {parent: parent, context: parent.context, filters: parent.filters, directives: parent.directives});
 
       // Set view hierarchy.
-      view.parent = parent;
       parent.nested.push(view);
-
-      // Set context.
-      if (parent.context) {
-        view.context = parent.context;
-      }
-
-      // Set filters.
-      if (parent.filters) {
-        view.filters = parent.filters;
-      }
 
       // Remember to remove child ref on remove of view.
       child.ref = view;
-      view.onRemove = function () {
+      view.unbind = function () {
         child.ref = null;
       };
 
@@ -238,8 +217,8 @@
     }
 
     // Remove self from parent's children map or child ref.
-    if (this.onRemove) {
-      this.onRemove();
+    if (this.unbind) {
+      this.unbind();
     }
 
     // Remove all nested views.
@@ -253,6 +232,11 @@
       i = this.parent.nested.indexOf(this);
       this.parent.nested.splice(i, 1);
       this.parent = null;
+    }
+
+    // Call on remove callback.
+    if (this.onRemove) {
+      this.onRemove();
     }
 
     // Store view in pool for reuse in future.

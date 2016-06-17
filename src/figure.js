@@ -12,11 +12,13 @@ export class Figure {
     this.imports = [];
     this.declarations = [];
     this.constructions = [];
+    this.directives = [];
     this.renderActions = [];
     this.subFigures = [];
     this.spots = {};
     this.scope = [];
     this.onUpdate = [];
+    this.onRemove = [];
     this.thisRef = false;
     this.spotMaxLength = 0;
   }
@@ -69,6 +71,14 @@ export class Figure {
       ]);
     }
 
+    if (this.directives.length > 0) {
+      sn.add([
+        `  // Directives\n`,
+        `  `, sourceNode(null, this.directives).join(`\n  `),
+        `\n\n`
+      ]);
+    }
+
     if (size(this.spots) > 0) {
       sn.add([
         `  // Update functions\n`,
@@ -83,7 +93,7 @@ export class Figure {
       sn.add([
         `  // Extra render actions\n`,
         `  this.onRender = function () {\n`,
-        this.generateRenderActions(), `\n`,
+        sourceNode(this.renderActions).join(`\n`), `\n`,
         `  };\n`,
         `\n`
       ]);
@@ -93,7 +103,17 @@ export class Figure {
       sn.add([
         `  // On update actions\n`,
         `  this.onUpdate = function (__data__) {\n`,
-        this.generateOnUpdate(), `\n`,
+        sourceNode(this.onUpdate).join(`\n`), `\n`,
+        `  };\n`,
+        `\n`
+      ]);
+    }
+
+    if (this.onRemove.length > 0) {
+      sn.add([
+        `  // On remove actions\n`,
+        `  this.onRemove = function (__data__) {\n`,
+        sourceNode(this.onRemove).join(`\n`), `\n`,
         `  };\n`,
         `\n`
       ]);
@@ -111,13 +131,6 @@ export class Figure {
       `${this.name}.prototype.constructor = ${this.name};\n`,
       `${this.name}.pool = [];\n`
     ]);
-
-    // If this figure is root figure.
-    if (this.parent === null) {
-      sn.add([
-        `${this.name}.filters = {};\n`
-      ]);
-    }
 
     sn.add(this.generateUpdateFunction());
 
@@ -149,14 +162,6 @@ export class Figure {
       });
 
     return sourceNode(null, parts).join(`,\n`);
-  }
-
-  generateRenderActions() {
-    return sourceNode(this.renderActions).join(`\n`);
-  }
-
-  generateOnUpdate() {
-    return sourceNode(this.onUpdate).join(`\n`);
   }
 
   generateUpdateFunction() {
@@ -289,5 +294,13 @@ export class Figure {
 
   addOnUpdate(node) {
     this.onUpdate.push(node);
+  }
+
+  addOnRemove(node) {
+    this.onRemove.push(node);
+  }
+
+  addDirective(node) {
+    this.directives.push(node);
   }
 }

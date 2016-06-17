@@ -51,3 +51,7 @@ export function arrayToObject(array, value = 1) {
   }
   return obj;
 }
+
+export function hyphensToCamelCase(str) {
+  return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+}
