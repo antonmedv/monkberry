@@ -41,11 +41,9 @@
   "devDependencies": {
     "babel-cli": "^6.9.0",
     "babel-preset-es2015": "^6.9.0",
-    "doctoc": "^1.1.1",
     "jasmine": "^2.4.1",
     "jison": "^0.4.17",
     "preprocessor": "^1.4.0",
-    "testem": "^1.8.1",
-    "through": "^2.3.8"
+    "testem": "^1.8.1"
   }
 }
