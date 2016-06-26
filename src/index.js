@@ -11,7 +11,13 @@ export class Compiler {
       asModule: true
     }, options);
     this.transforms = [whitespace, entity];
-    this.globals = ['window', 'Math'];
+    this.globals = [
+      'window',
+      'Array',
+      'Object',
+      'Math',
+      'JSON'
+    ];
   }
 
   compile(filename, code) {

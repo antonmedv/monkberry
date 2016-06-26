@@ -142,8 +142,14 @@ describe('Monkberry', function () {
   it('should support global variables', function () {
     var view = Monkberry.render(Globals, root);
     view.update({host: window.location.host});
-
     expect(view).toBeLike('<i>expr, if<!--if-->, for<!--for-->, <i class="attr"></i>, custom<!--GlobalsCustom--></i>');
+
+    view = Monkberry.render(GlobalsList, root);
+    view.update({
+      array: [1, 2, 3],
+      obj: {a: 1, b: 2}
+    });
+    expect(view).toBeLike('array, 4, a;b, {"a":1,"b":2}');
   });
 
   it('should support expressions without variables', function () {

@@ -80,6 +80,12 @@
         </GlobalsCustom>
     </i>
 </Globals>
+<GlobalsList>
+  {{ Array.isArray(array) ? 'array' : '' }},
+  {{ Math.pow(2, 2) }},
+  {{ Object.keys(obj).join(';') }},
+  {{ JSON.stringify(obj) }}
+</GlobalsList>
 <EmptyExpression>
     {{ 1 + 2 * 3 }}
 </EmptyExpression>
