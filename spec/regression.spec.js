@@ -74,7 +74,7 @@ describe('Regression', function () {
 
     expect(function () {
       view.querySelector('.if');
-    }).toThrow('Can not use querySelector with non-element nodes on first level.');
+    }).toThrow(new Error('Can not use querySelector with non-element nodes on first level.'));
   });
 
 

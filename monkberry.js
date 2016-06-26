@@ -295,7 +295,7 @@
       }
 
       if (this.nodes[i].nodeType === 8) {
-        throw 'Can not use querySelector with non-element nodes on first level.';
+        throw new Error('Can not use querySelector with non-element nodes on first level.');
       }
 
       if (this.nodes[i].querySelector) {

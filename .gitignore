@@ -4,3 +4,4 @@
 /benchmark/
 size.sh
 *.full.jison
+spec/views.js
