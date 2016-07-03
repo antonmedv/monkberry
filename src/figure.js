@@ -38,26 +38,26 @@ export class Figure {
       sn.add(this.generateFunctions());
     }
 
-    let src = '\n';
+    let src = '';
 
     if (ecmaVersion < 6) {
       sn.add(dedent`
-
         /**
-         * @class
+         * @class ${this.name}
          */
         function ${this.name}() {
           Monkberry.call(this);
+          
       `);
     } else {
       sn.add(dedent`
-        
         /**
-         * @class
+         * @class ${this.name}
          */
         class ${this.name} extends Monkberry {
           constructor() {
             super();
+
       `);
     }
 
@@ -241,7 +241,7 @@ export class Figure {
       sn.add(`  this.onUpdate(__data__);\n`);
     }
 
-    sn.add(`};\n`);
+    sn.add(`};\n\n`);
     return sn;
   }
 

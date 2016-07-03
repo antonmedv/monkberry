@@ -71,7 +71,8 @@ function unsafe(root, nodes, html) {
         root.parentNode.insertBefore(nodes[i], root);
       }
     } else {
-      throw "Can not insert child view into parent node. You need append your view first and then update.";
+      throw new ReferenceError("Cannot insert child view into parent node. " + 
+        "You need to append your view first before updating.");
     }
   } else {
     while (i-- > 0)
