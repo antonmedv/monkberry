@@ -85,7 +85,7 @@ export class Figure {
     if (this.constructions.length > 0) {
       src += dedent`
         // Construct dom
-        ${ sourceNode(null, this.constructions).join(`\n  `) }
+        ${ sourceNode(null, this.constructions).join(`\n`) }
         
 
       `;
@@ -94,7 +94,7 @@ export class Figure {
     if (this.directives.length > 0) {
       src += dedent`
         // Directives
-        ${ sourceNode(null, this.directives).join(`\n  `) }
+        ${ sourceNode(null, this.directives).join(`\n`) }
         
 
       `;
