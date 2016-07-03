@@ -47,7 +47,7 @@ export class Figure {
          */
         function ${this.name}() {
           Monkberry.call(this);
-          
+
       `);
     } else {
       sn.add(dedent`
@@ -145,7 +145,7 @@ export class Figure {
       this.nodes = [${ sourceNode(this.children).join(`, `) }];
     `;
 
-    sn.add(src.split('\n').join('\n' + indent));
+    sn.add(indent + src.split('\n').join('\n' + indent));
 
     if (ecmaVersion < 6) {
       sn.add(dedent`
