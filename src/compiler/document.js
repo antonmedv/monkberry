@@ -4,12 +4,17 @@ import { notNull } from '../utils';
 export default {
   Document: ({node, figure, compile, options}) => {
     figure.children = node.body.map((child) => compile(child)).filter(notNull);
+    const { ecmaVersion } = options;
 
     if (options.asModule) {
       return sourceNode(node.loc, [
-        `var Monkberry = require('monkberry');\n`,
+        ecmaVersion < 6
+          ? `var Monkberry = require('monkberry');\n`
+          : `import Monkberry from 'monkberry';\n`,
         figure.generate(), `\n`,
-        `module.exports = ${figure.name};\n`
+        ecmaVersion < 6
+          ? `module.exports = ${figure.name};\n`
+          : `export default ${figure.name};\n`
       ]);
     } else {
       return sourceNode(node.loc, [
@@ -19,5 +24,3 @@ export default {
     }
   }
 };
-
-

@@ -4,21 +4,23 @@ import { isSingleChild, esc, notNull } from '../utils';
 import { Figure } from '../figure';
 
 export default {
-  ForStatement: ({parent, node, figure, compile}) => {
+  ForStatement: ({parent, node, figure, compile, options}) => {
     node.reference = null;
 
     let templateName = figure.name + '_for' + figure.uniqid('template_name');
     let childrenName = 'children' + figure.uniqid('child_name');
     let placeholder;
 
+    const _var = options.ecmaVersion < 6 ? 'var' : 'const';
+
     if (isSingleChild(parent, node)) {
       placeholder = parent.reference;
     } else {
       node.reference = placeholder = 'for' + figure.uniqid('placeholder');
-      figure.declare(sourceNode(`var ${placeholder} = document.createComment('for');`));
+      figure.declare(sourceNode(`${_var} ${placeholder} = document.createComment('for');`));
     }
 
-    figure.declare(sourceNode(`var ${childrenName} = new Monkberry.Map();`));
+    figure.declare(sourceNode(`${_var} ${childrenName} = new Monkberry.Map();`));
 
     // for (
 

@@ -1,6 +1,6 @@
 {
   "name": "monkberry",
-  "version": "4.0.2",
+  "version": "4.0.4",
   "description": "Monkberry is a JavaScript library for building web user interfaces",
   "bin": "bin/monkberry",
   "main": "lib/index.js",
@@ -8,6 +8,14 @@
   "babel": {
     "presets": [
       "es2015"
+    ],
+    "plugins": [
+      [
+        "transform-es2015-for-of",
+        {
+          "loose": true
+        }
+      ]
     ]
   },
   "scripts": {
@@ -43,6 +51,7 @@
     "babel-preset-es2015": "^6.9.0",
     "jasmine": "^2.4.1",
     "jison": "^0.4.17",
+    "phantomjs": "^2.1.7",
     "preprocessor": "^1.4.0",
     "testem": "^1.8.1"
   }

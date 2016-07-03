@@ -4,7 +4,7 @@ import { collectVariables } from './variable';
 import { isSingleChild, notNull } from '../utils';
 
 export default {
-  IfStatement: ({parent, node, figure, compile}) => {
+  IfStatement: ({parent, node, figure, compile, options}) => {
     node.reference = null;
 
     let templateNameForThen = figure.name + '_if' + figure.uniqid('template_name');
@@ -13,18 +13,20 @@ export default {
     let childNameForOtherwise = 'child' + figure.uniqid('child_name');
     let placeholder;
 
+    const _var = options.ecmaVersion < 6 ? 'var' : 'const';
+
     if (isSingleChild(parent, node)) {
       placeholder = parent.reference;
     } else {
       node.reference = placeholder = 'for' + figure.uniqid('placeholder');
-      figure.declare(sourceNode(`var ${placeholder} = document.createComment('if');`));
+      figure.declare(sourceNode(`${_var} ${placeholder} = document.createComment('if');`));
     }
 
 
-    figure.declare(`var ${childNameForThen} = {};`);
+    figure.declare(`${_var} ${childNameForThen} = {};`);
 
     if (node.otherwise) {
-      figure.declare(`var ${childNameForOtherwise} = {};`);
+      figure.declare(`${_var} ${childNameForOtherwise} = {};`);
     }
 
     // if (
@@ -33,7 +35,7 @@ export default {
 
     figure.thisRef = true;
     figure.hasNested = true;
-    
+
     figure.spot(variablesOfExpression).add(
       sourceNode(node.loc, [
         `      `,
