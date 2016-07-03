@@ -64,7 +64,7 @@ export class Figure {
     const indent = ecmaVersion < 6 ? '  ' : '    ';
 
     if (this.spotMaxLength > 1) {
-      src += `this.__cache__ = {};\n`
+      src += `this.__cache__ = {};\n`;
     }
 
     if (this.thisRef) {
@@ -117,7 +117,7 @@ export class Figure {
         ${sourceNode(this.renderActions).join(`\n`)}
         };
         
-      `
+      `;
     }
 
     if (this.onUpdate.length > 0) {
