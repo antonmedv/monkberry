@@ -56,7 +56,7 @@ export default {
     // ) then {
 
     let compileBody = (loc, body, templateName, childName) => {
-      let subfigure = new Figure(templateName, figure);
+      let subfigure = new Figure(templateName, figure, options);
       subfigure.children = body.map(node => compile(node, subfigure)).filter(notNull);
       figure.addFigure(subfigure);
 

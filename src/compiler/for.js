@@ -39,7 +39,7 @@ export default {
 
     // ) {
 
-    let subfigure = new Figure(templateName, figure);
+    let subfigure = new Figure(templateName, figure, options);
 
     if (node.body.length > 0) {
       subfigure.children = node.body.map((node) => compile(node, subfigure)).filter(notNull);

@@ -3,9 +3,10 @@ import { size } from './utils';
 import { Spot } from './spot';
 
 export class Figure {
-  constructor(name, parent = null) {
+  constructor(name, parent = null, options = {}) {
     this.name = name;
     this.parent = parent;
+    this.options = options;
     this.uniqCounters = {};
     this.children = [];
     this.functions = {};
@@ -24,6 +25,7 @@ export class Figure {
   }
 
   generate() {
+    const { ecmaVersion } = this.options;
     let sn = sourceNode(``);
 
     if (this.imports.length > 0) {
@@ -36,102 +38,134 @@ export class Figure {
       sn.add(this.generateFunctions());
     }
 
-    sn.add([
-      `\n`,
-      `/**\n`,
-      ` * @class\n`,
-      ` */\n`,
-      `function ${this.name}() {\n`,
-      `  Monkberry.call(this);\n`
-    ]);
+    let src = '\n';
+
+    if (ecmaVersion < 6) {
+      sn.add(dedent`
+
+        /**
+         * @class
+         */
+        function ${this.name}() {
+          Monkberry.call(this);
+      `);
+    } else {
+      sn.add(dedent`
+        
+        /**
+         * @class
+         */
+        class ${this.name} extends Monkberry {
+          constructor() {
+            super();
+      `);
+    }
+
+    const indent = ecmaVersion < 6 ? '  ' : '    ';
 
     if (this.spotMaxLength > 1) {
-      sn.add(`  this.__cache__ = {};\n`);
+      src += `this.__cache__ = {};\n`
     }
 
     if (this.thisRef) {
-      sn.add(`  var _this = this;\n`);
+      src += `var _this = this;\n`;
     }
 
-    sn.add(`\n`);
+    src += `\n`;
 
     if (this.declarations.length > 0) {
-      sn.add([
-        `  // Create elements\n`,
-        `  `, sourceNode(this.declarations).join(`\n  `),
-        `\n\n`
-      ]);
+      src += dedent`
+        // Create elements
+        ${ sourceNode(this.declarations).join(`\n`) }
+        
+
+      `;
     }
 
     if (this.constructions.length > 0) {
-      sn.add([
-        `  // Construct dom\n`,
-        `  `, sourceNode(null, this.constructions).join(`\n  `),
-        `\n\n`
-      ]);
+      src += dedent`
+        // Construct dom
+        ${ sourceNode(null, this.constructions).join(`\n  `) }
+        
+
+      `;
     }
 
     if (this.directives.length > 0) {
-      sn.add([
-        `  // Directives\n`,
-        `  `, sourceNode(null, this.directives).join(`\n  `),
-        `\n\n`
-      ]);
+      src += dedent`
+        // Directives
+        ${ sourceNode(null, this.directives).join(`\n  `) }
+        
+
+      `;
     }
 
     if (size(this.spots) > 0) {
-      sn.add([
-        `  // Update functions\n`,
-        `  this.__update__ = {\n`,
-        this.generateSpots(), `\n`,
-        `  };\n`,
-        `\n`
-      ]);
+      src += dedent`
+        // Update functions
+        this.__update__ = {
+        ${this.generateSpots()}, 
+        };
+        
+      `;
     }
 
     if (this.renderActions.length > 0) {
-      sn.add([
-        `  // Extra render actions\n`,
-        `  this.onRender = function () {\n`,
-        sourceNode(this.renderActions).join(`\n`), `\n`,
-        `  };\n`,
-        `\n`
-      ]);
+      src += dedent`
+        // Extra render actions
+        this.onRender = function () {
+        ${sourceNode(this.renderActions).join(`\n`)}
+        };
+        
+      `
     }
 
     if (this.onUpdate.length > 0) {
-      sn.add([
-        `  // On update actions\n`,
-        `  this.onUpdate = function (__data__) {\n`,
-        sourceNode(this.onUpdate).join(`\n`), `\n`,
-        `  };\n`,
-        `\n`
-      ]);
+      src += dedent`
+        // On update actions
+        this.onUpdate = function (__data__) {
+          ${sourceNode(this.onUpdate).join(`\n`)}
+
+        };
+        
+      `;
     }
 
     if (this.onRemove.length > 0) {
-      sn.add([
-        `  // On remove actions\n`,
-        `  this.onRemove = function (__data__) {\n`,
-        sourceNode(this.onRemove).join(`\n`), `\n`,
-        `  };\n`,
-        `\n`
-      ]);
+      src += dedent`
+        // On remove actions
+        this.onRemove = function (__data__) {
+        ${sourceNode(this.onRemove).join(`\n`)}
+        };
+      `;
     }
 
-    sn.add([
-      `  // Set root nodes\n`,
-      `  this.nodes = [`, sourceNode(this.children).join(`, `), `];\n`
-    ]);
+    src += dedent`
+      // Set root nodes
+      this.nodes = [${ sourceNode(this.children).join(`, `) }];
+    `;
 
-    sn.add(`}\n`);
+    sn.add(src.split('\n').join('\n' + indent));
 
-    sn.add([
-      `${this.name}.prototype = Object.create(Monkberry.prototype);\n`,
-      `${this.name}.prototype.constructor = ${this.name};\n`,
-      `${this.name}.pool = [];\n`
-    ]);
+    if (ecmaVersion < 6) {
+      sn.add(dedent`
 
+        }
+        ${this.name}.prototype = Object.create(Monkberry.prototype);
+        ${this.name}.prototype.constructor = ${this.name};
+        ${this.name}.pool = [];
+
+      `);      
+    } else {
+      sn.add(dedent`
+
+          }
+        }
+        ${this.name}.pool = [];
+
+      `);
+    }
+    
     sn.add(this.generateUpdateFunction());
 
     for (let subfigure of this.subFigures) {
