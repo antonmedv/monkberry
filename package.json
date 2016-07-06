@@ -8,6 +8,15 @@
   "babel": {
     "presets": [
       "es2015"
+    ],
+    "plugins": [
+      "dedent",
+      [
+        "transform-es2015-for-of",
+        {
+          "loose": true
+        }
+      ]
     ]
   },
   "scripts": {
@@ -40,9 +49,11 @@
   },
   "devDependencies": {
     "babel-cli": "^6.9.0",
+    "babel-plugin-dedent": "^2.0.0",
     "babel-preset-es2015": "^6.9.0",
     "jasmine": "^2.4.1",
     "jison": "^0.4.17",
+    "phantomjs-prebuilt": "^2.1.7",
     "preprocessor": "^1.4.0",
     "testem": "^1.8.1"
   }

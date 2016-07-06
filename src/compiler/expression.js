@@ -2,8 +2,9 @@ import { sourceNode } from './sourceNode';
 import { collectVariables } from './variable';
 
 export default {
-  ExpressionStatement: ({node, compile, figure}) => {
+  ExpressionStatement: ({node, compile, figure, options}) => {
     node.reference = 'text' + figure.uniqid();
+    const _var = options.ecmaVersion < 6 ? 'var' : 'const';
 
     let defaultValue = `''`;
 
@@ -15,7 +16,7 @@ export default {
     }
 
     figure.declare(
-      sourceNode(`var ${node.reference} = document.createTextNode(${defaultValue});`)
+      sourceNode(`${_var} ${node.reference} = document.createTextNode(${defaultValue});`)
     );
 
     let variables = collectVariables(figure.getScope(), node.expression);
@@ -33,14 +34,14 @@ export default {
     return node.reference;
   },
 
-  FilterExpression: ({node, figure, compile}) => { 
+  FilterExpression: ({node, figure, compile}) => {
     let prefix = ``;
 
     if (!figure.isInScope(node.callee.name)) {
       figure.thisRef = true;
       prefix = `_this.filters.`;
     }
-    
+
     let sn = sourceNode(node.loc, [prefix, compile(node.callee), '(']);
 
     for (let i = 0; i < node.arguments.length; i++) {
@@ -203,7 +204,7 @@ export default {
     const ref = fig => fig.parent == null ? '' : '.parent' + ref(fig.parent);
 
     figure.thisRef = true;
-    
+
     return sourceNode(node.loc, '_this' + ref(figure));
   },
 

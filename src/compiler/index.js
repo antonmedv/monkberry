@@ -42,7 +42,7 @@ function next(parent, node, figure, options) {
 }
 
 export function compile(name, ast, options, globals) {
-  let figure = new Figure(name);
+  let figure = new Figure(name, null, options);
   figure.scope = globals;
   return next(null, ast, figure, options);
 }

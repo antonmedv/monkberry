@@ -5,21 +5,22 @@ import { compileToExpression } from './attribute';
 import { Figure } from '../figure';
 
 export default {
-  Element: ({parent, node, figure, compile}) => {
+  Element: ({parent, node, figure, compile, options}) => {
     node.reference = null;
 
     let templateName = getTemplateName(node.name);
     let childName = 'child' + figure.uniqid('child_name');
     let placeholder;
+    const _var = options.ecmaVersion < 6 ? 'var' : 'const';
 
     if (isSingleChild(parent, node)) {
       placeholder = parent.reference;
     } else {
       node.reference = placeholder = 'custom' + figure.uniqid('placeholder');
-      figure.declare(sourceNode(`var ${placeholder} = document.createComment('${node.name}');`));
+      figure.declare(sourceNode(`${_var} ${placeholder} = document.createComment('${node.name}');`));
     }
 
-    figure.declare(sourceNode(`var ${childName} = {};`));
+    figure.declare(sourceNode(`${_var} ${childName} = {};`));
 
     let data = [];
     let variables = [];
@@ -52,7 +53,7 @@ export default {
 
     // Add spot for custom attribute or insert on render if no variables in attributes.
     if (variables.length > 0) {
-      
+
       figure.spot(variables).add(
         sourceNode(node.loc,
           `      Monkberry.insert(_this, ${placeholder}, ${childName}, ${templateName}, ${data})`
@@ -69,7 +70,7 @@ export default {
     }
 
     if (node.body.length > 0) {
-      let subfigure = new Figure(templateName, figure);
+      let subfigure = new Figure(templateName, figure, options);
       subfigure.children = node.body.map((node) => compile(node, subfigure)).filter(notNull);
 
       figure.addFigure(subfigure);
