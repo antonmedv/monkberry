@@ -28,6 +28,7 @@ export class Figure {
     if (this.imports.length > 0) {
       sn.add(sourceNode(this.imports).join(`\n`));
       sn.add(`\n`);
+      sn.add(`function __requireDefault(obj) { return obj && obj.__esModule ? obj.default : obj; }\n`);
     }
 
     if (size(this.functions) > 0) {

@@ -9,7 +9,7 @@ export default {
       return sourceNode(node.loc, [
         `var Monkberry = require('monkberry');\n`,
         figure.generate(), `\n`,
-        `exports.default = ${figure.name};\n`
+        `module.exports = ${figure.name};\n`
       ]);
     } else {
       return sourceNode(node.loc, [
