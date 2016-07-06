@@ -1,5 +1,10 @@
 # CHANGELOG
 
+### 4.0.5
+
+* Fixed bug with custom tag importing.
+* Fixed bug in loop with options.
+
 ### 4.0.3
 * A lot of refactoring in compiler and runtime.
 * Improved performance in 1.5 times.
