@@ -175,9 +175,9 @@ export function compileToExpression(figure, node, compile) {
  */
 function attr(loc, reference, attrName, value) {
   if (plainAttributes.indexOf(attrName) != -1) {
-    return sourceNode(loc, [reference, '.', attrName, ' = ', value]);
+    return sourceNode(loc, [reference, '.', attrName, ' = ', value, ';']);
   } else {
-    return sourceNode(loc, [reference, '.setAttribute(', esc(attrName), ', ', value, ')']);
+    return sourceNode(loc, [reference, '.setAttribute(', esc(attrName), ', ', value, ');']);
   }
 }
 
