@@ -1,6 +1,6 @@
 {
   "name": "monkberry",
-  "version": "4.0.4",
+  "version": "4.0.5",
   "description": "Monkberry is a JavaScript library for building web user interfaces",
   "bin": "bin/monkberry",
   "main": "lib/index.js",
