@@ -53,10 +53,19 @@ export default {
         ])
       );
 
+      // Add to child(!) figure extra cache methods,
+      // for saving data from loop options for render.
       [node.options.value, node.options.key].forEach(variable => {
-        if (subfigure.hasSpot(variable)) {
-          subfigure.spot(variable).onlyFromLoop = true;
-        }
+        subfigure.thisRef = true;
+        subfigure.prependOnUpdate(sourceNode([
+          `    if (_this.__cache__.${variable}) {\n`,
+          `      __data__.${variable} = _this.__cache__.${variable};\n`,
+          `    }`
+        ]));
+
+        // Cache all options data.
+        subfigure.spot(variable).onlyFromLoop = true;
+        subfigure.spot(variable).cache = true;
       });
 
     }

@@ -76,3 +76,18 @@
         {% endif %}
     </p>
 </UpdateLocalVars>
+<ReLoopOptionsCache>
+    <ul>
+        {% for code, item of currencies %}
+            {% if code == currency %}
+                <li class="selected">
+                    <span>{{ code }}</span>{{ ': ' + item.name }}
+                </li>
+            {% else %}
+                <li>
+                    <span>{{ code }}</span>{{ ': ' + item.name }}
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</ReLoopOptionsCache>

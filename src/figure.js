@@ -20,7 +20,6 @@ export class Figure {
     this.onUpdate = [];
     this.onRemove = [];
     this.thisRef = false;
-    this.spotMaxLength = 0;
   }
 
   generate() {
@@ -45,7 +44,7 @@ export class Figure {
       `  Monkberry.call(this);\n`
     ]);
 
-    if (this.spotMaxLength > 1) {
+    if (this.isCacheNeeded()) {
       sn.add(`  this.__cache__ = {};\n`);
     }
 
@@ -234,13 +233,29 @@ export class Figure {
         for (let variable of s.variables) {
           this.spot(variable).cache = true;
         }
-
-        this.spotMaxLength = s.variables.length;
       }
     }
 
     return this.spots[s.reference];
   }
+
+  isCacheNeeded() {
+    let needed = false;
+
+    Object.keys(this.spots)
+      .map(x => this.spots[x])
+      .forEach(spot => {
+        if (spot.variables.length > 1) {
+          needed = true;
+        }
+        if (spot.cache) {
+          needed = true;
+        }
+      });
+
+    return needed;
+  }
+
 
   root() {
     if (this.parent) {
@@ -294,6 +309,10 @@ export class Figure {
 
   addOnUpdate(node) {
     this.onUpdate.push(node);
+  }
+
+  prependOnUpdate(node) {
+    this.onUpdate.unshift(node);
   }
 
   addOnRemove(node) {

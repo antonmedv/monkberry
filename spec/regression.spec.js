@@ -136,4 +136,28 @@ describe('Regression', function () {
     expect(view).toBe('<p><i>1</i><!--for--><i>2</i><!--for--><i>3</i><!--for--><!--for--></p>');
   });
 
+  it('should cache options variable data for loops', function () {
+    var view = Monkberry.render(ReLoopOptionsCache, root);
+
+    var data1 = {
+      "currency": "USD",
+      "locale": "en",
+      "currencies": {"USD": {"name": "US dollar"}, "EUR": {"name": "Euro"}, "AUD": {"name": "Australian dollar"}}
+    };
+
+    view.update(data1);
+    expect(view).toBe('<ul><li class="selected"><span>USD</span>: US dollar</li><!--if--><li><span>EUR</span>: Euro</li><!--if--><li><span>AUD</span>: Australian dollar</li><!--if--></ul>');
+    
+    
+    var data2 = {
+      "currency": "AUD",
+      "locale": "en",
+      "currencies": {"USD": {"name": "US dollar"}, "EUR": {"name": "Euro"}, "AUD": {"name": "Australian dollar"}}
+    };
+    
+    view.update(data2);
+    expect(view).toBe('<ul><li><span>USD</span>: US dollar</li><!--if--><li><span>EUR</span>: Euro</li><!--if--><li class="selected"><span>AUD</span>: Australian dollar</li><!--if--></ul>');
+    
+  });
+
 });
