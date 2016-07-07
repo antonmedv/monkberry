@@ -1,6 +1,6 @@
 # CHANGELOG
 
-### 4.0.5
+### 4.0.7
 
 * Fixed bug with custom tag importing.
 * Fixed bug in loop with options.
