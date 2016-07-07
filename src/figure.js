@@ -20,6 +20,7 @@ export class Figure {
     this.onUpdate = [];
     this.onRemove = [];
     this.thisRef = false;
+    this.stateNeed = false;
   }
 
   generate() {
@@ -47,6 +48,10 @@ export class Figure {
 
     if (this.isCacheNeeded()) {
       sn.add(`  this.__cache__ = {};\n`);
+    }
+
+    if (this.stateNeed) {
+      sn.add(`  this.__state__ = {};\n`);
     }
 
     if (this.thisRef) {

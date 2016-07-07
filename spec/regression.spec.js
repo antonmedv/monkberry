@@ -160,4 +160,34 @@ describe('Regression', function () {
     
   });
 
+  it('loos should update two levels loops once', function () {
+    var data = {
+      colors: [
+        {
+          colors: [
+            {color: 'red'},
+            {color: 'green'},
+            {color: 'blue'}
+          ]
+        },
+        {
+          colors: [
+            {color: 'red'},
+            {color: 'green'},
+            {color: 'blue'}
+          ]
+        }
+      ],
+      color: {color: 'black'}
+    };
+
+    var view = Monkberry.render(ReLoopMustNotMutateData, root);
+    view.update(data);
+    expect(view).toBe('<ol><li>red</li><li>green</li><li>blue</li><!--for--><li>red</li><li>green</li><li>blue</li><!--for--></ol>');
+
+    view = Monkberry.render(ReLoopMustWorkWithSameNameLoops, root);
+    view.update(data);
+    expect(view).toBe('<ol><li>red</li><li>green</li><li>blue</li><!--for--><li>red</li><li>green</li><li>blue</li><!--for--></ol>');
+  });
+
 });

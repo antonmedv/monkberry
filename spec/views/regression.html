@@ -91,3 +91,25 @@
         {% endfor %}
     </ul>
 </ReLoopOptionsCache>
+<ReLoopMustNotMutateData>
+    <ol>
+        {% for sub of colors %}
+            {% for color of sub.colors %}
+                <li>
+                    {{ color.color }}
+                </li>
+            {% endfor %}
+        {% endfor %}
+    </ol>
+</ReLoopMustNotMutateData>
+<ReLoopMustWorkWithSameNameLoops>
+    <ol>
+        {% for colors %}
+            {% for colors %}
+                <li>
+                    {{ color }}
+                </li>
+            {% endfor %}
+        {% endfor %}
+    </ol>
+</ReLoopMustWorkWithSameNameLoops>

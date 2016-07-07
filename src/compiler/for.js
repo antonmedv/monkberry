@@ -42,32 +42,24 @@ export default {
     if (node.body.length > 0) {
       subfigure.children = node.body.map((node) => compile(node, subfigure)).filter(notNull);
       figure.addFigure(subfigure);
+      subfigure.stateNeed = true;
     }
 
-    if (node.options !== null) {
-      figure.addOnUpdate(
-        sourceNode(node.loc, [
-          `    ${childrenName}.forEach(function (view) {\n`,
-          `      view.update(__data__);\n`,
-          `    });`
-        ])
-      );
+    figure.addOnUpdate(
+      sourceNode(node.loc, [
+        `    ${childrenName}.forEach(function (view) {\n`,
+        node.options === null ? `` : `      view.update(__data__);\n`,
+        `      view.update(view.__state__);\n`,
+        `    });`
+      ])
+    );
 
-      // Add to child(!) figure extra cache methods,
-      // for saving data from loop options for render.
-      [node.options.value, node.options.key].forEach(variable => {
-        subfigure.thisRef = true;
-        subfigure.prependOnUpdate(sourceNode([
-          `    if (_this.__cache__.${variable}) {\n`,
-          `      __data__.${variable} = _this.__cache__.${variable};\n`,
-          `    }`
-        ]));
+    if (node.options && node.options.value) {
+      subfigure.spot(node.options.value).onlyFromLoop = true;
+    }
 
-        // Cache all options data.
-        subfigure.spot(variable).onlyFromLoop = true;
-        subfigure.spot(variable).cache = true;
-      });
-
+    if (node.options && node.options.key) {
+      subfigure.spot(node.options.key).onlyFromLoop = true;
     }
 
     // }

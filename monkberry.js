@@ -129,10 +129,10 @@
       }
     }
 
-    // If there is already some views, update there data with new.
+    // If there is already some views, update there loop state.
     j = 0;
     for (i in map.items) {
-      map.items[i].update(transform(array, keys, j, options));
+      map.items[i].__state__ = transform(array, keys, j, options);
       j++;
     }
 
@@ -152,8 +152,8 @@
         };
       })(i);
 
-      // Set view data (note what it must be after adding nodes to DOM).
-      view.update(transform(array, keys, j, options));
+      // Set view state for later update in onUpdate.
+      view.__state__ = transform(array, keys, j, options);
     }
   };
 
