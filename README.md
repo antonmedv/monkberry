@@ -95,7 +95,7 @@ function (state) {
 }
 ```
 
-Benchmarks covers a few use cases, and compare Monkberry with React and innerHTML. Also it contains real site code and data.
+Benchmarks covers a few use cases and compares Monkberry with React and innerHTML. Also, it contains real site code and data.
 
 
 ## License
