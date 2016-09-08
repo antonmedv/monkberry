@@ -28,6 +28,8 @@
  *        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  */
 (function (document) {
+  function noop() {}
+
   /**
    * Monkberry
    * @class
@@ -205,6 +207,13 @@
       view.update(data);
     }
   };
+
+  /**
+   * Lifecycle methods.
+   */
+
+  Monkberry.prototype.beforeUpdate = noop;
+  Monkberry.prototype.afterUpdate = noop;
 
   /**
    * Remove view from DOM.

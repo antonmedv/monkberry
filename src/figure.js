@@ -174,6 +174,8 @@ export class Figure {
       `${this.name}.prototype.update = function (__data__) {\n`
     );
 
+    sn.add(`this.beforeUpdate(__data__);\n`);
+
     let spots = Object.keys(this.spots).map(key => this.spots[key]).sort((a, b) => a.length - b.length);
 
     for (let spot of spots) {
@@ -211,6 +213,8 @@ export class Figure {
     if (this.onUpdate.length > 0) {
       sn.add(`  this.onUpdate(__data__);\n`);
     }
+
+    sn.add(`this.afterUpdate(__data__);\n`);
 
     sn.add(`};\n`);
     return sn;
