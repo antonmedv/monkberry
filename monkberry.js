@@ -63,14 +63,6 @@
       view = template.pool.pop() || new template();
     }
 
-    view.beforeRender();
-
-    if (node.nodeType == 8) {
-      view.insertBefore(node);
-    } else {
-      view.appendTo(node);
-    }
-
     if (options) {
       if (options.parent) {
         view.parent = options.parent;
@@ -87,6 +79,14 @@
       if (options.directives) {
         view.directives = options.directives;
       }
+    }
+
+    view.beforeRender();
+
+    if (node.nodeType == 8) {
+      view.insertBefore(node);
+    } else {
+      view.appendTo(node);
     }
 
     if (view.onRender) {
