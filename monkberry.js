@@ -28,6 +28,8 @@
  *        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  */
 (function (document) {
+  function noop() {}
+
   /**
    * Monkberry
    * @class
@@ -61,12 +63,6 @@
       view = template.pool.pop() || new template();
     }
 
-    if (node.nodeType == 8) {
-      view.insertBefore(node);
-    } else {
-      view.appendTo(node);
-    }
-
     if (options) {
       if (options.parent) {
         view.parent = options.parent;
@@ -85,9 +81,19 @@
       }
     }
 
+    view.beforeRender();
+
+    if (node.nodeType == 8) {
+      view.insertBefore(node);
+    } else {
+      view.appendTo(node);
+    }
+
     if (view.onRender) {
       view.onRender();
     }
+
+    view.afterRender();
 
     return view;
   };
@@ -207,9 +213,25 @@
   };
 
   /**
+   * Lifecycle methods.
+   */
+
+  Monkberry.prototype.beforeRender = noop;
+  Monkberry.prototype.afterRender = noop;
+
+  Monkberry.prototype.beforeUpdate = noop;
+  Monkberry.prototype.afterUpdate = noop;
+
+  Monkberry.prototype.beforeRemove = noop;
+  Monkberry.prototype.afterRemove = noop;
+
+  /**
    * Remove view from DOM.
    */
   Monkberry.prototype.remove = function () {
+    // Call beforeRemove lifecycle method.
+    this.beforeRemove();
+
     // Remove appended nodes.
     var i = this.nodes.length;
     while (i--) {
@@ -241,6 +263,9 @@
 
     // Store view in pool for reuse in future.
     this.constructor.pool.push(this);
+
+    // Call afterRemove lifecycle method.
+    this.afterRemove();
   };
 
   /**
