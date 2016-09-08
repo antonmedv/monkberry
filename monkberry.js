@@ -63,6 +63,8 @@
       view = template.pool.pop() || new template();
     }
 
+    view.beforeRender();
+
     if (node.nodeType == 8) {
       view.insertBefore(node);
     } else {
@@ -90,6 +92,8 @@
     if (view.onRender) {
       view.onRender();
     }
+
+    view.afterRender();
 
     return view;
   };
@@ -211,6 +215,9 @@
   /**
    * Lifecycle methods.
    */
+
+  Monkberry.prototype.beforeRender = noop;
+  Monkberry.prototype.afterRender = noop;
 
   Monkberry.prototype.beforeUpdate = noop;
   Monkberry.prototype.afterUpdate = noop;
