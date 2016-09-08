@@ -174,7 +174,7 @@ export class Figure {
       `${this.name}.prototype.update = function (__data__) {\n`
     );
 
-    sn.add(`this.beforeUpdate(__data__);\n`);
+    sn.add(`  this.beforeUpdate(__data__);\n`);
 
     let spots = Object.keys(this.spots).map(key => this.spots[key]).sort((a, b) => a.length - b.length);
 
@@ -214,7 +214,7 @@ export class Figure {
       sn.add(`  this.onUpdate(__data__);\n`);
     }
 
-    sn.add(`this.afterUpdate(__data__);\n`);
+    sn.add(`  this.afterUpdate(__data__);\n`);
 
     sn.add(`};\n`);
     return sn;
