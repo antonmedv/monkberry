@@ -215,10 +215,16 @@
   Monkberry.prototype.beforeUpdate = noop;
   Monkberry.prototype.afterUpdate = noop;
 
+  Monkberry.prototype.beforeRemove = noop;
+  Monkberry.prototype.afterRemove = noop;
+
   /**
    * Remove view from DOM.
    */
   Monkberry.prototype.remove = function () {
+    // Call beforeRemove lifecycle method.
+    this.beforeRemove();
+
     // Remove appended nodes.
     var i = this.nodes.length;
     while (i--) {
@@ -250,6 +256,9 @@
 
     // Store view in pool for reuse in future.
     this.constructor.pool.push(this);
+
+    // Call afterRemove lifecycle method.
+    this.afterRemove();
   };
 
   /**
