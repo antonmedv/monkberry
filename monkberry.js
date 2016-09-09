@@ -43,6 +43,7 @@
     this.onRender = null;
     this.onUpdate = null;
     this.onRemove = null;
+    this.noCache = false;
   }
 
   /**
@@ -82,6 +83,10 @@
 
       if (options.directives) {
         view.directives = options.directives;
+      }
+
+      if (options.noCache) {
+        view.noCache = options.noCache;
       }
     }
 
@@ -139,7 +144,7 @@
     // If new array contains more items when previous, render new views and append them.
     for (j = childrenSize, len = arrayLength; j < len; j++) {
       // Render new view.
-      var view = Monkberry.render(template, node, {parent: parent, context: parent.context, filters: parent.filters, directives: parent.directives});
+      var view = Monkberry.render(template, node, {parent: parent, context: parent.context, filters: parent.filters, directives: parent.directives, noCache: parent.noCache});
 
       // Set view hierarchy.
       parent.nested.push(view);
@@ -167,7 +172,7 @@
       }
     } else if (test) {
       // Render new view.
-      var view = Monkberry.render(template, node, {parent: parent, context: parent.context, filters: parent.filters, directives: parent.directives});
+      var view = Monkberry.render(template, node, {parent: parent, context: parent.context, filters: parent.filters, directives: parent.directives, noCache: parent.noCache});
 
       // Set view hierarchy.
       parent.nested.push(view);
@@ -190,7 +195,7 @@
       child.ref.update(data);
     } else {
       // Render new view.
-      var view = Monkberry.render(template, node, {parent: parent, context: parent.context, filters: parent.filters, directives: parent.directives});
+      var view = Monkberry.render(template, node, {parent: parent, context: parent.context, filters: parent.filters, directives: parent.directives, noCache: parent.noCache});
 
       // Set view hierarchy.
       parent.nested.push(view);
@@ -240,7 +245,9 @@
     }
 
     // Store view in pool for reuse in future.
-    this.constructor.pool.push(this);
+    if (!this.noCache) {
+      this.constructor.pool.push(this);
+    }
   };
 
   /**
