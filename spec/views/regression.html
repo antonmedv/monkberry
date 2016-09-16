@@ -113,3 +113,14 @@
         {% endfor %}
     </ol>
 </ReLoopMustWorkWithSameNameLoops>
+<ReLoopWithIfAndOuterScope>
+    <div>
+        {% for attr of attributes %}
+            <span>{{attr.name}}</span>
+            <span>{{attr.value}}</span>
+            {% if attr %}
+                <span>{{outer}}</span>
+            {% endif %}
+        {% endfor %}
+    </div>
+</ReLoopWithIfAndOuterScope>

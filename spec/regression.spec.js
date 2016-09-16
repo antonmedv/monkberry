@@ -147,17 +147,17 @@ describe('Regression', function () {
 
     view.update(data1);
     expect(view).toBe('<ul><li class="selected"><span>USD</span>: US dollar</li><!--if--><li><span>EUR</span>: Euro</li><!--if--><li><span>AUD</span>: Australian dollar</li><!--if--></ul>');
-    
-    
+
+
     var data2 = {
       "currency": "AUD",
       "locale": "en",
       "currencies": {"USD": {"name": "US dollar"}, "EUR": {"name": "Euro"}, "AUD": {"name": "Australian dollar"}}
     };
-    
+
     view.update(data2);
     expect(view).toBe('<ul><li><span>USD</span>: US dollar</li><!--if--><li><span>EUR</span>: Euro</li><!--if--><li class="selected"><span>AUD</span>: Australian dollar</li><!--if--></ul>');
-    
+
   });
 
   it('loos should update two levels loops once', function () {
@@ -188,6 +188,29 @@ describe('Regression', function () {
     view = Monkberry.render(ReLoopMustWorkWithSameNameLoops, root);
     view.update(data);
     expect(view).toBe('<ol><li>red</li><li>green</li><li>blue</li><!--for--><li>red</li><li>green</li><li>blue</li><!--for--></ol>');
+  });
+
+  it('loops with cond and outer scope', function () {
+    var view = Monkberry.render(ReLoopWithIfAndOuterScope, root);
+    view.update({
+      outer: "outer",
+      attributes: [
+        {
+          name: "name1",
+          value: "value1"
+        },
+        {
+          name: "name2",
+          value: "value2"
+        }
+      ]
+    });
+
+    expect(view).toBe('<div><span>name1</span><span>value1</span><span>outer</span><!--if--><span>name2</span><span>value2</span><span>outer</span><!--if--></div>');
+    view.update({
+      outer: "outer2"
+    });
+    expect(view).toBe('<div><span>name1</span><span>value1</span><span>outer2</span><!--if--><span>name2</span><span>value2</span><span>outer2</span><!--if--></div>');
   });
 
 });

@@ -46,9 +46,20 @@ export default {
     }
 
     figure.addOnUpdate(
+      node.options === null ?
       sourceNode(node.loc, [
         `    ${childrenName}.forEach(function (view) {\n`,
-        node.options === null ? `` : `      view.update(__data__);\n`,
+        `      view.update(view.__state__);\n`,
+        `    });`
+      ]) :
+      // TODO: Remove double update on foreach.
+      // Simple solution is to use Object.assign({}, __data__, view.__state__),
+      // But this isn't supported in a lot of browsers for now.
+      // Also i have solution for this what may come in next v5 version...
+      sourceNode(node.loc, [
+        `    ${childrenName}.forEach(function (view) {\n`,
+        `      view.update(view.__state__);\n`,
+        `      view.update(__data__);\n`,
         `      view.update(view.__state__);\n`,
         `    });`
       ])
