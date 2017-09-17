@@ -27,7 +27,7 @@ export function patchElement(lastVNode: VNode, nextVNode: VNode, parentDom: Elem
       if (view.spots) {
         patchSpot(lastVNode.spots, nextVNode.spots, view.spots)
       } else {
-        throw new Error('Monkberry Error: last vNode doesnt have view.')
+        throw new Error('Monkberry Error: view without spots.')
       }
     }
 
@@ -40,7 +40,7 @@ export function patchElement(lastVNode: VNode, nextVNode: VNode, parentDom: Elem
     //   }
     // }
   } else {
-    throw new Error('Monkberry Error: last vNode doesnt have view.')
+    throw new Error('Monkberry Error: last vNode without view.')
   }
 }
 

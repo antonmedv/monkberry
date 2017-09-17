@@ -5,7 +5,7 @@ export function getDom(vNode: VNode): Element {
   if (vNode.view) {
     return vNode.view.root
   } else {
-    throw new Error('Monkberry Error: a vNode without DOM.')
+    throw new Error('Monkberry Error: vNode without DOM.')
   }
 }
 
@@ -17,7 +17,7 @@ export function insertOrAppend(parentDom: Comment, newNode: Element, nextNode: E
   }
 }
 
-export function replaceWithNewNode(lastVNode: VNode, nextVNode: VNode, parentDom: Comment) {
+export function replaceWithNewNode(lastVNode: VNode, nextVNode: VNode, parentDom: Element | Comment) {
   unmount(lastVNode, null)
   const dom = mount(nextVNode, null)
   parentDom.parentNode!.replaceChild(dom, getDom(lastVNode))
