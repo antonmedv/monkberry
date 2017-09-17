@@ -1,0 +1,25 @@
+{
+  "name": "monkberry",
+  "version": "5.0.0",
+  "description": "Monkberry is a JavaScript library for building web user interfaces",
+  "main": "monkberry.js",
+  "scripts": {
+    "watch": "rollup -c -w",
+    "build": "rollup -c",
+    "lint": "tslint",
+    "prepublish": "npm run build"
+  },
+  "repository": "monkberry/monkberry",
+  "keywords": [
+    "dom",
+    "template",
+    "view",
+    "ui"
+  ],
+  "author": "Anton Medvedev <anton@medv.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/monkberry/monkberry/issues"
+  },
+  "homepage": "https://monkberry.js.org"
+}

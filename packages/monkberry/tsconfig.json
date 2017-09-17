@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "rootDir": "src",
+    "lib": [
+      "es6",
+      "es7",
+      "dom"
+    ],
+    "strict": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  }
+}
