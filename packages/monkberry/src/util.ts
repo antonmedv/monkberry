@@ -1,15 +1,20 @@
 import {VNode} from './vnode'
 import {mount, unmount} from './dom/mounting'
 
-export function getDom(vNode: VNode): Element {
-  if (vNode.view) {
-    return vNode.view.root
-  } else {
-    throw new Error('Monkberry Error: vNode without DOM.')
+export const assert = (cond: boolean, message: string) => {
+  if (cond) {
+    throw new Error('Monkberry Error: ' + message)
   }
 }
 
-export function insertOrAppend(parentDom: Comment, newNode: Element, nextNode: Element | null) {
+export function getDom(vNode: VNode): Element {
+  if (process.env.NODE_ENV !== 'production') {
+    assert(!vNode.view, `can't get dom from vNode without view`)
+  }
+  return vNode.view!.root
+}
+
+export function insertBefore(parentDom: Comment, newNode: Element, nextNode: Element | null) {
   if (nextNode) {
     parentDom.parentNode!.insertBefore(newNode, nextNode)
   } else {

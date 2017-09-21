@@ -6,7 +6,7 @@ export function mount(vNode: VNode, parentDom: Element | Comment | null): Elemen
   const view = template()
 
   if (parentDom) {
-    if (parentDom.nodeType === Node.COMMENT_NODE) {
+    if (parentDom.nodeType === 8 /* Node.COMMENT_NODE */) {
       parentDom.parentNode!.insertBefore(view.root, parentDom)
     } else {
       parentDom.appendChild(view.root)

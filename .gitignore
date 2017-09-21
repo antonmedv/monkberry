@@ -1,7 +1,3 @@
 /node_modules/
-/lib/
-/monkberrify/
-/benchmark/
-size.sh
-*.full.jison
-spec/views.js
+package-lock.json
+~*

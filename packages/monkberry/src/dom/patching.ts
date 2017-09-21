@@ -1,6 +1,6 @@
 import {Spot, VNode} from '../vnode'
 import {mount, mountChildren, unmount, unmountChildren} from './mounting'
-import {getDom, insertOrAppend, replaceWithNewNode} from '../util'
+import {assert, getDom, insertBefore, replaceWithNewNode} from '../util'
 
 export function patch(lastVNode: VNode, nextVNode: VNode, parentDom: Element | Comment) {
   patchElement(lastVNode, nextVNode, parentDom)
@@ -16,7 +16,10 @@ export function patchElement(lastVNode: VNode, nextVNode: VNode, parentDom: Elem
       nextVNode,
       parentDom
     )
-  } else if (lastVNode.view) {
+  } else {
+    if (process.env.NODE_ENV !== 'production') {
+      assert(!lastVNode.view, `patching last vNode without view`)
+    }
     const view = lastVNode.view
     const lastProps = lastVNode.props
     const nextProps = nextVNode.props
@@ -24,23 +27,20 @@ export function patchElement(lastVNode: VNode, nextVNode: VNode, parentDom: Elem
 
     nextVNode.view = view
     if (lastVNode.spots && nextVNode.spots) {
-      if (view.spots) {
-        patchSpot(lastVNode.spots, nextVNode.spots, view.spots)
-      } else {
-        throw new Error('Monkberry Error: view without spots.')
+      if (process.env.NODE_ENV !== 'production') {
+        assert(!view!.spots, `patching children without view's spots`)
       }
+      patchSpot(lastVNode.spots, nextVNode.spots, view!.spots as Comment[])
     }
 
     if (lastProps !== nextProps) {
-      view.update(nextProps)
+      view!.update(nextProps)
     }
     // if (nextRef) {
     //   if (lastVNode.ref !== nextRef) {
     //     mountRef(dom, nextRef, lifecycle)
     //   }
     // }
-  } else {
-    throw new Error('Monkberry Error: last vNode without view.')
   }
 }
 
@@ -85,11 +85,11 @@ function patchChildren(lastSpot: Spot, nextSpot: Spot, parentDom: Comment) {
   }
 }
 
-export function patchNonKeyedChildren(lastChildren: VNode[],
-                                      nextChildren: VNode[],
-                                      parentDom: Comment,
-                                      lastChildrenLength: number,
-                                      nextChildrenLength: number) {
+function patchNonKeyedChildren(lastChildren: VNode[],
+                               nextChildren: VNode[],
+                               parentDom: Comment,
+                               lastChildrenLength: number,
+                               nextChildrenLength: number) {
   const commonLength =
     lastChildrenLength > nextChildrenLength
       ? nextChildrenLength
@@ -116,11 +116,11 @@ export function patchNonKeyedChildren(lastChildren: VNode[],
   }
 }
 
-export function patchKeyedChildren(a: VNode[],
-                                   b: VNode[],
-                                   dom: Comment,
-                                   aLength: number,
-                                   bLength: number) {
+const patchKeyedChildren = (a: VNode[],
+                            b: VNode[],
+                            dom: Comment,
+                            aLength: number,
+                            bLength: number) => {
   let
     aEnd = aLength - 1,
     bEnd = bLength - 1,
@@ -173,7 +173,7 @@ export function patchKeyedChildren(a: VNode[],
       while (bStart <= bEnd) {
         node = b[bStart]
         bStart++
-        insertOrAppend(dom, mount(node, null), nextNode)
+        insertBefore(dom, mount(node, null), nextNode)
       }
     }
   } else if (bStart > bEnd) {
@@ -252,7 +252,7 @@ export function patchKeyedChildren(a: VNode[],
       while (bStart < bLeft) {
         node = b[bStart]
         bStart++
-        insertOrAppend(dom, mount(node, null), null)
+        insertBefore(dom, mount(node, null), null)
       }
     } else {
       i = aLeft - patched
@@ -271,13 +271,13 @@ export function patchKeyedChildren(a: VNode[],
             pos = i + bStart
             node = b[pos]
             nextPos = pos + 1
-            insertOrAppend(dom, mount(node, null), nextPos < bLength ? getDom(b[nextPos]) : null)
+            insertBefore(dom, mount(node, null), nextPos < bLength ? getDom(b[nextPos]) : null)
           } else {
             if (j < 0 || i !== seq[j]) {
               pos = i + bStart
               node = b[pos]
               nextPos = pos + 1
-              insertOrAppend(dom, getDom(node), nextPos < bLength ? getDom(b[nextPos]) : null)
+              insertBefore(dom, getDom(node), nextPos < bLength ? getDom(b[nextPos]) : null)
             } else {
               j--
             }
@@ -291,7 +291,7 @@ export function patchKeyedChildren(a: VNode[],
             pos = i + bStart
             node = b[pos]
             nextPos = pos + 1
-            insertOrAppend(dom, mount(node, null), nextPos < bLength ? getDom(b[nextPos]) : null)
+            insertBefore(dom, mount(node, null), nextPos < bLength ? getDom(b[nextPos]) : null)
           }
         }
       }
@@ -299,8 +299,9 @@ export function patchKeyedChildren(a: VNode[],
   }
 }
 
+// Algorithm for finding longest increasing subsequence
+// @see https://en.wikipedia.org/wiki/Longest_increasing_subsequence
 function lis(arr: number[]): number[] {
-  // @see https://en.wikipedia.org/wiki/Longest_increasing_subsequence
   const p = arr.slice(0)
   const result: number[] = [0]
   let i

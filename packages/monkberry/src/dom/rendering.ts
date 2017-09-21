@@ -11,7 +11,7 @@ const roots: Root[] = []
 
 export function render(input: VNode, parentDom: Element) {
   const root = getRoot(parentDom)
-  normalize(input)
+  normalize(input) // TODO: remove normalization
   if (root) {
     patch(
       root.input,
