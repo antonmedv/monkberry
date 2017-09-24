@@ -10,7 +10,7 @@ class Template {
     this.spots = []
     this.declarations = []
     this.constructions = []
-    this.props = new Set()
+    this.params = new Set()
     this.updaters = []
     this.counters = {}
   }
@@ -49,9 +49,9 @@ class Template {
       s.add(`],`)
     }
 
-    if (this.props.size > 0) {
+    if (this.params.size > 0) {
       s.add([
-        `update({`, join([...this.props], ','), `}) {`, join(this.updaters, '\n'), `}`
+        `update({`, join([...this.params], ','), `}) {`, join(this.updaters, '\n'), `}`
       ])
     } else {
       s.add([
@@ -78,8 +78,8 @@ class Template {
     this.updaters.push(node)
   }
 
-  addProps(...props) {
-    props.forEach(prop => this.props.add(prop))
+  addParams(...params) {
+    params.forEach(param => this.params.add(param))
   }
 
   setRoot(children) {

@@ -20,10 +20,12 @@ module.exports = {
     {
       const subscope = scope.create()
 
+      const {value, key} = node.options
       subscope.addSpot(
         node.reference,
-        vNode => source`${expr}.map(() => (${vNode}))`
+        vNode => source`${expr}.map((${value} ${key ? `, ${key}` : ``}) => (${vNode}))`
       )
+      subscope.addCurrentProps(key, value)
 
       const children = node.children.map(child => compile(child, subscope))
       subscope.template.setRoot(children)

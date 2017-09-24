@@ -24,7 +24,7 @@ module.exports = {
         source`${node.reference}.textContent = ${compile(node.expression)}`
       )
     } else {
-      scope.template.addProps(...variables)
+      scope.template.addParams(...variables)
       scope.template.updater(
         source`${node.reference}.textContent = ${compile(node.expression)}`
       )

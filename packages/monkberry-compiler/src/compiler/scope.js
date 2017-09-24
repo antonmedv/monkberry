@@ -1,6 +1,7 @@
-const Template = require('./template')
 const visit = require('./visitor')
+const {join} = require('./util')
 const sourceNode = require('./sourceNode')
+const Template = require('./template')
 
 class Scope {
   constructor(parent = null) {
@@ -10,6 +11,7 @@ class Scope {
     this.imports = []
     this.template = new Template()
     this.props = new Set()
+    this.currentProps = new Set()
     this.vars = new Set()
   }
 
@@ -17,7 +19,7 @@ class Scope {
     return sourceNode([
       `{`,
       `type: ${this.template.name},`,
-      `props,`,
+      this.currentProps.size > 0 ? `props: {...props, ${join([...this.currentProps], ', ')}}` : `props,`,
       this.children.length > 0 ? `spots: [${this.renderChildren()}],` : ``,
       `}`
     ])
@@ -82,6 +84,12 @@ class Scope {
   addSpot(spot, fn) {
     this.parent.template.addSpot(spot)
     this.expr = fn
+  }
+
+  addCurrentProps(...props) {
+    for (let prop of props) {
+      this.currentProps.add(prop)
+    }
   }
 }
 
