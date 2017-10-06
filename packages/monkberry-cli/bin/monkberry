@@ -1,0 +1,220 @@
+#!/usr/bin/env node
+const Emitter = require('events').EventEmitter
+const {forEach} = require('async-foreach')
+const chokidar = require('chokidar')
+const meow = require('meow')
+const util = require('util')
+const path = require('path')
+const glob = require('glob')
+const stdout = require('stdout-stream')
+const stdin = require('get-stdin')
+const fs = require('fs')
+const {render} = require('../index')
+
+const cli = meow({
+  pkg: '../package.json',
+  help: [
+    'Usage:',
+    '  monkberry [options] <file.mx>',
+    '  cat <file.mx> | monkberry [options] > file.js',
+    '',
+    'Example: Compile foobar.monk to foobar.js',
+    '  monkberry foobar.monk > foobar.js',
+    '  cat foobar.monk | monkberry --output-style compressed > foobar.js',
+    '',
+    'Example: Watch the src directory for changes, compile with sourcemaps to the src directory',
+    '  monkberry --watch --output src --source-map true --source-map-contents src',
+    '',
+    'Options',
+    '  -w, --watch                Watch a directory or file',
+    '  -o, --output               Output directory',
+    '  -q, --quiet                Suppress log output except on error',
+    '  -v, --version              Prints version info',
+    '  --source-map               Emit source map',
+    '  --follow                   Follow symlinked directories',
+    '  --lex                      Print tokens from lexer',
+    '  --ast                      Print AST from parser',
+    '  --help                     Print this help',
+  ].join('\n')
+}, {
+  boolean: [
+    'watch',
+    'follow',
+    'quiet',
+    'source-map',
+    'lex',
+    'ast',
+  ],
+  string: [
+    'output',
+  ],
+  alias: {
+    w: 'watch',
+    o: 'output',
+    q: 'quiet',
+    v: 'version',
+  },
+  default: {
+    quiet: false
+  }
+})
+
+function isDirectory(filePath) {
+  let isDir = false
+  try {
+    const absolutePath = path.resolve(filePath)
+    isDir = fs.statSync(absolutePath).isDirectory()
+  } catch (e) {
+    isDir = e.code === 'ENOENT'
+  }
+  return isDir
+}
+
+function getEmitter() {
+  const emitter = new Emitter()
+
+  emitter.on('error', (err) => {
+    if (options.errorBell) {
+      err += '\x07'
+    }
+    console.error(err)
+    if (!options.watch) {
+      process.exit(1)
+    }
+  })
+
+  emitter.on('warn', (data) => {
+    if (!options.quiet) {
+      console.warn(data)
+    }
+  })
+
+  emitter.on('log', stdout.write.bind(stdout))
+
+  return emitter
+}
+
+function getOptions(args, options) {
+  options.src = args[0]
+
+  if (args[1]) {
+    options.dest = path.resolve(args[1])
+  } else if (options.output) {
+    options.dest = path.join(
+      path.resolve(options.output),
+      [path.basename(options.src, path.extname(options.src)), '.js'].join(''))  // replace ext.
+  }
+
+  return options
+}
+
+function watch(options, emitter) {
+  let paths
+  if (options.directory) {
+    paths = path.resolve(options.directory, '**/*.monk')
+  } else {
+    paths = options.src
+  }
+
+  const watcher = chokidar.watch(paths)
+
+  watcher.on('error', () => {
+    emitter.emit.bind(emitter, 'error')
+  })
+
+  watcher.on('change', (file) => {
+    renderFile(file, options, emitter)
+  })
+}
+
+function run(options, emitter) {
+  if (options.directory) {
+    if (!options.output) {
+      emitter.emit('error', 'An output directory must be specified when compiling a directory')
+    }
+    if (!isDirectory(options.output)) {
+      emitter.emit('error', 'An output directory must be specified when compiling a directory')
+    }
+  }
+
+  if (options.sourceMapOriginal && options.directory && !isDirectory(options.sourceMapOriginal) && options.sourceMapOriginal !== 'true') {
+    emitter.emit('error', 'The --source-map option must be either a boolean or directory when compiling a directory')
+  }
+
+  if (options.watch) {
+    watch(options, emitter)
+  } else if (options.directory) {
+    renderDir(options, emitter)
+  } else {
+    render(options, emitter)
+  }
+}
+
+function renderFile(file, options, emitter) {
+  options = getOptions([path.resolve(file)], options)
+  if (options.watch) {
+    emitter.emit('warn', util.format('=> changed: %s', file))
+  }
+  render(options, emitter)
+}
+
+function renderDir(options, emitter) {
+  const globPath = path.resolve(options.directory, '**/*.monk')
+  glob(globPath, {ignore: '**/_*', follow: options.follow}, (err, files) => {
+    if (err) {
+      return emitter.emit('error', util.format('You do not have permission to access this path: %s.', err.path))
+    } else if (!files.length) {
+      return emitter.emit('warn', 'No input files were found.')
+    }
+
+    forEach(files, function (subject) {
+      emitter.once('done', this.async())
+      renderFile(subject, options, emitter)
+    }, (successful, arr) => {
+      const outputDir = path.join(process.cwd(), options.output)
+      emitter.emit('warn', util.format('Wrote %s JS files to %s', arr.length, outputDir))
+      process.exit()
+    })
+  })
+}
+
+/**
+ * Arguments and options
+ */
+
+const options = getOptions(cli.input, cli.flags)
+const emitter = getEmitter()
+
+/**
+ * Show usage if no arguments are supplied
+ */
+
+if (!options.src && process.stdin.isTTY) {
+  emitter.emit('error', [
+    '  Monkberry',
+    '  ',
+    '  Example: Compile foobar.monk to foobar.js',
+    '    monkberry foobar.monk > foobar.js',
+    '    cat foobar.monk | monk > foobar.js',
+    '  ',
+    '  Example: Get all options',
+    '    monkberry --help'
+  ].join('\n'))
+}
+
+/**
+ * Apply arguments
+ */
+
+if (options.src) {
+  if (isDirectory(options.src)) {
+    options.directory = options.src
+  }
+  run(options, emitter)
+} else if (!process.stdin.isTTY) {
+  stdin().then((data) => {
+    options.data = data
+    options.stdin = true
+    run(options, emitter)
+  })
+}

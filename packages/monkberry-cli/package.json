@@ -1,0 +1,30 @@
+{
+  "name": "monkberry-cli",
+  "version": "5.0.0",
+  "description": "Monkberry command line",
+  "bin": {
+    "monkberry": "./bin/monkberry"
+  },
+  "repository": "antonmedv/monkberry",
+  "author": "Anton Medvedev <anton@medv.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/antonmedv/monkberry/issues"
+  },
+  "homepage": "https://monkberry.js.org",
+  "dependencies": {
+    "async-foreach": "^0.1.3",
+    "chalk": "^2.1.0",
+    "chokidar": "^1.7.0",
+    "columnify": "^1.5.4",
+    "get-stdin": "^5.0.1",
+    "glob": "^7.1.2",
+    "meow": "^3.7.0",
+    "mkdirp": "^0.5.1",
+    "monkberry-compiler": "^5.0.0",
+    "prettier": "^1.5.2",
+    "pretty-error": "^2.1.1",
+    "stdout-stream": "^1.4.0",
+    "uppercamelcase": "^3.0.0"
+  }
+}

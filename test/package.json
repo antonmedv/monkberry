@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "build": ""
+  },
+  "devDependencies": {
+    "monkberry": "^5.0.0"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "monkberry-compiler",
-  "version": "5.0.0-beta.1",
+  "version": "5.0.0",
   "description": "Monkberry templates compiler",
   "main": "src/index.js",
   "scripts": {
@@ -24,12 +24,5 @@
   "homepage": "https://monkberry.js.org",
   "dependencies": {
     "source-map": "^0.5.6"
-  },
-  "devDependencies": {
-    "dedent": "^0.7.0",
-    "jison-gho": "^0.6.0-191",
-    "onchange": "^3.2.1",
-    "preprocessor": "^1.4.0",
-    "prettier": "^1.4.4"
   }
 }
