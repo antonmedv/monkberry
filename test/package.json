@@ -1,9 +1,10 @@
 {
   "private": true,
   "scripts": {
-    "build": ""
+    "build": "webpack"
   },
-  "devDependencies": {
-    "monkberry": "^5.0.0"
+  "dependencies": {
+    "monkberry": "^5.0.0",
+    "monkberry-loader": "^5.0.0"
   }
 }

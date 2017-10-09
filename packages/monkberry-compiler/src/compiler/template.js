@@ -36,9 +36,9 @@ class Template {
       return {
     `)
 
-    s.add(`root: [`)
+    s.add(`root: `)
     s.add(this.root)
-    s.add(`],`)
+    s.add(`,`)
 
     if (this.spots.length > 0) {
       s.add(`spots: [`)

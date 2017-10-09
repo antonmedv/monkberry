@@ -2,16 +2,17 @@
   "name": "monkberry-cli",
   "version": "5.0.0",
   "description": "Monkberry command line",
+  "repository": "antonmedv/monkberry",
+  "homepage": "https://monkberry.js.org",
+  "author": "Anton Medvedev <anton@medv.io>",
+  "license": "MIT",
   "bin": {
     "monkberry": "./bin/monkberry"
   },
-  "repository": "antonmedv/monkberry",
-  "author": "Anton Medvedev <anton@medv.io>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/antonmedv/monkberry/issues"
+  "scripts": {
+    "watch": "exit 0",
+    "build": "exit 0"
   },
-  "homepage": "https://monkberry.js.org",
   "dependencies": {
     "async-foreach": "^0.1.3",
     "chalk": "^2.1.0",

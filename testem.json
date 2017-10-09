@@ -7,11 +7,7 @@
     "spec/*.spec.js"
   ],
   "watch_files": [
-    "lib/*.js",
-    "lib/**/*.js",
-    "bin/monkberry",
-    "spec/views/*.html"
+    "test/**/*"
   ],
-  "before_tests": "bin/monkberry --output spec/views.js -- spec/views/*.html",
-  "on_exit": "rm spec/views.js"
+  "before_tests": "cd test; npm run build"
 }

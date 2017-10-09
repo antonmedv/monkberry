@@ -2,26 +2,16 @@
   "name": "monkberry-compiler",
   "version": "5.0.0",
   "description": "Monkberry templates compiler",
-  "main": "src/index.js",
+  "repository": "antonmedv/monkberry",
+  "homepage": "https://monkberry.js.org",
+  "author": "Anton Medvedev <anton@medv.io>",
+  "license": "MIT",
   "scripts": {
     "build": "make build",
     "watch": "onchange src/parser/grammar.jison -- make build",
     "prepublish": "npm run build"
   },
-  "repository": "antonmedv/monkberry",
-  "keywords": [
-    "monkberry",
-    "template",
-    "compiler",
-    "view",
-    "ui"
-  ],
-  "author": "Anton Medvedev <anton@medv.io>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/antonmedv/monkberry/issues"
-  },
-  "homepage": "https://monkberry.js.org",
+  "main": "src/index.js",
   "dependencies": {
     "source-map": "^0.5.6"
   }

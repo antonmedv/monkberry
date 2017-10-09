@@ -9,13 +9,17 @@ module.exports = {
 
     const vNode = scope.render()
 
-    let props = source``
+    let body = source``
+
     if (scope.props.size > 0) {
-      props = source`{${[...scope.props]}}`
+      const props = source`{${[...scope.props]}}`
+      body = source`
+        const ${props} = props
+      `
     }
 
-    const body = source`
-      const ${props} = props
+    body = source`
+      ${body}
       return ${vNode}
     `
 
@@ -46,7 +50,6 @@ module.exports = {
     walk(scope)
 
     return source`
-      import createVNode from 'monkberry'
       ${imports}
       
       ${renderFn}
