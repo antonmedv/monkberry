@@ -90,7 +90,9 @@ class Scope {
 
   addCurrentProps(...props) {
     for (let prop of props) {
-      this.currentProps.add(prop)
+      if (prop) {
+        this.currentProps.add(prop)
+      }
     }
   }
 }

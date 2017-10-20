@@ -5,3 +5,7 @@ import * as $ from './_build'
 test('hello world', t => {
   t.snapshot(renderToString($.helloWorld()))
 })
+
+test('loop sibling', t => {
+  t.is(renderToString($.loopSibling()))
+})

@@ -1,0 +1,8 @@
+<div>
+  {% for value of [1, 2, 3] %}
+    {{ value }}
+  {% endfor %}
+  {% for value of 'abc'.split('') %}
+    {{ value }}
+  {% endfor %}
+</div>
