@@ -1,0 +1,5 @@
+<div>
+  {{ '@' + name.toUpperCase() }}
+  {{ unknown || 'default' }}
+  {{ ['a', 'b'].join(',') }}
+</div>

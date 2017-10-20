@@ -4,17 +4,8 @@ module.exports = {
   ExpressionStatement: ({node, compile, source, scope}) => {
     node.reference = 'text' + scope.template.uniqid('text')
 
-    let defaultValue = `''`
-
-    // if (node.expression.type == 'LogicalExpression' && node.expression.operator == '||') {
-    //   // Add as default right side of "||" expression if there are no variables.
-    //   if (collectVariables(figure.getScope(), node.expression.right) == 0) {
-    //     defaultValue = compile(node.expression.right);
-    //   }
-    // }
-
     scope.template.declare(
-      source`${node.reference} = document.createTextNode(${defaultValue})`
+      source`${node.reference} = document.createTextNode('')`
     )
 
     const variables = scope.findIdentifiers(node.expression)
@@ -33,12 +24,11 @@ module.exports = {
     return node.reference
   },
 
-  FilterExpression: ({node, figure, compile}) => {
+  FilterExpression: ({node, scope, compile}) => {
     let prefix = ``
 
-    if (!figure.isInScope(node.callee.name)) {
-      figure.thisRef = true
-      prefix = `_this.filters.`
+    if (!scope.has(node.callee.name)) {
+      prefix = `context.filters.`
     }
 
     let sn = sourceNode(node.loc, [prefix, compile(node.callee), '('])
@@ -126,7 +116,7 @@ module.exports = {
   },
 
   UnaryExpression: ({node, compile}) => {
-    if (node.operator == 'delete' || node.operator == 'void' || node.operator == 'typeof') {
+    if (node.operator === 'delete' || node.operator === 'void' || node.operator === 'typeof') {
       return sourceNode(node.loc, [node.operator, ' (', compile(node.argument), ')'])
     } else {
       return sourceNode(node.loc, [node.operator, '(', compile(node.argument), ')'])

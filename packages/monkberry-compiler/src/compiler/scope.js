@@ -105,6 +105,13 @@ class Scope {
     this.template.addSpot(spot)
     this.spots.push(code)
   }
+
+  has(variable) {
+    if (!this.vars.has(variable)) {
+      return this.parent ? this.parent.has(variable) : false
+    }
+    return true
+  }
 }
 
 module.exports = Scope

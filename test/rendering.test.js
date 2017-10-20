@@ -23,3 +23,7 @@ test('nested loops', t => {
     ]
   })))
 })
+
+test('expression', t => {
+  t.snapshot(renderToString($.expressions({name: 'Alyona'})))
+})
