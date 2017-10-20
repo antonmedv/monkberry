@@ -9,9 +9,11 @@ module.exports = {
     const children = node.children.map(child => compile(child))
 
     for (let child of children) {
-      scope.template.construct(
-        source`${node.reference}.appendChild(${child})`
-      )
+      if (child) {
+        scope.template.construct(
+          source`${node.reference}.appendChild(${child})`
+        )
+      }
     }
 
     node.attributes.map(attr => compile(attr))

@@ -1,6 +1,5 @@
 const { ast } =require( '../parser')
 const { sourceNode } =require( './sourceNode')
-const { collectVariables } =require( './variable')
 const { esc, arrayToObject } =require( '../utils')
 
 /**

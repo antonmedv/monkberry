@@ -1,5 +1,4 @@
 const { sourceNode } =require( './sourceNode')
-const { collectVariables } =require( './variable')
 const { isSingleChild, unique, notNull, getTemplateName } =require( '../utils')
 const { compileToExpression } =require( './attribute')
 const { Figure } =require( '../figure')

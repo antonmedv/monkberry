@@ -1,5 +1,4 @@
 const { sourceNode } =require( './sourceNode')
-const { collectVariables } =require( './variable')
 const { isSingleChild } =require( '../utils')
 
 module.exports = {
