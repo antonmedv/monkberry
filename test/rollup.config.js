@@ -1,9 +1,10 @@
 const monkberry = require('monkberry-rollup')
+const path = require('path')
 
 module.exports = {
-  input: './views/index.js',
+  input: path.join(__dirname, '/views/index.js'),
   output: {
-    file: './_build.js',
+    file: path.join(__dirname, '/_build.js'),
     format: 'cjs'
   },
   plugins: [

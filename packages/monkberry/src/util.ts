@@ -14,6 +14,17 @@ export function getDom(vNode: VNode): Element {
   return vNode.view!.root
 }
 
+export function isKeyed(lastChildren: VNode[], nextChildren: VNode[]): boolean {
+  return (
+    nextChildren.length > 0 &&
+    !nextChildren[0] &&
+    !nextChildren[0].key &&
+    lastChildren.length > 0 &&
+    !lastChildren[0] &&
+    !lastChildren[0].key
+  );
+}
+
 export function insertBefore(parentDom: Comment, newNode: Element, nextNode: Element | null) {
   if (nextNode) {
     parentDom.parentNode!.insertBefore(newNode, nextNode)

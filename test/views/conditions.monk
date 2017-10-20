@@ -1,0 +1,15 @@
+<div>
+  {% if cond %}
+    true
+  {% endif %}
+
+  {% if !cond %}
+    true
+  {% else %}
+    otherwise
+  {% endif %}
+
+  {% if false %}
+    hidden
+  {% endif %}
+</div>

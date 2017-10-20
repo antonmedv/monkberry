@@ -1,0 +1,7 @@
+<div>
+  {% for line of map %}
+    {% for value of line %}
+      {{ value }}
+    {% endfor %}
+  {% endfor %}
+</div>

@@ -6,7 +6,7 @@ const Template = require('./template')
 class Scope {
   constructor(parent = null) {
     this.parent = parent
-    this.expr = _ => _
+    this.spots = []
     this.children = []
     this.imports = []
     this.template = new Template()
@@ -19,22 +19,32 @@ class Scope {
     return sourceNode([
       `{`,
       `type: ${this.template.name},`,
-      this.currentProps.size > 0
-        ? `props: Object.assign({}, props, {${join([...this.currentProps], ', ')}})`
-        : `props,`,
-      this.children.length > 0 ? `spots: [${this.renderChildren()}],` : ``,
+      this.renderProps(),
+      this.renderSpots(),
       `}`
     ])
   }
 
-  renderChildren() {
-    return this.children.map(scope => sourceNode([
-      `{`,
-      `keyed: false,`,
-      `children:`,
-      scope.expr(scope.render()),
-      `}`
-    ]))
+  renderProps() {
+    if (this.currentProps.size > 0) {
+      return sourceNode([
+        `props: Object.assign({}, props, {${join([...this.currentProps], ', ')}}),`
+      ])
+    } else {
+      return sourceNode(`props,`)
+    }
+  }
+
+  renderSpots() {
+    if (this.spots.length > 0) {
+      return sourceNode([
+        `spots: [`,
+        join(this.spots, ',\n'),
+        `],`
+      ])
+    } else {
+      return sourceNode(``)
+    }
   }
 
   create() {
@@ -83,17 +93,17 @@ class Scope {
     }
   }
 
-  addSpot(spot, fn) {
-    this.parent.template.addSpot(spot)
-    this.expr = fn
-  }
-
   addCurrentProps(...props) {
     for (let prop of props) {
       if (prop) {
         this.currentProps.add(prop)
       }
     }
+  }
+
+  addSpot(spot, code) {
+    this.template.addSpot(spot)
+    this.spots.push(code)
   }
 }
 

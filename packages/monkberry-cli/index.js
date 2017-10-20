@@ -6,8 +6,7 @@ const prettier = require('prettier')
 const PrettyError = require('pretty-error')
 const columnify = require('columnify')
 const upperCamelCase = require('uppercamelcase')
-const parser = require('monkberry-compiler/src/parser')
-const compile = require('monkberry-compiler/src/compiler')
+const {compile, parser} = require('monkberry-compiler')
 
 exports.render = function (options, emitter) {
   const destination = options.dest
@@ -102,10 +101,8 @@ exports.render = function (options, emitter) {
         code: JSON.stringify(ast, (key, value) => key === 'loc' ? void 0 : value, 2) + '\n'
       }
     } else {
-      const ast = parser.parse(sourcePath, code)
-      const node = compile(ast, {
-        name: filename && upperCamelCase(filename.replace(/\.monk$/, ''))
-      })
+
+      const node = compile(sourcePath, code)
 
       if (sourceMap) {
         node.add(`\n//# sourceMappingURL=${sourceMapPath}\n`)

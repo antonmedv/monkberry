@@ -18,14 +18,16 @@ class Template {
   render() {
     const s = sourceNode(`function ${this.name}() {`)
 
-    s.add([
-      `  const  
+    if (this.declarations.length > 0) {
+      s.add([
+        `  const  
       `,
-      join(this.declarations, ','),
-      `;
+        join(this.declarations, ','),
+        `;
       
       `
-    ])
+      ])
+    }
 
     s.add(
       join(this.constructions, '\n')

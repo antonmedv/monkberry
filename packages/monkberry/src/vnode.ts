@@ -12,10 +12,7 @@ export interface VNode {
 
 export type Ref = (node: Element | null) => void;
 
-export interface Spot {
-  keyed: boolean
-  children: VNode[]
-}
+export type Spot = VNode[]
 
 export interface View {
   root: Element,

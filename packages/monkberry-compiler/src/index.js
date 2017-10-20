@@ -23,4 +23,4 @@ function compile(file, code, options = {}) {
   return doCompile(ast, {globals})
 }
 
-module.exports = {compile}
+module.exports = {compile, parser}

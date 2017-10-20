@@ -26,13 +26,15 @@ export function mount(vNode: VNode, parentDom: Element | Comment | null): Elemen
 
 export function mountSpots(vSpots: Spot[], spots: Comment[]) {
   for (let i = 0, len = vSpots.length; i < len; i++) {
-    mountChildren(vSpots[i].children, spots[i])
+    mountChildren(vSpots[i], spots[i])
   }
 }
 
 export function mountChildren(children: VNode[], parentDom: Comment) {
   for (let child of children) {
-    mount(child, parentDom)
+    if (child) {
+      mount(child, parentDom)
+    }
   }
 }
 

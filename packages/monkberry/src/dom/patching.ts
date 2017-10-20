@@ -1,6 +1,6 @@
 import {Spot, VNode} from '../vnode'
 import {mount, mountChildren, unmount, unmountChildren} from './mounting'
-import {assert, getDom, insertBefore, replaceWithNewNode} from '../util'
+import {assert, getDom, insertBefore, isKeyed, replaceWithNewNode} from '../util'
 
 export function patch(lastVNode: VNode, nextVNode: VNode, parentDom: Element | Comment) {
   patchElement(lastVNode, nextVNode, parentDom)
@@ -47,18 +47,16 @@ export function patchElement(lastVNode: VNode, nextVNode: VNode, parentDom: Elem
 
 function patchSpot(lastSpot: Spot[], nextSpot: Spot[], spots: Comment[]) {
   for (let i = 0, len = lastSpot.length; i < len; i++) {
-    if (lastSpot[i].children !== nextSpot[i].children) {
+    if (lastSpot[i] !== nextSpot[i]) {
       patchChildren(lastSpot[i], nextSpot[i], spots[i])
     }
   }
 }
 
-function patchChildren(lastSpot: Spot, nextSpot: Spot, parentDom: Comment) {
-  const lastChildren = lastSpot.children
-  const nextChildren = nextSpot.children
+function patchChildren(lastChildren: VNode[], nextChildren: VNode[], parentDom: Comment) {
   const lastLength = lastChildren.length
   const nextLength = nextChildren.length
-  const patchKeyed = lastSpot.keyed && nextSpot.keyed
+  const patchKeyed = isKeyed(lastChildren, nextChildren)
 
   if (lastLength === 0) {
     if (nextLength > 0) {

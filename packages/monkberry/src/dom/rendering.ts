@@ -11,7 +11,6 @@ const roots: Root[] = []
 
 export function render(input: VNode, parentDom: Element) {
   const root = getRoot(parentDom)
-  normalize(input) // TODO: remove normalization
   if (root) {
     patch(
       root.input,
@@ -22,14 +21,6 @@ export function render(input: VNode, parentDom: Element) {
   } else {
     mount(input, parentDom)
     setRoot(parentDom, input)
-  }
-}
-
-function normalize(input: VNode) {
-  if (input.spots) {
-    for (let spot of input.spots) {
-      spot.children = spot.children.filter(child => child)
-    }
   }
 }
 
