@@ -2,6 +2,6 @@ import test from 'ava'
 import {renderToString} from './helpers/render-to-string'
 import * as $ from './_build'
 
-test('foo', t => {
+test('hello world', t => {
   t.snapshot(renderToString($.helloWorld()))
 })

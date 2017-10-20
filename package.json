@@ -2,8 +2,8 @@
   "private": true,
   "scripts": {
     "test": "ava test/*.test.js",
-    "build": "lerna exec npm run build",
-    "start": "lerna exec npm run watch",
+    "build": "lerna exec -- npm run build",
+    "start": "lerna exec -- npm run watch",
     "bootstrap": "lerna bootstrap"
   },
   "ava": {
@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "ava": "^0.22.0",
+    "babel-preset-es2017": "^6.24.1",
     "browser-env": "^3.2.1",
     "dedent": "^0.7.0",
     "gzip-size": "^4.0.0",

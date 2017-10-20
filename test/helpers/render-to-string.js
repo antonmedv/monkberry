@@ -1,37 +1,50 @@
 import {render} from 'monkberry'
-import indent from 'indent-string'
+import indentString from 'indent-string'
+
+export const print = createPrint(true)
+export const print2 = createPrint(false)
 
 export function renderToString(vNode) {
   const root = document.createElement('div')
 
   render(vNode, root)
 
-  return Array.from(root.children).map(print).join('\n')
+  return print2(root)
 }
 
-function print(node) {
-  switch (node.nodeType) {
+function createPrint(oneline = true) {
+  const eol = oneline ? '' : '\n'
+  const indent = oneline ? x => x : indentString
 
-    case Node.ELEMENT_NODE:
-      const tag = node.nodeName.toLowerCase()
-      const attrs = Array.from(node.attributes)
-        .map(attr => `${attr.name}="${attr.value}"`)
-        .join(' ')
+  const print = (node) => {
+    switch (node.nodeType) {
 
-      let html = `<${tag}${attrs}>\n`
+      case Node.ELEMENT_NODE:
+        const tag = node.nodeName.toLowerCase()
+        const attrs = Array.from(node.attributes)
+          .map(attr => `${attr.name}="${attr.value}"`)
+          .join(' ')
 
-      node = node.firstChild
-      while (node) {
-        html += indent(print(node), 2)
-        node = node.nextSibling
-      }
+        let html = `<${tag}${attrs}>${eol}`
 
-      html += `</${tag}>\n`
+        node = node.firstChild
+        while (node) {
+          html += indent(print(node), 2)
+          node = node.nextSibling
+        }
 
-      return html
+        html += `</${tag}>${eol}`
 
-    case Node.TEXT_NODE:
-      return `${node.textContent}\n`
+        return html
 
+      case Node.TEXT_NODE:
+        return `${node.textContent}${eol}`
+
+      case Node.COMMENT_NODE:
+        return `<!-- ${node.textContent} -->${eol}`
+
+    }
   }
+
+  return (node) => Array.from(node.children).map(print).join('\n')
 }

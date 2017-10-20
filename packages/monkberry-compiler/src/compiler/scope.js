@@ -19,7 +19,9 @@ class Scope {
     return sourceNode([
       `{`,
       `type: ${this.template.name},`,
-      this.currentProps.size > 0 ? `props: {...props, ${join([...this.currentProps], ', ')}}` : `props,`,
+      this.currentProps.size > 0
+        ? `props: Object.assign({}, props, {${join([...this.currentProps], ', ')}})`
+        : `props,`,
       this.children.length > 0 ? `spots: [${this.renderChildren()}],` : ``,
       `}`
     ])

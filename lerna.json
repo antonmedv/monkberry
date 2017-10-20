@@ -1,8 +1,13 @@
 {
   "lerna": "2.2.0",
+  "version": "5.0.0",
   "packages": [
     "packages/*",
     "test"
   ],
-  "version": "5.0.0"
+  "command": {
+    "exec": {
+      "parallel": true
+    }
+  }
 }

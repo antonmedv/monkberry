@@ -1,28 +1,26 @@
 const parser = require('./parser')
-const compile = require('./compiler')
+const doCompile = require('./compiler')
+const whitespace = require('./transform/whitespace')
+const entity = require('./transform/entity')
 
-class Compiler {
-  constructor(options = {}) {
-    this.transforms = [/*whitespace, entity*/]
-    this.globals = []
-  }
+function compile(file, code, options = {}) {
+  const transforms = [whitespace, entity]
+  const globals = [
+    'window',
+    'Array',
+    'Object',
+    'Math',
+    'JSON'
+  ].concat(options.globals || [])
 
-  compile(filename, code) {
-    let ast = parser.parse(filename, code)
+  // Parse
+  let ast = parser.parse(file, code)
 
-    // Modify ast
-    this.transforms.forEach(transform => transform(ast))
+  // Modify ast
+  transforms.forEach(transform => transform(ast))
 
-    const globals = [
-      'window',
-      'Array',
-      'Object',
-      'Math',
-      'JSON'
-    ].concat(this.globals)
-
-    return compile(ast, {globals})
-  }
+  // Compile
+  return doCompile(ast, {globals})
 }
 
-module.exports = Compiler
+module.exports = {compile}

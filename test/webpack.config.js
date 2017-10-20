@@ -3,10 +3,9 @@ const path = require('path')
 module.exports = {
   entry: path.join(__dirname, '/views/index.js'),
   output: {
-    path: path.resolve(__dirname, '_build'),
-    filename: 'index.js',
-    library: 'views',
-    libraryTarget: 'umd'
+    path: __dirname,
+    filename: '_build.js',
+    libraryTarget: 'commonjs'
   },
   module: {
     rules: [

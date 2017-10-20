@@ -1,15 +1,15 @@
-import {visit} from '../compiler/visitor';
+const visit = require('../compiler/visitor')
 
-export function entity(ast) {
+module.exports = function entity(ast) {
   visit(ast, {
     Text: (node) => {
-      replaceEntities(node);
+      replaceEntities(node)
     }
-  });
+  })
 }
 
 function replaceEntities(node) {
-  node.text = node.text.replace(/&(\w+);/g, (_, name) => name in ENTITIES ? String.fromCharCode(ENTITIES[name]) : `&${name};`);
+  node.text = node.text.replace(/&(\w+);/g, (_, name) => name in ENTITIES ? String.fromCharCode(ENTITIES[name]) : `&${name};`)
 }
 
 const ENTITIES = {
@@ -266,4 +266,4 @@ const ENTITIES = {
   'clubs': 9827,
   'hearts': 9829,
   'diams': 9830
-};
+}

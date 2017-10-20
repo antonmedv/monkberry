@@ -1,10 +1,11 @@
 {
-  "private": true,
   "scripts": {
-    "build": "webpack"
+    "build": "rollup -c",
+    "watch": "rollup -c -w"
   },
   "dependencies": {
     "monkberry": "^5.0.0",
-    "monkberry-loader": "^5.0.0"
+    "monkberry-loader": "^5.0.0",
+    "monkberry-rollup": "^5.0.0"
   }
 }

@@ -1,0 +1,5 @@
+<ul>
+  {% for key, value of list %}
+    <li>{{ value }}</li>
+  {% endfor %}
+</ul>
