@@ -1,7 +1,13 @@
-<div>
-  {% for line of map %}
-    {% for value of line %}
-      {{ value }}
-    {% endfor %}
+<section>
+  <h1>Section</h1>
+  {% for i, line of map %}
+    <article>
+      <h2>Title {{ i + 1 }}</h2>
+      {% for value of line %}
+        <p>
+          {{ value }}
+        </p>
+      {% endfor %}
+    </article>
   {% endfor %}
-</div>
+</section>
