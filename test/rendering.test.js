@@ -7,5 +7,5 @@ test('hello world', t => {
 })
 
 test('loop sibling', t => {
-  t.is(renderToString($.loopSibling()))
+  t.snapshot(renderToString($.loopSibling()))
 })
