@@ -154,7 +154,7 @@ AttributeText [^\"{]+
 <expr>"..."                        return "...";
 
 <comment>"-->"                     this.popState(); return "-->";
-<comment>((?!\-\-\>).)*            return "COMMENT";
+<comment>((?!\-\-\>)(.|$|\r\n|\r|\n))*  return "COMMENT";
 
 <<EOF>>                            return "EOF";
 
