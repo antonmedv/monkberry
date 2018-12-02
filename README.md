@@ -43,6 +43,10 @@ view.update({todos: [...]});
 * Custom tags
 * Blazingly fast (only necessary dom updates)
 
+<a href="https://www.patreon.com/antonmedv">
+	<img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160">
+</a>
+
 ## Documentation
 
 Documentation available on [monkberry.js.org](http://monkberry.js.org) site.
