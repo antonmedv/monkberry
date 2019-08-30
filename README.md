@@ -69,6 +69,12 @@ npm run watch
 testem
 ```
 
+Alternatively You can also use Gitpod ( a free online IDE that will automate your dev setup ) with a single click. It will launch a ready to code workspace with the dependencies pre-installed and build command running in watch mode.
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/antonmedv/monkberry)
+
+
+
 ## Plugins
 
 * [Atom Package](https://atom.io/packages/language-monkberry)
